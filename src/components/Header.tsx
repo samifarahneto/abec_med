@@ -80,8 +80,9 @@ export default function Header() {
       <div className="relative">
         {/* Header Fixo */}
         <header className="fixed top-0 left-0 right-0 bg-white shadow-md z-50">
-          <nav className="w-full px-[150px]">
+          <nav className="w-full md:px-[150px]">
             <div className="flex justify-between h-16">
+              {/* Menu Button */}
               <div className="flex items-center">
                 <button
                   onClick={() => setIsMenuOpen(!isMenuOpen)}
@@ -106,6 +107,8 @@ export default function Header() {
                   </svg>
                 </button>
               </div>
+
+              {/* Logo */}
               <div className="flex items-center">
                 <Link href="/">
                   <Image
@@ -114,23 +117,13 @@ export default function Header() {
                     width={200}
                     height={40}
                     priority
+                    className="w-[150px] sm:w-[200px]"
                   />
                 </Link>
               </div>
-              <div className="flex items-center space-x-4">
-                <span className="text-sm font-medium text-gray-700">
-                  {session.user.name}
-                </span>
-                <span className="text-xs bg-[#16829E] text-white px-2 py-1 rounded-full">
-                  {session.user.role}
-                </span>
-                <button
-                  onClick={() => signOut({ callbackUrl: "/" })}
-                  className="text-gray-500 hover:text-[#16829E] text-sm font-medium"
-                >
-                  Sair
-                </button>
-              </div>
+
+              {/* Espaço reservado para alinhamento */}
+              <div className="w-6" />
             </div>
           </nav>
         </header>
@@ -173,6 +166,18 @@ export default function Header() {
               </button>
             </div>
 
+            {/* Informações do Usuário */}
+            <div className="p-4 border-b">
+              <div className="flex flex-col items-center space-y-2">
+                <span className="text-lg font-medium text-gray-700">
+                  {session.user.name}
+                </span>
+                <span className="text-xs bg-[#16829E] text-white px-2 py-1 rounded-full">
+                  {session.user.role}
+                </span>
+              </div>
+            </div>
+
             {/* Links de Navegação */}
             <nav className="flex-1 p-4 overflow-y-auto">
               <ul className="space-y-2">
@@ -193,19 +198,29 @@ export default function Header() {
                 ))}
               </ul>
             </nav>
+
+            {/* Botão Sair */}
+            <div className="p-4 border-t">
+              <button
+                onClick={() => signOut({ callbackUrl: "/" })}
+                className="w-full text-center text-gray-500 hover:text-[#16829E] text-sm font-medium py-2"
+              >
+                Sair
+              </button>
+            </div>
           </div>
         </aside>
 
         {/* Overlay para fechar o menu */}
         {isMenuOpen && (
           <div
-            className="fixed inset-0 bg-black bg-opacity-50 z-30 lg:hidden"
+            className="fixed inset-0 bg-black bg-opacity-50 z-30 md:hidden"
             onClick={() => setIsMenuOpen(false)}
           />
         )}
 
         {/* Conteúdo Principal */}
-        <main className="pt-16 lg:pl-64">
+        <main className="pt-16 md:pl-64">
           {/* Aqui será renderizado o conteúdo da página */}
         </main>
       </div>
@@ -215,24 +230,47 @@ export default function Header() {
   // Header para usuários não autenticados
   return (
     <header className="bg-white shadow-md">
-      <nav className="w-full px-[150px]">
+      <nav className="w-full">
         <div className="flex justify-between h-16">
-          <div className="flex">
-            <div className="flex-shrink-0 flex items-center">
-              <Link href="/">
-                <Image
-                  src="/images/logo.png"
-                  alt="ABEC Med"
-                  width={200}
-                  height={40}
-                  priority
+          <div className="flex items-center">
+            <Link href="/">
+              <Image
+                src="/images/logo.png"
+                alt="ABEC Med"
+                width={200}
+                height={40}
+                priority
+                className="w-[150px] sm:w-[200px]"
+              />
+            </Link>
+          </div>
+
+          {/* Menu Mobile */}
+          <div className="flex items-center sm:hidden">
+            <button
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+              className="p-2 rounded-md text-gray-500 hover:text-[#16829E] hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-[#16829E]"
+            >
+              <span className="sr-only">Abrir menu principal</span>
+              <svg
+                className="h-6 w-6"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M4 6h16M4 12h16M4 18h16"
                 />
-              </Link>
-            </div>
+              </svg>
+            </button>
           </div>
 
           {/* Menu Desktop */}
-          <div className="hidden sm:ml-6 sm:flex sm:items-center sm:space-x-8">
+          <div className="hidden sm:flex sm:items-center sm:space-x-8">
             {unauthenticatedLinks.map((link) => (
               <Link
                 key={link.href}
@@ -247,54 +285,13 @@ export default function Header() {
               </Link>
             ))}
           </div>
-
-          {/* Botão do menu mobile */}
-          <div className="flex items-center sm:hidden">
-            <button
-              onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-[#16829E] hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-[#16829E]"
-            >
-              <span className="sr-only">Abrir menu principal</span>
-              {!isMenuOpen ? (
-                <svg
-                  className="block h-6 w-6"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M4 6h16M4 12h16M4 18h16"
-                  />
-                </svg>
-              ) : (
-                <svg
-                  className="block h-6 w-6"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M6 18L18 6M6 6l12 12"
-                  />
-                </svg>
-              )}
-            </button>
-          </div>
         </div>
       </nav>
 
-      {/* Menu Mobile */}
+      {/* Menu Mobile Aberto */}
       {isMenuOpen && (
         <div className="sm:hidden">
-          <div className="pt-2 pb-3 space-y-1">
+          <div className="space-y-1">
             {unauthenticatedLinks.map((link) => (
               <Link
                 key={link.href}
@@ -303,7 +300,7 @@ export default function Header() {
                   isActive(link.href)
                     ? "bg-[#16829E] text-white"
                     : "text-gray-500 hover:bg-gray-50 hover:text-[#16829E]"
-                } block px-3 py-2 rounded-md text-base font-medium`}
+                } block px-3 py-2 text-base font-medium`}
                 onClick={() => setIsMenuOpen(false)}
               >
                 {link.label}
