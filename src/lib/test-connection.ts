@@ -1,28 +1,23 @@
-import clientPromise from "@/lib/mongodb";
+import { connectToDatabase } from "@/lib/mongodb";
 
-interface DatabaseInfo {
-  name: string;
-  sizeOnDisk?: number;
-  empty?: boolean;
-}
-
-async function testConnection() {
+export async function testConnection() {
   try {
-    const client = await clientPromise;
-    const db = client.db();
+    const { db } = await connectToDatabase();
 
-    // Testa a conexão listando os bancos de dados
-    const dbs = await db.admin().listDatabases();
-    console.log("Conexão com MongoDB estabelecida com sucesso!");
-    console.log(
-      "Bancos de dados disponíveis:",
-      dbs.databases.map((db: DatabaseInfo) => db.name)
-    );
+    // Testa a conexão listando as coleções do banco de dados
+    const collections = await db.listCollections().toArray();
 
-    return true;
+    return {
+      success: true,
+      message: "Conexão com MongoDB estabelecida com sucesso",
+      collections: collections.map((col) => col.name),
+    };
   } catch (error) {
     console.error("Erro ao conectar com MongoDB:", error);
-    return false;
+    return {
+      success: false,
+      message: "Erro ao conectar com MongoDB",
+    };
   }
 }
 

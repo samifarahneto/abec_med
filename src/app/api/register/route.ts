@@ -6,6 +6,7 @@ export async function POST(request: Request) {
   try {
     const { name, email, password, role } = await request.json();
 
+    // Validações básicas
     if (!name || !email || !password || !role) {
       return NextResponse.json(
         { message: "Todos os campos são obrigatórios" },
@@ -13,6 +14,16 @@ export async function POST(request: Request) {
       );
     }
 
+    // Validar tipo de usuário
+    const validRoles = ["patient", "doctor", "reception", "admin"];
+    if (!validRoles.includes(role)) {
+      return NextResponse.json(
+        { message: "Tipo de usuário inválido" },
+        { status: 400 }
+      );
+    }
+
+    // Conectar ao banco de dados
     const { db } = await connectToDatabase();
 
     // Verificar se o email já existe
@@ -45,23 +56,9 @@ export async function POST(request: Request) {
       { status: 201 }
     );
   } catch (error) {
-    console.error("Erro ao criar usuário:", error);
+    console.error("Erro ao registrar usuário:", error);
     return NextResponse.json(
       { message: "Erro ao processar o registro" },
-      { status: 500 }
-    );
-  }
-}
-
-export async function GET() {
-  try {
-    const { db } = await connectToDatabase();
-    const users = await db.collection("users").find({}).toArray();
-    return NextResponse.json(users);
-  } catch (error) {
-    console.error("Erro ao buscar usuários:", error);
-    return NextResponse.json(
-      { message: "Erro ao buscar usuários" },
       { status: 500 }
     );
   }

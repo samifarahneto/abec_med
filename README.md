@@ -10,6 +10,7 @@ Este é um projeto desenvolvido com [Next.js](https://nextjs.org) e [Tailwind CS
 - [React](https://react.dev) - Biblioteca JavaScript para interfaces
 - [MongoDB](https://www.mongodb.com) - Banco de dados NoSQL
 - [NextAuth.js](https://next-auth.js.org) - Autenticação para Next.js
+- [bcryptjs](https://www.npmjs.com/package/bcryptjs) - Criptografia de senhas
 
 ## 📋 Estrutura do Projeto
 
@@ -19,9 +20,12 @@ abec_med/
 │   ├── app/
 │   │   ├── layout.tsx        # Layout principal da aplicação
 │   │   ├── page.tsx          # Página inicial
+│   │   ├── login/            # Página de login
 │   │   ├── globals.css       # Estilos globais
 │   │   ├── api/              # Rotas da API
-│   │   │   └── auth/         # Rotas de autenticação
+│   │   │   ├── auth/         # Rotas de autenticação
+│   │   │   ├── setup/        # Configuração inicial
+│   │   │   └── users/        # Gerenciamento de usuários
 │   │   └── (rotas futuras)   # Outras páginas do site
 │   ├── components/
 │   │   ├── Header.tsx        # Componente de cabeçalho responsivo
@@ -30,36 +34,76 @@ abec_med/
 │   ├── lib/
 │   │   ├── mongodb.ts        # Conexão com MongoDB
 │   │   └── auth.ts           # Configuração de autenticação
+│   ├── models/
+│   │   └── User.ts           # Modelo de usuário
+│   ├── providers/
+│   │   └── AuthProvider.tsx  # Provedor de autenticação
 │   └── types/
-│       └── user.ts           # Tipos para usuários e perfis
+│       └── next-auth.d.ts    # Tipos para NextAuth
 ├── public/                    # Arquivos estáticos
 ├── tailwind.config.js         # Configuração do Tailwind CSS
 └── package.json               # Dependências do projeto
 ```
 
-## 👥 Perfis de Usuário
+## 🔐 Autenticação e Autorização
 
-### Estrutura de Dados no MongoDB
+### Endpoints da API
 
-```typescript
-interface User {
-  _id: string;
-  email: string;
-  name: string;
-  role: "admin" | "medico" | "paciente" | "secretaria";
-  profile: {
-    crm?: string; // Apenas para médicos
-    especialidade?: string; // Apenas para médicos
-    dataNascimento?: Date; // Para pacientes
-    telefone?: string;
-    endereco?: string;
-  };
-  createdAt: Date;
-  updatedAt: Date;
-}
-```
+1. **Configuração Inicial**
 
-### Permissões e Acessos
+   ```
+   POST /api/setup
+   ```
+
+   Cria o primeiro usuário administrador do sistema.
+
+   Corpo da requisição:
+
+   ```json
+   {
+     "name": "Administrador",
+     "email": "admin@abecmed.com",
+     "password": "admin123"
+   }
+   ```
+
+2. **Gerenciamento de Usuários**
+
+   ```
+   POST /api/users
+   ```
+
+   Cria um novo usuário.
+
+   ```
+   GET /api/users
+   ```
+
+   Lista todos os usuários.
+
+3. **Autenticação**
+
+   ```
+   POST /api/auth/signin
+   ```
+
+   Realiza o login do usuário.
+
+   ```
+   POST /api/auth/signout
+   ```
+
+   Realiza o logout do usuário.
+
+### Estrutura de Autenticação
+
+- Login com email/senha
+- Senhas criptografadas com bcryptjs
+- Sessões JWT
+- Proteção de rotas por perfil
+- Middleware de autorização
+
+### Perfis de Usuário
 
 1. **Administrador**
 
@@ -74,66 +118,11 @@ interface User {
    - Prontuários médicos
    - Prescrições
 
-3. **Paciente**
-
-   - Agendamento de consultas
-   - Visualização de histórico
-   - Acesso a exames
-   - Comunicação com médicos
-
-4. **Secretária**
+3. **Secretária**
    - Agendamento de consultas
    - Cadastro de pacientes
    - Gerenciamento de horários
    - Controle de pagamentos
-
-## 🔐 Autenticação e Autorização
-
-### Estrutura de Autenticação
-
-- Login com email/senha
-- Recuperação de senha
-- Sessões seguras
-- Proteção de rotas por perfil
-
-### Middleware de Autorização
-
-```typescript
-import { withAuth } from "next-auth/middleware";
-import { NextResponse } from "next/server";
-
-export default withAuth(
-  function middleware(req) {
-    const token = req.nextauth.token;
-    const { pathname } = req.nextUrl;
-
-    // Verifica se o usuário tem acesso à rota baseado no seu perfil
-    if (pathname.startsWith("/admin") && token?.role !== "admin") {
-      return NextResponse.redirect(new URL("/acesso-negado", req.url));
-    }
-    if (pathname.startsWith("/medico") && token?.role !== "medico") {
-      return NextResponse.redirect(new URL("/acesso-negado", req.url));
-    }
-    // ... outras verificações
-
-    return NextResponse.next();
-  },
-  {
-    callbacks: {
-      authorized: ({ token }) => !!token,
-    },
-  }
-);
-
-export const config = {
-  matcher: [
-    "/admin/:path*",
-    "/medico/:path*",
-    "/paciente/:path*",
-    "/secretaria/:path*",
-  ],
-};
-```
 
 ## 🎨 Design System
 
@@ -141,6 +130,7 @@ export const config = {
 
 - Azul Principal: `#16829E`
 - Branco: `#FFFFFF`
+- Indigo (Botões): `#4F46E5`
 
 ### Breakpoints
 
@@ -151,6 +141,13 @@ export const config = {
 - Desktop Grande: `1536px`
 
 ## 🛠️ Funcionalidades Implementadas
+
+### Autenticação
+
+- Login com email/senha
+- Proteção de rotas
+- Diferentes níveis de acesso
+- Sessões seguras
 
 ### Header Responsivo
 
@@ -167,14 +164,6 @@ export const config = {
 - Cards de serviços responsivos
 - Footer com informações de contato
 
-### Componentes
-
-- Header compartilhado entre todas as páginas
-- Cards de serviços com hover effects
-- Seção de contato responsiva
-- Links para redes sociais
-- Componentes específicos por perfil
-
 ## 🚀 Como Executar
 
 1. Clone o repositório:
@@ -186,7 +175,7 @@ git clone [url-do-repositorio]
 2. Instale as dependências:
 
 ```bash
-npm install mongodb mongoose next-auth
+npm install
 ```
 
 3. Configure as variáveis de ambiente:
@@ -196,15 +185,21 @@ cp .env.example .env.local
 # Edite o .env.local com suas configurações
 ```
 
-4. Inicie o servidor de desenvolvimento:
+4. Crie o usuário administrador inicial:
+
+```bash
+curl -X POST http://localhost:3000/api/setup \
+  -H "Content-Type: application/json" \
+  -d '{"name":"Administrador","email":"admin@abecmed.com","password":"admin123"}'
+```
+
+5. Inicie o servidor de desenvolvimento:
 
 ```bash
 npm run dev
-# ou
-yarn dev
 ```
 
-5. Acesse [http://localhost:3000](http://localhost:3000) no seu navegador
+6. Acesse [http://localhost:3000](http://localhost:3000) no seu navegador
 
 ## 📱 Responsividade
 
@@ -217,23 +212,19 @@ O projeto foi desenvolvido seguindo a abordagem mobile-first, garantindo uma exp
 
 ## 🔧 Configurações Especiais
 
-### Tailwind CSS
+### NextAuth.js
 
-- Configuração personalizada de breakpoints
-- Cores personalizadas
-- Utilitários para responsividade
-
-### Next.js
-
-- Otimização de imagens
-- Roteamento dinâmico
-- Renderização híbrida (SSR/CSR)
+- Autenticação por credenciais
+- Sessões JWT
+- Callbacks personalizados
+- Páginas de login personalizadas
 
 ### MongoDB
 
-- Schemas para diferentes perfis
+- Conexão otimizada
+- Cache de conexão
+- Schemas tipados
 - Índices otimizados
-- Queries eficientes
 
 ## 🤝 Contribuição
 
@@ -249,10 +240,10 @@ Este projeto está sob a licença MIT. Veja o arquivo [LICENSE](LICENSE) para ma
 
 ## ✨ Próximos Passos
 
+- [x] Implementar sistema de autenticação
 - [ ] Implementar página de serviços
 - [ ] Implementar página de contato
 - [ ] Adicionar formulário de agendamento
-- [ ] Implementar sistema de autenticação
 - [ ] Adicionar área do paciente
 - [ ] Implementar dashboard para médicos
 - [ ] Criar sistema de prontuários

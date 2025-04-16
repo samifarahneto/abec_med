@@ -1,42 +1,36 @@
-import mongoose from "mongoose";
+import { MongoClient } from "mongodb";
 
-const MONGODB_URI = process.env.MONGODB_URI;
-
-if (!MONGODB_URI) {
-  throw new Error("Por favor, defina a variável de ambiente MONGODB_URI");
+if (!process.env.MONGODB_URI) {
+  throw new Error('Invalid/Missing environment variable: "MONGODB_URI"');
 }
 
-const cached: {
-  conn: typeof mongoose | null;
-  promise: Promise<typeof mongoose> | null;
-} = {
-  conn: null,
-  promise: null,
-};
+const uri = process.env.MONGODB_URI;
+const options = {};
 
-async function connectDB() {
-  if (cached.conn) {
-    return cached.conn;
+let client;
+let clientPromise: Promise<MongoClient>;
+
+if (process.env.NODE_ENV === "development") {
+  // Em desenvolvimento, use uma variável global para preservar o valor
+  // entre recarregamentos de módulo causados pelo HMR (Hot Module Replacement).
+  const globalWithMongo = global as typeof globalThis & {
+    _mongoClientPromise?: Promise<MongoClient>;
+  };
+
+  if (!globalWithMongo._mongoClientPromise) {
+    client = new MongoClient(uri, options);
+    globalWithMongo._mongoClientPromise = client.connect();
   }
-
-  if (!cached.promise) {
-    const opts = {
-      bufferCommands: false,
-    };
-
-    cached.promise = mongoose.connect(MONGODB_URI!, opts).then((mongoose) => {
-      return mongoose;
-    });
-  }
-
-  try {
-    cached.conn = await cached.promise;
-  } catch (e) {
-    cached.promise = null;
-    throw e;
-  }
-
-  return cached.conn;
+  clientPromise = globalWithMongo._mongoClientPromise;
+} else {
+  // Em produção, é melhor não usar uma variável global.
+  client = new MongoClient(uri, options);
+  clientPromise = client.connect();
 }
 
-export default connectDB;
+// Exporte uma função que conecta ao banco de dados
+export async function connectToDatabase() {
+  const client = await clientPromise;
+  const db = client.db(process.env.MONGODB_DB || "abecmed");
+  return { client, db };
+}

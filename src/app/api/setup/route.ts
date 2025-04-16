@@ -4,9 +4,10 @@ import bcrypt from "bcryptjs";
 
 export async function POST(request: Request) {
   try {
-    const { name, email, password, role } = await request.json();
+    const { name, email, password } = await request.json();
 
-    if (!name || !email || !password || !role) {
+    // Validação básica
+    if (!name || !email || !password) {
       return NextResponse.json(
         { message: "Todos os campos são obrigatórios" },
         { status: 400 }
@@ -15,53 +16,50 @@ export async function POST(request: Request) {
 
     const { db } = await connectToDatabase();
 
-    // Verificar se o email já existe
-    const existingUser = await db.collection("users").findOne({ email });
-    if (existingUser) {
+    // Verifica se já existe algum usuário admin
+    const existingAdmin = await db
+      .collection("users")
+      .findOne({ role: "admin" });
+    if (existingAdmin) {
       return NextResponse.json(
-        { message: "Email já cadastrado" },
+        { message: "Administrador já existe" },
         { status: 400 }
       );
     }
 
-    // Criptografar a senha
+    // Verifica se o email já existe
+    const existingUser = await db.collection("users").findOne({ email });
+    if (existingUser) {
+      return NextResponse.json(
+        { error: "Este email já está cadastrado" },
+        { status: 400 }
+      );
+    }
+
+    // Criptografa a senha
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Criar o usuário
+    // Cria o usuário administrador
     const result = await db.collection("users").insertOne({
       name,
       email,
       password: hashedPassword,
-      role,
+      role: "admin",
       createdAt: new Date(),
       updatedAt: new Date(),
     });
 
     return NextResponse.json(
       {
-        message: "Usuário criado com sucesso",
+        message: "Administrador criado com sucesso",
         userId: result.insertedId,
       },
       { status: 201 }
     );
   } catch (error) {
-    console.error("Erro ao criar usuário:", error);
+    console.error("Erro ao criar administrador:", error);
     return NextResponse.json(
       { message: "Erro ao processar o registro" },
-      { status: 500 }
-    );
-  }
-}
-
-export async function GET() {
-  try {
-    const { db } = await connectToDatabase();
-    const users = await db.collection("users").find({}).toArray();
-    return NextResponse.json(users);
-  } catch (error) {
-    console.error("Erro ao buscar usuários:", error);
-    return NextResponse.json(
-      { message: "Erro ao buscar usuários" },
       { status: 500 }
     );
   }
