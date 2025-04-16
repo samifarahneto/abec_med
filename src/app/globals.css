@@ -3,8 +3,16 @@
 @tailwind utilities;
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --foreground-rgb: 0, 0, 0;
+  --background-start-rgb: 255, 255, 255;
+  --background-end-rgb: 255, 255, 255;
+  --primary-color: #16829e;
+  --secondary-color: #1e3a8a;
+  --accent-color: #10b981;
+  --white: #ffffff;
+  --gray-light: #f3f4f6;
+  --gray-medium: #9ca3af;
+  --gray-dark: #4b5563;
 }
 
 @theme inline {
@@ -16,13 +24,46 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --foreground-rgb: 255, 255, 255;
+    --background-start-rgb: 0, 0, 0;
+    --background-end-rgb: 0, 0, 0;
   }
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
+  color: rgb(var(--foreground-rgb));
+  background: rgb(var(--background-start-rgb));
   font-family: Arial, Helvetica, sans-serif;
+}
+
+@layer base {
+  h1 {
+    @apply text-3xl font-bold text-[#16829E];
+  }
+  h2 {
+    @apply text-2xl font-bold text-[#16829E];
+  }
+  h3 {
+    @apply text-xl font-bold text-[#16829E];
+  }
+  a {
+    @apply text-[#16829E] hover:text-[#1E3A8A] transition-colors duration-200;
+  }
+  input,
+  textarea,
+  select {
+    @apply border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#16829E] focus:border-transparent;
+  }
+  .btn-primary {
+    @apply bg-[#16829E] text-white hover:bg-[#1E3A8A] transition-colors duration-200 px-4 py-2 rounded-md;
+  }
+  .btn-secondary {
+    @apply bg-white text-[#16829E] border border-[#16829E] hover:bg-[#F3F4F6] transition-colors duration-200 px-4 py-2 rounded-md;
+  }
+  .card {
+    @apply bg-white rounded-lg shadow-md p-6;
+  }
+  .badge {
+    @apply bg-[#16829E] text-white text-xs px-2 py-1 rounded-full;
+  }
 }

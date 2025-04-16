@@ -4,12 +4,18 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useSession, signOut } from "next-auth/react";
+import Image from "next/image";
+
+interface LinkItem {
+  href: string;
+  label: string;
+}
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
   const pathname = usePathname();
-  const { data: session, status } = useSession();
+  const { data: session } = useSession();
 
   useEffect(() => {
     setMounted(true);
@@ -17,11 +23,8 @@ export default function Header() {
 
   const isActive = (path: string) => pathname === path;
 
-  // Links comuns para todos os perfis
-  const commonLinks = [{ href: "/", label: "Início" }];
-
   // Links específicos por perfil
-  const profileLinks = {
+  const profileLinks: Record<string, LinkItem[]> = {
     admin: [
       { href: "/admin/dashboard", label: "Dashboard" },
       { href: "/admin/usuarios", label: "Usuários" },
@@ -38,42 +41,18 @@ export default function Header() {
       { href: "/acolhimento/relatorios", label: "Relatórios" },
     ],
     patient: [
-      { href: "/paciente/consultas", label: "Minhas Consultas" },
-      { href: "/paciente/exames", label: "Meus Exames" },
-      { href: "/paciente/perfil", label: "Meu Perfil" },
+      { href: "/paciente/pedidos", label: "Pedidos" },
+      { href: "/paciente/receitas", label: "Receitas" },
+      { href: "/paciente/medicamentos", label: "Medicamentos" },
     ],
   };
 
   // Links para usuários não autenticados
   const unauthenticatedLinks = [
+    { href: "/", label: "Início" },
     { href: "/registrar", label: "Registrar-se" },
     { href: "/login", label: "Login" },
   ];
-
-  // Determina quais links mostrar baseado no perfil
-  const getLinks = () => {
-    // Durante o carregamento ou antes da montagem, mostra apenas links comuns
-    if (status === "loading" || !mounted) {
-      return commonLinks;
-    }
-
-    // Se não houver sessão, mostra links para não autenticados
-    if (!session?.user) {
-      return [...commonLinks, ...unauthenticatedLinks];
-    }
-
-    // Se houver sessão, mostra links específicos do perfil
-    const role = session.user.role;
-    if (role && profileLinks[role as keyof typeof profileLinks]) {
-      return [
-        ...commonLinks,
-        ...profileLinks[role as keyof typeof profileLinks],
-      ];
-    }
-
-    // Fallback para caso o perfil não seja reconhecido
-    return commonLinks;
-  };
 
   // Se o componente ainda não estiver montado, retorna um header vazio
   if (!mounted) {
@@ -92,21 +71,169 @@ export default function Header() {
     );
   }
 
+  // Se o usuário estiver autenticado, retorna o layout com header e sidebar controlável
+  if (session?.user) {
+    const role = session.user.role as keyof typeof profileLinks;
+    const links = profileLinks[role] || [];
+
+    return (
+      <div className="relative">
+        {/* Header Fixo */}
+        <header className="fixed top-0 left-0 right-0 bg-white shadow-md z-50">
+          <nav className="w-full px-[150px]">
+            <div className="flex justify-between h-16">
+              <div className="flex items-center">
+                <button
+                  onClick={() => setIsMenuOpen(!isMenuOpen)}
+                  className={`p-2 rounded-md text-gray-500 hover:text-[#16829E] hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-[#16829E] ${
+                    isMenuOpen ? "hidden" : "block"
+                  }`}
+                >
+                  <span className="sr-only">Abrir menu</span>
+                  <svg
+                    className="h-6 w-6"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M4 6h16M4 12h16M4 18h16"
+                    />
+                  </svg>
+                </button>
+              </div>
+              <div className="flex items-center">
+                <Link href="/">
+                  <Image
+                    src="/images/logo.png"
+                    alt="ABEC Med"
+                    width={200}
+                    height={40}
+                    priority
+                  />
+                </Link>
+              </div>
+              <div className="flex items-center space-x-4">
+                <span className="text-sm font-medium text-gray-700">
+                  {session.user.name}
+                </span>
+                <span className="text-xs bg-[#16829E] text-white px-2 py-1 rounded-full">
+                  {session.user.role}
+                </span>
+                <button
+                  onClick={() => signOut({ callbackUrl: "/" })}
+                  className="text-gray-500 hover:text-[#16829E] text-sm font-medium"
+                >
+                  Sair
+                </button>
+              </div>
+            </div>
+          </nav>
+        </header>
+
+        {/* Sidebar */}
+        <aside
+          className={`fixed top-0 left-0 bottom-0 z-50 w-64 bg-white shadow-md transform transition-transform duration-200 ease-in-out ${
+            isMenuOpen ? "translate-x-0" : "-translate-x-full"
+          }`}
+        >
+          <div className="flex flex-col h-[calc(100vh-4rem)]">
+            {/* Cabeçalho do Sidebar com botão de fechar */}
+            <div className="p-4 border-b flex justify-between items-center">
+              <Image
+                src="/images/icon.png"
+                alt="ABEC Med"
+                width={40}
+                height={40}
+                priority
+              />
+              <button
+                onClick={() => setIsMenuOpen(false)}
+                className="p-2 rounded-md text-gray-500 hover:text-[#16829E] hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-[#16829E]"
+              >
+                <span className="sr-only">Fechar menu</span>
+                <svg
+                  className="h-6 w-6"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                </svg>
+              </button>
+            </div>
+
+            {/* Links de Navegação */}
+            <nav className="flex-1 p-4 overflow-y-auto">
+              <ul className="space-y-2">
+                {links.map((link) => (
+                  <li key={link.href}>
+                    <Link
+                      href={link.href}
+                      className={`block px-4 py-2 rounded-md ${
+                        isActive(link.href)
+                          ? "bg-[#16829E] text-white"
+                          : "text-gray-700 hover:bg-gray-100"
+                      }`}
+                      onClick={() => setIsMenuOpen(false)}
+                    >
+                      {link.label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </nav>
+          </div>
+        </aside>
+
+        {/* Overlay para fechar o menu */}
+        {isMenuOpen && (
+          <div
+            className="fixed inset-0 bg-black bg-opacity-50 z-30 lg:hidden"
+            onClick={() => setIsMenuOpen(false)}
+          />
+        )}
+
+        {/* Conteúdo Principal */}
+        <main className="pt-16 lg:pl-64">
+          {/* Aqui será renderizado o conteúdo da página */}
+        </main>
+      </div>
+    );
+  }
+
+  // Header para usuários não autenticados
   return (
     <header className="bg-white shadow-md">
-      <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <nav className="w-full px-[150px]">
         <div className="flex justify-between h-16">
           <div className="flex">
             <div className="flex-shrink-0 flex items-center">
-              <Link href="/" className="text-2xl font-bold text-[#16829E]">
-                ABEC Med
+              <Link href="/">
+                <Image
+                  src="/images/logo.png"
+                  alt="ABEC Med"
+                  width={200}
+                  height={40}
+                  priority
+                />
               </Link>
             </div>
           </div>
 
           {/* Menu Desktop */}
           <div className="hidden sm:ml-6 sm:flex sm:items-center sm:space-x-8">
-            {getLinks().map((link) => (
+            {unauthenticatedLinks.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
@@ -119,27 +246,6 @@ export default function Header() {
                 {link.label}
               </Link>
             ))}
-            {session?.user ? (
-              <div className="flex items-center space-x-4">
-                <Link
-                  href="/perfil"
-                  className="flex items-center space-x-2 text-gray-500 hover:text-[#16829E]"
-                >
-                  <span className="text-sm font-medium">
-                    {session.user.name}
-                  </span>
-                  <span className="text-xs bg-[#16829E] text-white px-2 py-1 rounded-full">
-                    {session.user.role}
-                  </span>
-                </Link>
-                <button
-                  onClick={() => signOut({ callbackUrl: "/" })}
-                  className="text-gray-500 hover:text-[#16829E] text-sm font-medium"
-                >
-                  Sair
-                </button>
-              </div>
-            ) : null}
           </div>
 
           {/* Botão do menu mobile */}
@@ -189,7 +295,7 @@ export default function Header() {
       {isMenuOpen && (
         <div className="sm:hidden">
           <div className="pt-2 pb-3 space-y-1">
-            {getLinks().map((link) => (
+            {unauthenticatedLinks.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
@@ -203,27 +309,6 @@ export default function Header() {
                 {link.label}
               </Link>
             ))}
-            {session?.user && (
-              <div className="px-3 py-2 space-y-2">
-                <div className="flex items-center space-x-2">
-                  <span className="text-sm font-medium text-gray-500">
-                    {session.user.name}
-                  </span>
-                  <span className="text-xs bg-[#16829E] text-white px-2 py-1 rounded-full">
-                    {session.user.role}
-                  </span>
-                </div>
-                <button
-                  onClick={() => {
-                    setIsMenuOpen(false);
-                    signOut({ callbackUrl: "/" });
-                  }}
-                  className="w-full text-left text-gray-500 hover:text-[#16829E] text-sm font-medium"
-                >
-                  Sair
-                </button>
-              </div>
-            )}
           </div>
         </div>
       )}
