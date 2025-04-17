@@ -31,6 +31,38 @@
       "password": "$2b$10$nNn1bA.vvdKKUvqRlxRQ7.35vC/mk9AniMks.vRFSwoDDuOHMfeG6",
       "role": "reception",
       "active": true
+    },
+    {
+      "name": "Teste",
+      "email": "teste@gmail.com",
+      "password": "$2b$10$StrRgBZJ6ZpP3DLKYv6Q3uks8P.kxyIC0aLX0seMcN4MBa.Q1Rjjm",
+      "role": "user",
+      "active": true,
+      "id": "5"
+    },
+    {
+      "name": "Teste2",
+      "email": "teste2@gmail.com",
+      "password": "$2b$10$LA3BDIZnBwsE4Yturx.sM.7xDcwNNV1W361Jo/QXyMT3mNc5c1syG",
+      "role": "user",
+      "active": true,
+      "id": "6"
+    },
+    {
+      "name": "teste3@gmail.com",
+      "email": "teste3@gmail.com",
+      "password": "$2b$10$9BKu9ihp3hoCe10qrwfDV.C8zBivwGfeBWK7mFenlOPtkyZBx0gRy",
+      "role": "reception",
+      "active": true,
+      "id": "7"
+    },
+    {
+      "name": "Teste 5",
+      "email": "teste5@gmail.com",
+      "password": "$2b$10$pk/U8EPlBh50VPqi8IU6pO9JI1jNOelHLzkli7G8tFfuf.18RStge",
+      "role": "doctor",
+      "active": true,
+      "id": "8"
     }
   ]
 }

@@ -3,10 +3,10 @@ import { createUser, findUserByEmail } from "@/lib/json-db";
 
 export async function POST(request: Request) {
   try {
-    const { name, email, password } = await request.json();
+    const { name, email, password, role } = await request.json();
 
     // Validação básica
-    if (!name || !email || !password) {
+    if (!name || !email || !password || !role) {
       return NextResponse.json(
         { error: "Todos os campos são obrigatórios" },
         { status: 400 }
@@ -27,7 +27,7 @@ export async function POST(request: Request) {
       name,
       email,
       password,
-      role: "user", // Role padrão para novos usuários
+      role, // Usando o role enviado pelo formulário
       active: true,
     });
 
