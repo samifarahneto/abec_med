@@ -1,21 +1,25 @@
 import { NextResponse } from "next/server";
-import { connectToDatabase } from "@/lib/mongodb";
+import { testConnection } from "@/lib/json-db";
 
 export async function GET() {
   try {
-    const { db } = await connectToDatabase();
+    const isConnected = await testConnection();
 
-    // Testa a conexão listando as coleções do banco de dados
-    const collections = await db.listCollections().toArray();
+    if (!isConnected) {
+      return NextResponse.json(
+        { error: "Falha na conexão com o banco de dados" },
+        { status: 500 }
+      );
+    }
 
     return NextResponse.json({
-      message: "Conexão com MongoDB estabelecida com sucesso",
-      collections: collections.map((col) => col.name),
+      success: true,
+      message: "Conexão com o banco de dados JSON estabelecida com sucesso",
     });
   } catch (error) {
-    console.error("Erro ao conectar com MongoDB:", error);
+    console.error("Erro ao testar conexão:", error);
     return NextResponse.json(
-      { message: "Erro ao conectar com MongoDB" },
+      { error: "Erro ao testar conexão com o banco de dados" },
       { status: 500 }
     );
   }

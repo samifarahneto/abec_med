@@ -1,64 +1,48 @@
 import { NextResponse } from "next/server";
-import { connectToDatabase } from "@/lib/mongodb";
-import bcrypt from "bcryptjs";
+import { createUser, findUserByEmail } from "@/lib/json-db";
 
 export async function POST(request: Request) {
   try {
-    const { name, email, password, role } = await request.json();
+    const { name, email, password } = await request.json();
 
-    // Validações básicas
-    if (!name || !email || !password || !role) {
+    // Validação básica
+    if (!name || !email || !password) {
       return NextResponse.json(
-        { message: "Todos os campos são obrigatórios" },
+        { error: "Todos os campos são obrigatórios" },
         { status: 400 }
       );
     }
-
-    // Validar tipo de usuário
-    const validRoles = ["patient", "doctor", "reception", "admin"];
-    if (!validRoles.includes(role)) {
-      return NextResponse.json(
-        { message: "Tipo de usuário inválido" },
-        { status: 400 }
-      );
-    }
-
-    // Conectar ao banco de dados
-    const { db } = await connectToDatabase();
 
     // Verificar se o email já existe
-    const existingUser = await db.collection("users").findOne({ email });
+    const existingUser = await findUserByEmail(email);
     if (existingUser) {
       return NextResponse.json(
-        { message: "Email já cadastrado" },
+        { error: "Email já está em uso" },
         { status: 400 }
       );
     }
 
-    // Criptografar a senha
-    const hashedPassword = await bcrypt.hash(password, 10);
-
-    // Criar o usuário
-    const result = await db.collection("users").insertOne({
+    // Criar novo usuário
+    const newUser = await createUser({
       name,
       email,
-      password: hashedPassword,
-      role,
-      createdAt: new Date(),
-      updatedAt: new Date(),
+      password,
+      role: "user", // Role padrão para novos usuários
+      active: true,
     });
 
+    // Remover a senha do objeto de resposta
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { password: _, ...userWithoutPassword } = newUser;
+
     return NextResponse.json(
-      {
-        message: "Usuário criado com sucesso",
-        userId: result.insertedId,
-      },
+      { message: "Usuário criado com sucesso", user: userWithoutPassword },
       { status: 201 }
     );
   } catch (error) {
-    console.error("Erro ao registrar usuário:", error);
+    console.error("Erro no registro:", error);
     return NextResponse.json(
-      { message: "Erro ao processar o registro" },
+      { error: "Erro ao criar usuário" },
       { status: 500 }
     );
   }

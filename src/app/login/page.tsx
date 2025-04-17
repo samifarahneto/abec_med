@@ -19,15 +19,26 @@ export default function LoginPage() {
     const password = formData.get("password") as string;
 
     try {
+      console.log("Tentando fazer login com:", email);
       const result = await signIn("credentials", {
         email,
         password,
         redirect: false,
       });
 
+      console.log("Resultado do login:", result);
+
       if (result?.error) {
-        setError(result.error);
+        console.error("Erro no login:", result.error);
+        if (result.error === "CredentialsSignin") {
+          setError("Email ou senha incorretos");
+        } else {
+          setError(
+            "Ocorreu um erro ao fazer login. Por favor, tente novamente."
+          );
+        }
       } else {
+        console.log("Login bem sucedido, redirecionando...");
         router.push("/dashboard");
         router.refresh();
       }
@@ -87,7 +98,11 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={loading}
-              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
+              className={`group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white ${
+                loading
+                  ? "bg-indigo-400 cursor-not-allowed"
+                  : "bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+              }`}
             >
               {loading ? "Entrando..." : "Entrar"}
             </button>

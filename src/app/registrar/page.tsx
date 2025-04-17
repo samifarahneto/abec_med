@@ -117,7 +117,7 @@ export default function RegisterPage() {
                   required
                   value={formData.name}
                   onChange={handleChange}
-                  className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-[#16829E] focus:border-[#16829E] sm:text-sm"
+                  className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-[#16829E] focus:border-[#16829E] sm:text-sm text-gray-900"
                 />
               </div>
             </div>
@@ -138,7 +138,7 @@ export default function RegisterPage() {
                   required
                   value={formData.email}
                   onChange={handleChange}
-                  className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-[#16829E] focus:border-[#16829E] sm:text-sm"
+                  className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-[#16829E] focus:border-[#16829E] sm:text-sm text-gray-900"
                 />
               </div>
             </div>
@@ -156,7 +156,7 @@ export default function RegisterPage() {
                   name="role"
                   value={formData.role}
                   onChange={handleChange}
-                  className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-[#16829E] focus:border-[#16829E] sm:text-sm"
+                  className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-[#16829E] focus:border-[#16829E] sm:text-sm text-gray-900"
                 >
                   <option value="patient">Paciente</option>
                   <option value="doctor">Médico</option>
@@ -182,7 +182,7 @@ export default function RegisterPage() {
                   required
                   value={formData.password}
                   onChange={handleChange}
-                  className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-[#16829E] focus:border-[#16829E] sm:text-sm"
+                  className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-[#16829E] focus:border-[#16829E] sm:text-sm text-gray-900"
                 />
               </div>
             </div>
@@ -203,7 +203,7 @@ export default function RegisterPage() {
                   required
                   value={formData.confirmPassword}
                   onChange={handleChange}
-                  className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-[#16829E] focus:border-[#16829E] sm:text-sm"
+                  className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-[#16829E] focus:border-[#16829E] sm:text-sm text-gray-900"
                 />
               </div>
             </div>

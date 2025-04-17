@@ -32,7 +32,7 @@ export default function RootLayout({
       <body className={inter.className} suppressHydrationWarning>
         <AuthProvider>
           <Header />
-          <main className="min-h-screen bg-gray-50">{children}</main>
+          <main className="pt-16 min-h-screen bg-gray-50">{children}</main>
         </AuthProvider>
       </body>
     </html>
