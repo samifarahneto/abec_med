@@ -65,8 +65,10 @@ export default function FlowersPage() {
 
   return (
     <MainLayout>
-      <div className="px-6">
-        <h1 className="text-2xl font-bold text-[#16829E] mb-6">Flores</h1>
+      <div className="px-0 sm:px-6">
+        <h1 className="text-2xl font-bold text-[#16829E] mb-6 px-0 sm:px-6">
+          Flores
+        </h1>
 
         {loading ? (
           <div className="text-center py-8">
@@ -77,11 +79,11 @@ export default function FlowersPage() {
             <p className="text-gray-500">Nenhum produto disponível</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-y-6 sm:gap-6">
             {produtos.map((produto) => (
               <div
                 key={produto.id}
-                className="bg-white rounded-xl shadow-xl overflow-hidden hover:shadow-2xl transition-all duration-300 h-[600px] flex flex-col group"
+                className="bg-white rounded-none sm:rounded-xl shadow-xl overflow-hidden hover:shadow-2xl transition-all duration-300 h-[600px] flex flex-col group"
               >
                 <div className="relative h-72">
                   {produto.foto && produto.foto !== "/produtos/sem-foto.jpg" ? (
@@ -119,7 +121,7 @@ export default function FlowersPage() {
                   </div>
                 </div>
 
-                <div className="p-6 flex flex-col flex-grow">
+                <div className="p-4 sm:p-6 flex flex-col flex-grow">
                   <div className="mb-4 text-center">
                     <h2 className="text-xl font-bold text-gray-800 mb-2">
                       {produto.nome}

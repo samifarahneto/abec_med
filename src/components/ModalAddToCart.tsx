@@ -64,7 +64,7 @@ export default function ModalAddToCart({
   return (
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50">
       <div className="bg-white rounded-2xl max-w-5xl w-full max-h-[90vh] overflow-y-auto">
-        <div className="p-8 flex flex-col h-full">
+        <div className="p-4 sm:p-8 flex flex-col h-full">
           {/* Cabeçalho do Modal */}
           <div className="relative mb-8">
             <button
@@ -95,11 +95,11 @@ export default function ModalAddToCart({
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 flex-1">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-8 flex-1">
             {/* Coluna Esquerda */}
             <div>
               {/* Imagem do Produto */}
-              <div className="bg-white rounded-xl p-8 mb-6 border border-gray-100">
+              <div className="bg-white rounded-xl p-4 sm:p-8 mb-6 border border-gray-100">
                 <div className="relative w-full aspect-square">
                   {produto.foto ? (
                     <Image
@@ -117,7 +117,7 @@ export default function ModalAddToCart({
               </div>
 
               {/* Descrição do Produto */}
-              <div className="bg-gray-50 rounded-xl p-6">
+              <div className="bg-gray-50 rounded-xl p-4 sm:p-6 shadow-md">
                 <h3 className="text-lg font-semibold text-gray-800 mb-4">
                   Sobre o Medicamento
                 </h3>
@@ -132,7 +132,7 @@ export default function ModalAddToCart({
             {/* Coluna Direita */}
             <div className="flex flex-col">
               {/* Destaques do Produto */}
-              <div className="bg-gray-50 rounded-xl p-6">
+              <div className="bg-gray-50 rounded-xl p-4 sm:p-6 shadow-md">
                 <h3 className="text-lg font-semibold text-gray-800 mb-4">
                   Destaques do Medicamento
                 </h3>
@@ -161,8 +161,8 @@ export default function ModalAddToCart({
               </div>
 
               {/* Características do Medicamento */}
-              <div className="bg-gray-50 rounded-xl p-6 mt-6">
-                <h3 className="text-lg font-semibold text-gray-800 mb-4 text-center">
+              <div className="bg-gray-50 rounded-xl p-4 sm:p-6 mt-6 shadow-md">
+                <h3 className="text-lg font-semibold text-gray-800 mb-4">
                   Características do Medicamento
                 </h3>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
@@ -209,7 +209,7 @@ export default function ModalAddToCart({
               </div>
 
               {/* Preço e Quantidade */}
-              <div className="bg-gray-50 rounded-xl p-6 mt-6 mt-auto">
+              <div className="bg-gray-50 rounded-xl p-4 sm:p-6 mt-6 shadow-md">
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
                   <span className="text-2xl sm:text-3xl font-bold text-[#16829E] text-center sm:text-left">
                     R$ {produto.preco.toFixed(2)}
