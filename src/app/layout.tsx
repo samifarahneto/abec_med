@@ -7,8 +7,8 @@ import AuthProvider from "@/providers/AuthProvider";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "ABEC Med - Clínica Médica",
-  description: "Sistema de gestão para clínica médica",
+  title: "ABECMed - Associação Brasileira de Estudos Canábicos",
+  description: "Associação Brasileira de Estudos Canábicos",
 };
 
 // Suprimir avisos de hidratação em desenvolvimento

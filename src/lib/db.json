@@ -55,14 +55,6 @@
       "role": "reception",
       "active": true,
       "id": "7"
-    },
-    {
-      "name": "Teste 5",
-      "email": "teste5@gmail.com",
-      "password": "$2b$10$pk/U8EPlBh50VPqi8IU6pO9JI1jNOelHLzkli7G8tFfuf.18RStge",
-      "role": "doctor",
-      "active": true,
-      "id": "8"
     }
   ]
 }

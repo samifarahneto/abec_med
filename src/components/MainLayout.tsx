@@ -7,17 +7,15 @@ interface MainLayoutProps {
   className?: string;
 }
 
-const MainLayout: React.FC<MainLayoutProps> = ({
+export default function MainLayout({
   children,
   className = "",
-}) => {
+}: MainLayoutProps) {
   return (
     <div
-      className={`w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-5 ${className}`}
+      className={`w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-10 ${className}`}
     >
       {children}
     </div>
   );
-};
-
-export default MainLayout;
+}
