@@ -108,7 +108,7 @@ const HeroH6: React.FC<HeroH6Props> = ({ className = "" }) => {
       className={`relative w-full min-h-[900px] flex items-center justify-center bg-white ${className}`}
     >
       {/* Conteúdo */}
-      <div className="relative z-10 w-full max-w-7xl mx-auto px-8 md:px-12 lg:px-16">
+      <div className="relative z-10 w-full max-w-7xl mx-auto px-0 sm:px-8 md:px-12 lg:px-16">
         {/* Título Principal */}
         <div className="text-center mb-16 pt-8 md:pt-0">
           <h2 className="text-4xl sm:text-5xl md:text-6xl font-bold text-[#16829E] mb-4">
@@ -129,13 +129,13 @@ const HeroH6: React.FC<HeroH6Props> = ({ className = "" }) => {
         {/* Grid de FAQs */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           {/* Lista de FAQs */}
-          <div className="bg-white rounded-xl shadow-md border border-gray-100 overflow-hidden relative h-fit">
+          <div className="bg-white rounded-none sm:rounded-xl shadow-md border border-gray-100 overflow-hidden relative h-fit">
             <div className="p-4 space-y-2">
               {faqs.map((faq) => (
                 <button
                   key={faq.id}
                   onClick={() => setActiveFaq(faq.id)}
-                  className={`w-full p-4 flex items-center rounded-lg transition-all duration-300 relative ${
+                  className={`w-full p-4 flex items-center rounded-none sm:rounded-lg transition-all duration-300 relative ${
                     activeFaq === faq.id
                       ? "bg-[#16829E] text-white shadow-lg"
                       : "hover:bg-gray-50 text-gray-800 hover:shadow-md"
@@ -159,7 +159,7 @@ const HeroH6: React.FC<HeroH6Props> = ({ className = "" }) => {
           </div>
 
           {/* Conteúdo da FAQ Ativa */}
-          <div className="bg-white rounded-xl shadow-md border border-gray-100 overflow-hidden relative min-h-[400px]">
+          <div className="bg-white rounded-none sm:rounded-xl shadow-md border border-gray-100 overflow-hidden relative min-h-[400px]">
             <div className="p-6">
               {activeFaqData && (
                 <div className="space-y-6">

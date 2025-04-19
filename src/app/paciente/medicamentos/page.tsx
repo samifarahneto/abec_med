@@ -1,10 +1,10 @@
 "use client";
 
-import ProfileLayout from "@/components/ProfileLayout";
+import MainLayout from "@/components/MainLayout";
 
 export default function MedicamentosPaciente() {
   return (
-    <ProfileLayout>
+    <MainLayout>
       <div className="px-6">
         <h1 className="text-2xl font-bold text-[#16829E] mb-6">
           Meus Medicamentos
@@ -25,6 +25,6 @@ export default function MedicamentosPaciente() {
           </div>
         </div>
       </div>
-    </ProfileLayout>
+    </MainLayout>
   );
 }

@@ -5,45 +5,140 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useSession, signOut } from "next-auth/react";
 import Image from "next/image";
+import {
+  FaHome,
+  FaUsers,
+  FaCog,
+  FaCalendarAlt,
+  FaFileMedical,
+  FaShoppingCart,
+  FaPills,
+  FaOilCan,
+  FaFlask,
+  FaLeaf,
+  FaCookie,
+  FaSignOutAlt,
+  FaChartLine,
+  FaUserCircle,
+  FaBox,
+} from "react-icons/fa";
 
 interface LinkItem {
   href: string;
   label: string;
+  icon?: React.ReactNode;
   submenu?: LinkItem[];
 }
 
 // Links específicos por perfil
 const profileLinks: Record<string, LinkItem[]> = {
   admin: [
-    { href: "/admin/dashboard", label: "Dashboard" },
-    { href: "/admin/usuarios", label: "Usuários" },
-    { href: "/admin/configuracoes", label: "Configurações" },
+    {
+      href: "/admin/dashboard",
+      label: "Dashboard",
+      icon: <FaHome className="w-5 h-5" />,
+    },
+    {
+      href: "/admin/usuarios",
+      label: "Usuários",
+      icon: <FaUsers className="w-5 h-5" />,
+    },
+    {
+      href: "/admin/estoque",
+      label: "Estoque",
+      icon: <FaBox className="w-5 h-5" />,
+    },
+    {
+      href: "/admin/relatorios",
+      label: "Relatórios",
+      icon: <FaChartLine className="w-5 h-5" />,
+    },
+    {
+      href: "/admin/configuracoes",
+      label: "Configurações",
+      icon: <FaCog className="w-5 h-5" />,
+    },
+    {
+      href: "/admin/perfil",
+      label: "Perfil",
+      icon: <FaUserCircle className="w-5 h-5" />,
+    },
   ],
   doctor: [
-    { href: "/medico/consultas", label: "Consultas" },
-    { href: "/medico/pacientes", label: "Pacientes" },
-    { href: "/medico/agenda", label: "Agenda" },
+    {
+      href: "/medico/consultas",
+      label: "Consultas",
+      icon: <FaCalendarAlt className="w-5 h-5" />,
+    },
+    {
+      href: "/medico/pacientes",
+      label: "Pacientes",
+      icon: <FaUsers className="w-5 h-5" />,
+    },
+    {
+      href: "/medico/agenda",
+      label: "Agenda",
+      icon: <FaCalendarAlt className="w-5 h-5" />,
+    },
   ],
   reception: [
-    { href: "/acolhimento/agendamentos", label: "Agendamentos" },
-    { href: "/acolhimento/pacientes", label: "Pacientes" },
-    { href: "/acolhimento/relatorios", label: "Relatórios" },
+    {
+      href: "/acolhimento/agendamentos",
+      label: "Agendamentos",
+      icon: <FaCalendarAlt className="w-5 h-5" />,
+    },
+    {
+      href: "/acolhimento/pacientes",
+      label: "Pacientes",
+      icon: <FaUsers className="w-5 h-5" />,
+    },
+    {
+      href: "/acolhimento/relatorios",
+      label: "Relatórios",
+      icon: <FaFileMedical className="w-5 h-5" />,
+    },
   ],
   patient: [
-    { href: "/paciente", label: "Início" },
-    { href: "/paciente/receitas", label: "Receitas" },
-    { href: "/paciente/pedidos", label: "Pedidos" },
+    {
+      href: "/paciente/dashboard",
+      label: "Dashboard",
+      icon: <FaHome className="w-5 h-5" />,
+    },
+    {
+      href: "/paciente/receitas",
+      label: "Receitas",
+      icon: <FaFileMedical className="w-5 h-5" />,
+    },
+    {
+      href: "/paciente/pedidos",
+      label: "Pedidos",
+      icon: <FaShoppingCart className="w-5 h-5" />,
+    },
     {
       href: "/paciente/medicamentos",
       label: "Medicamentos",
+      icon: <FaPills className="w-5 h-5" />,
       submenu: [
-        { href: "/paciente/medicamentos/oleos", label: "Óleos" },
-        { href: "/paciente/medicamentos/concentrados", label: "Concentrados" },
         {
-          href: "/paciente/medicamentos/inflorescencias",
-          label: "Inflorescências",
+          href: "/paciente/medicamentos/flowers",
+          label: "Flores",
+          icon: <FaLeaf className="w-4 h-4" />,
         },
-        { href: "/paciente/medicamentos/comestiveis", label: "Comestíveis" },
+        {
+          href: "/paciente/medicamentos/oils",
+          label: "Óleos",
+          icon: <FaOilCan className="w-4 h-4" />,
+        },
+        {
+          href: "/paciente/medicamentos/extracts",
+          label: "Concentrados",
+          icon: <FaFlask className="w-4 h-4" />,
+        },
+        {
+          href: "/paciente/medicamentos/eatables",
+          label: "Comestíveis",
+          icon: <FaCookie className="w-4 h-4" />,
+        },
       ],
     },
   ],
@@ -251,117 +346,124 @@ export default function Header() {
 
       {/* Sidebar */}
       <aside
-        className={`fixed top-0 left-0 bottom-0 z-50 w-64 bg-white shadow-md transform transition-transform duration-200 ease-in-out ${
+        className={`fixed top-0 left-0 bottom-0 z-50 w-64 bg-white shadow-md transform transition-transform duration-300 ease-in-out ${
           isMenuOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >
-        <div className="flex flex-col h-[calc(100vh-4rem)]">
-          {/* Cabeçalho do Sidebar com botão de fechar */}
-          <div className="p-4 border-b flex justify-between items-center">
-            <Image
-              src="/images/icon.png"
-              alt="ABEC Med"
-              width={40}
-              height={40}
-              priority
-            />
-            <button
-              onClick={() => setIsMenuOpen(false)}
-              className="p-2 rounded-md text-gray-500 hover:text-[#16829E] hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-[#16829E]"
-            >
-              <span className="sr-only">Fechar menu</span>
-              <svg
-                className="h-6 w-6"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
+        <div className="flex flex-col h-full">
+          <div className="flex-1 flex flex-col">
+            {/* Cabeçalho do Sidebar com botão de fechar */}
+            <div className="p-4 border-b flex justify-between items-center">
+              <Image
+                src="/images/icon.png"
+                alt="ABEC Med"
+                width={40}
+                height={40}
+                priority
+              />
+              <button
+                onClick={() => setIsMenuOpen(false)}
+                className="p-2 rounded-md text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200"
               >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M6 18L18 6M6 6l12 12"
-                />
-              </svg>
-            </button>
-          </div>
-
-          {/* Informações do Usuário */}
-          <div className="p-4 border-b">
-            <div className="flex flex-col items-center space-y-2">
-              <span className="text-lg font-medium text-gray-700">
-                {session.user.name}
-              </span>
-              <span className="text-xs bg-[#16829E] text-white px-2 py-1 rounded-full">
-                {session.user.role}
-              </span>
+                <span className="sr-only">Fechar menu</span>
+                <svg
+                  className="h-6 w-6"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                </svg>
+              </button>
             </div>
+
+            {/* Informações do Usuário */}
+            <div className="p-4 border-b">
+              <div className="flex flex-col items-center space-y-2">
+                <span className="text-lg font-medium text-gray-800">
+                  {session.user.name}
+                </span>
+                <span className="text-xs bg-gray-100 text-gray-600 px-3 py-1 rounded-full">
+                  {session.user.role}
+                </span>
+              </div>
+            </div>
+
+            {/* Links de Navegação */}
+            <nav className="flex-1 p-4 overflow-y-auto">
+              <ul className="space-y-1">
+                {links.map((link) => (
+                  <li key={link.href}>
+                    <div className="relative">
+                      <Link
+                        href={link.href}
+                        className={`${
+                          isActive(link.href)
+                            ? "text-[#16829E] font-medium"
+                            : "text-gray-600 hover:text-gray-900"
+                        } flex items-center px-4 py-2.5 text-sm transition-colors duration-200`}
+                        onClick={() => setIsMenuOpen(false)}
+                      >
+                        {link.icon && <span className="mr-3">{link.icon}</span>}
+                        {link.label}
+                        {link.submenu && (
+                          <svg
+                            className="ml-auto h-4 w-4"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M19 9l-7 7-7-7"
+                            />
+                          </svg>
+                        )}
+                      </Link>
+                      {link.submenu && (
+                        <ul className="ml-4 mt-1 space-y-1">
+                          {link.submenu.map((subitem) => (
+                            <li key={subitem.href}>
+                              <Link
+                                href={subitem.href}
+                                className={`${
+                                  isActive(subitem.href)
+                                    ? "text-[#16829E] font-medium"
+                                    : "text-gray-600 hover:text-gray-900"
+                                } flex items-center px-4 py-2 text-sm transition-colors duration-200`}
+                                onClick={() => setIsMenuOpen(false)}
+                              >
+                                {subitem.icon && (
+                                  <span className="mr-3">{subitem.icon}</span>
+                                )}
+                                {subitem.label}
+                              </Link>
+                            </li>
+                          ))}
+                        </ul>
+                      )}
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            </nav>
           </div>
 
-          {/* Links de Navegação */}
-          <nav className="flex-1 p-4 overflow-y-auto">
-            <ul className="space-y-2">
-              {links.map((link) => (
-                <li key={link.href}>
-                  <div className="relative">
-                    <Link
-                      href={link.href}
-                      className={`${
-                        isActive(link.href)
-                          ? "text-[#16829E] border-b-2 border-[#16829E]"
-                          : "text-gray-500 hover:text-[#16829E] hover:border-b-2 hover:border-[#16829E]"
-                      } block px-4 py-2 text-sm font-medium transition-colors duration-200`}
-                      onClick={() => setIsMenuOpen(false)}
-                    >
-                      {link.label}
-                      {link.submenu && (
-                        <svg
-                          className="ml-1 h-4 w-4 inline-block"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M19 9l-7 7-7-7"
-                          />
-                        </svg>
-                      )}
-                    </Link>
-                    {link.submenu && (
-                      <ul className="ml-4 mt-1 space-y-1">
-                        {link.submenu.map((subitem) => (
-                          <li key={subitem.href}>
-                            <Link
-                              href={subitem.href}
-                              className={`${
-                                isActive(subitem.href)
-                                  ? "text-[#16829E]"
-                                  : "text-gray-500 hover:text-[#16829E]"
-                              } block px-4 py-1 text-sm font-medium transition-colors duration-200`}
-                              onClick={() => setIsMenuOpen(false)}
-                            >
-                              {subitem.label}
-                            </Link>
-                          </li>
-                        ))}
-                      </ul>
-                    )}
-                  </div>
-                </li>
-              ))}
-            </ul>
-          </nav>
-
-          {/* Botão Sair */}
-          <div className="p-4 border-t">
+          {/* Botão Sair fixo no final */}
+          <div className="p-4 border-t mt-auto">
             <button
               onClick={() => signOut({ callbackUrl: "/" })}
-              className="w-full text-center text-gray-500 hover:text-[#16829E] text-sm font-medium py-2"
+              className="w-full flex items-center justify-center px-4 py-2 text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors duration-200"
             >
+              <FaSignOutAlt className="h-5 w-5 mr-2" />
               Sair
             </button>
           </div>
@@ -371,13 +473,17 @@ export default function Header() {
       {/* Overlay para fechar o menu */}
       {isMenuOpen && (
         <div
-          className="fixed inset-0 bg-black bg-opacity-50 z-30 md:hidden"
+          className="fixed inset-0 bg-black bg-opacity-50 z-40"
           onClick={() => setIsMenuOpen(false)}
         />
       )}
 
       {/* Conteúdo Principal */}
-      <main className="pt-16 md:pl-64">
+      <main
+        className={`pt-16 transition-all duration-300 ${
+          isMenuOpen ? "md:pl-64" : ""
+        }`}
+      >
         {/* Aqui será renderizado o conteúdo da página */}
       </main>
     </div>

@@ -11,7 +11,7 @@ const HeroH2: React.FC<HeroH2Props> = ({ className = "" }) => {
       className={`relative w-full min-h-[900px] flex items-center justify-center bg-white pb-16 ${className}`}
     >
       {/* Conteúdo */}
-      <div className="relative z-10 w-full max-w-7xl mx-auto px-8 md:px-12 lg:px-16">
+      <div className="relative z-10 w-full max-w-7xl mx-auto px-0 sm:px-8 md:px-12 lg:px-16">
         {/* Título Principal */}
         <div className="text-center mb-16">
           <h2 className="text-4xl sm:text-5xl md:text-6xl font-bold text-[#16829E] mb-4">
@@ -28,7 +28,7 @@ const HeroH2: React.FC<HeroH2Props> = ({ className = "" }) => {
         {/* Grid de Conteúdo */}
         <div className="grid md:grid-cols-3 gap-8">
           {/* Quem Somos */}
-          <div className="relative group overflow-hidden rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 bg-white border border-[#16829E]/10">
+          <div className="relative group overflow-hidden rounded-none sm:rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 bg-white border border-[#16829E]/10">
             <div className="relative h-48 w-full">
               <Image
                 src="/images/quemsomos.webp"

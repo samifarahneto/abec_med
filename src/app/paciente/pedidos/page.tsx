@@ -1,10 +1,10 @@
 "use client";
 
-import ProfileLayout from "@/components/ProfileLayout";
+import MainLayout from "@/components/MainLayout";
 
 export default function PedidosPaciente() {
   return (
-    <ProfileLayout>
+    <MainLayout>
       <div className="px-6">
         <h1 className="text-2xl font-bold text-[#16829E] mb-6">Meus Pedidos</h1>
         <div className="bg-white rounded-lg shadow-md p-6">
@@ -30,6 +30,6 @@ export default function PedidosPaciente() {
           </div>
         </div>
       </div>
-    </ProfileLayout>
+    </MainLayout>
   );
 }

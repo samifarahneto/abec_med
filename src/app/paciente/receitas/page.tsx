@@ -7,7 +7,7 @@ import type {
   TextItem,
   TextMarkedContent,
 } from "pdfjs-dist/types/src/display/api";
-import ProfileLayout from "@/components/ProfileLayout";
+import MainLayout from "@/components/MainLayout";
 
 type TextContentItem = TextItem | TextMarkedContent;
 
@@ -134,7 +134,7 @@ export default function ReceitasPaciente() {
   };
 
   return (
-    <ProfileLayout>
+    <MainLayout>
       <div className="px-6">
         <h1 className="text-2xl font-bold text-[#16829E] mb-6">
           Minhas Receitas
@@ -242,6 +242,6 @@ export default function ReceitasPaciente() {
           {/* Aqui serão exibidas as receitas quando houver */}
         </div>
       </div>
-    </ProfileLayout>
+    </MainLayout>
   );
 }

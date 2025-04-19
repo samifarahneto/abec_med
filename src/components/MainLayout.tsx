@@ -2,12 +2,12 @@
 
 import React from "react";
 
-interface ProfileLayoutProps {
+interface MainLayoutProps {
   children: React.ReactNode;
   className?: string;
 }
 
-const ProfileLayout: React.FC<ProfileLayoutProps> = ({
+const MainLayout: React.FC<MainLayoutProps> = ({
   children,
   className = "",
 }) => {
@@ -20,4 +20,4 @@ const ProfileLayout: React.FC<ProfileLayoutProps> = ({
   );
 };
 
-export default ProfileLayout;
+export default MainLayout;

@@ -1,13 +1,13 @@
 "use client";
 
 import { useSession } from "next-auth/react";
-import ProfileLayout from "@/components/ProfileLayout";
+import MainLayout from "@/components/MainLayout";
 
 export default function DashboardPaciente() {
   const { data: session } = useSession();
 
   return (
-    <ProfileLayout>
+    <MainLayout>
       <div className="px-6">
         <h1 className="text-2xl font-bold text-[#16829E] mb-6">
           Bem-vindo, {session?.user?.name}
@@ -34,6 +34,6 @@ export default function DashboardPaciente() {
           </div>
         </div>
       </div>
-    </ProfileLayout>
+    </MainLayout>
   );
 }
