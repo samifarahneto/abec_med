@@ -12,6 +12,7 @@ interface Produto {
   foto: string;
   descricao: string;
   dataCadastro: string;
+  tags: string[];
 }
 
 const getArquivoPorTipo = (tipo: string) => {

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { FaUpload } from "react-icons/fa";
+import { FaUpload, FaTimes } from "react-icons/fa";
 import Image from "next/image";
 import FormLayout from "@/components/ui/form-layout";
 
@@ -17,6 +17,7 @@ interface Produto {
   foto: File | null;
   descricao: string;
   dataCadastro: string;
+  tags: string[];
 }
 
 export default function NovoProduto() {
@@ -32,10 +33,36 @@ export default function NovoProduto() {
     foto: null,
     descricao: "",
     dataCadastro: new Date().toISOString(),
+    tags: [],
   });
 
   const [erros, setErros] = useState<Partial<Produto>>({});
   const [previewFoto, setPreviewFoto] = useState<string | null>(null);
+  const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  const [negativeTags, setNegativeTags] = useState<string[]>([]);
+
+  const availableTags = [
+    "Analgésico",
+    "Anti-inflamatório",
+    "Ansiolítico",
+    "Antidepressivo",
+    "Relaxante",
+    "Energético",
+    "Indutor de sono",
+    "Estimulante de apetite",
+    "Neuroprotetor",
+    "Anticonvulsivante",
+  ];
+
+  const toggleTag = (tag: string) => {
+    setSelectedTags((prev) => {
+      if (prev.includes(tag)) {
+        return prev.filter((t) => t !== tag);
+      } else {
+        return [...prev, tag];
+      }
+    });
+  };
 
   const handleChange = (
     e: React.ChangeEvent<
@@ -94,10 +121,14 @@ export default function NovoProduto() {
           });
         }
 
-        // Cria o objeto de produto com a foto em base64
+        // Cria o objeto de produto com a foto em base64 e as tags
         const produtoParaEnviar = {
           ...produto,
           foto: fotoBase64 || "/produtos/sem-foto.jpg",
+          tags: [
+            ...selectedTags,
+            ...negativeTags.map((tag) => `negativo:${tag}`),
+          ],
         };
 
         console.log("Enviando produto:", produtoParaEnviar); // Debug
@@ -312,6 +343,75 @@ export default function NovoProduto() {
             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#16829E] focus:ring-[#16829E] text-gray-900"
             placeholder="Descreva as características do produto..."
           />
+        </div>
+
+        {/* Tags */}
+        <div className="md:col-span-2">
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Tags Positivas
+          </label>
+
+          {/* Tags Positivas */}
+          <div className="flex flex-wrap gap-2">
+            {availableTags.map((tag) => (
+              <button
+                key={tag}
+                type="button"
+                onClick={() => toggleTag(tag)}
+                className={`px-3 py-1.5 rounded-full text-sm font-medium transition-all duration-200 flex items-center gap-2 ${
+                  selectedTags.includes(tag)
+                    ? "bg-[#16829E] text-white"
+                    : "bg-[#16829E]/10 text-[#16829E] hover:bg-[#16829E]/20"
+                }`}
+              >
+                {tag}
+                {selectedTags.includes(tag) && <FaTimes className="w-3 h-3" />}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Tags Negativas */}
+        <div className="md:col-span-2">
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Efeitos Colaterais
+          </label>
+          <div className="flex flex-wrap gap-2">
+            {[
+              "Sonolência",
+              "Tontura",
+              "Boca Seca",
+              "Fome",
+              "Ansiedade",
+              "Paranoia",
+              "Náusea",
+              "Dor de Cabeça",
+              "Insônia",
+              "Fadiga",
+            ].map((tag) => (
+              <button
+                key={tag}
+                type="button"
+                onClick={() => {
+                  setNegativeTags((prev) => {
+                    if (prev.includes(tag)) {
+                      return prev.filter((t) => t !== tag);
+                    } else {
+                      return [...prev, tag];
+                    }
+                  });
+                }}
+                className={`px-3 py-1.5 rounded-full text-sm font-medium transition-all duration-200 flex items-center gap-2 ${
+                  negativeTags.includes(tag)
+                    ? "bg-red-500 text-white"
+                    : "bg-red-100 text-red-500 hover:bg-red-200"
+                }`}
+              >
+                {tag}
+                {negativeTags.includes(tag) && <FaTimes className="w-3 h-3" />}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
     </FormLayout>

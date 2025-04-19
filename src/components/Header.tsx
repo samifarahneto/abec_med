@@ -289,7 +289,7 @@ export default function Header() {
   }
 
   // Se o usuário estiver autenticado, retorna o layout com header e sidebar controlável
-  const role = session.user.role as keyof typeof profileLinks;
+  const role = session?.user?.role as keyof typeof profileLinks;
   const links = profileLinks[role] || [];
 
   return (
@@ -299,7 +299,7 @@ export default function Header() {
         <nav className="w-full md:px-[150px]">
           <div className="flex justify-between h-16">
             {/* Menu Button */}
-            <div className="flex items-center">
+            <div className="flex items-center w-12">
               <button
                 onClick={() => setIsMenuOpen(!isMenuOpen)}
                 className={`p-2 rounded-md text-gray-500 hover:text-[#16829E] hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-[#16829E] ${
@@ -325,7 +325,7 @@ export default function Header() {
             </div>
 
             {/* Logo */}
-            <div className="flex items-center">
+            <div className="flex items-center justify-center flex-1">
               <Link href="/">
                 <Image
                   src="/images/logo.png"
@@ -338,8 +338,20 @@ export default function Header() {
               </Link>
             </div>
 
-            {/* Espaço reservado para alinhamento */}
-            <div className="w-6" />
+            {/* Carrinho de Compras (apenas para pacientes) */}
+            <div className="flex items-center w-12">
+              {role === "patient" && (
+                <Link
+                  href="/paciente/carrinho"
+                  className="relative p-2 text-gray-500 hover:text-[#16829E]"
+                >
+                  <FaShoppingCart className="w-6 h-6" />
+                  <span className="absolute -top-1 -right-1 bg-[#16829E] text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                    0
+                  </span>
+                </Link>
+              )}
+            </div>
           </div>
         </nav>
       </header>

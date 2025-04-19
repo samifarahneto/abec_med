@@ -16,6 +16,7 @@ interface Produto {
   foto: string;
   descricao: string;
   dataCadastro: string;
+  tags: string[];
 }
 
 export default function Estoque() {
@@ -85,25 +86,28 @@ export default function Estoque() {
           Estoque de {tipo}
         </h2>
         <div className="bg-white rounded-lg shadow-md overflow-hidden">
-          <table className="min-w-full">
+          <table className="w-full table-fixed">
             <thead className="bg-gray-50">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="w-[14.28%] px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Foto
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="w-[14.28%] px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Nome
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="w-[14.28%] px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Tipo
+                </th>
+                <th className="w-[14.28%] px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Canabinóide
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="w-[14.28%] px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Quantidade
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="w-[14.28%] px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Preço
                 </th>
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="w-[14.28%] px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Ações
                 </th>
               </tr>
@@ -112,7 +116,7 @@ export default function Estoque() {
               {produtosFiltrados.length === 0 ? (
                 <tr>
                   <td
-                    colSpan={6}
+                    colSpan={7}
                     className="px-6 py-4 text-center text-gray-500"
                   >
                     Nenhum produto encontrado
@@ -121,7 +125,7 @@ export default function Estoque() {
               ) : (
                 produtosFiltrados.map((produto) => (
                   <tr key={produto.id} className="hover:bg-gray-50">
-                    <td className="px-6 py-4 whitespace-nowrap">
+                    <td className="w-[14.28%] px-6 py-4 whitespace-nowrap">
                       <div className="w-10 h-10 relative rounded-lg overflow-hidden">
                         {typeof produto.foto === "string" &&
                         produto.foto !== "/produtos/sem-foto.jpg" &&
@@ -141,27 +145,32 @@ export default function Estoque() {
                         )}
                       </div>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm font-medium text-gray-900">
+                    <td className="w-[14.28%] px-6 py-4 whitespace-nowrap">
+                      <div className="text-sm font-medium text-gray-900 truncate">
                         {produto.nome}
                       </div>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
+                    <td className="w-[14.28%] px-6 py-4 whitespace-nowrap">
+                      <div className="text-sm text-gray-900 truncate">
+                        {produto.strain_type || "-"}
+                      </div>
+                    </td>
+                    <td className="w-[14.28%] px-6 py-4 whitespace-nowrap">
                       <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
                         {produto.canabinoide}
                       </span>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
+                    <td className="w-[14.28%] px-6 py-4 whitespace-nowrap">
                       <div className="text-sm text-gray-900">
                         {produto.quantidade}
                       </div>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
+                    <td className="w-[14.28%] px-6 py-4 whitespace-nowrap">
                       <div className="text-sm text-gray-900">
                         R$ {produto.preco.toFixed(2)}
                       </div>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                    <td className="w-[14.28%] px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                       <button
                         onClick={() =>
                           router.push(`/admin/estoque/editar/${produto.id}`)

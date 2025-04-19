@@ -14,6 +14,7 @@ interface Produto {
   foto: string;
   descricao: string;
   dataCadastro: string;
+  tags: string[];
 }
 
 export default function EatablesPage() {

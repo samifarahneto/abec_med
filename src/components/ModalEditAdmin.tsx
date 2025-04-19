@@ -5,6 +5,7 @@ interface ModalEditAdminProps {
   onClose: () => void;
   title: string;
   children: React.ReactNode;
+  onSave: (e: React.FormEvent) => Promise<void>;
 }
 
 export default function ModalEditAdmin({
@@ -12,6 +13,7 @@ export default function ModalEditAdmin({
   onClose,
   title,
   children,
+  onSave,
 }: ModalEditAdminProps) {
   if (!isOpen) return null;
 
@@ -42,6 +44,7 @@ export default function ModalEditAdmin({
           </button>
           <button
             type="submit"
+            onClick={onSave}
             className="px-4 py-2 bg-[#16829E] text-white rounded-lg hover:bg-[#126a7e] transition-colors"
           >
             Salvar

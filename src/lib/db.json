@@ -15,46 +15,6 @@
       "password": "$2b$10$hKZfAQbWnZ5PEjUG4Hz..O4r7FTEz3F2bDXOz7ZbTWJgenr2u1L4q",
       "role": "patient",
       "active": true
-    },
-    {
-      "id": "67fff617b12294a609d328fd",
-      "name": "Medico Sami",
-      "email": "medic@abecmed.com.br",
-      "password": "$2b$10$TWPRbTYEj8raFkE9MKi5uuyCMNtrczchC.XPQqGP5uEfnFtUEwhzC",
-      "role": "doctor",
-      "active": true
-    },
-    {
-      "id": "67fff66bb12294a609d328fe",
-      "name": "Acolhimento Sami",
-      "email": "recepcao@abecmed.com",
-      "password": "$2b$10$nNn1bA.vvdKKUvqRlxRQ7.35vC/mk9AniMks.vRFSwoDDuOHMfeG6",
-      "role": "reception",
-      "active": true
-    },
-    {
-      "name": "Teste",
-      "email": "teste@gmail.com",
-      "password": "$2b$10$StrRgBZJ6ZpP3DLKYv6Q3uks8P.kxyIC0aLX0seMcN4MBa.Q1Rjjm",
-      "role": "user",
-      "active": true,
-      "id": "5"
-    },
-    {
-      "name": "Teste2",
-      "email": "teste2@gmail.com",
-      "password": "$2b$10$LA3BDIZnBwsE4Yturx.sM.7xDcwNNV1W361Jo/QXyMT3mNc5c1syG",
-      "role": "user",
-      "active": true,
-      "id": "6"
-    },
-    {
-      "name": "teste3@gmail.com",
-      "email": "teste3@gmail.com",
-      "password": "$2b$10$9BKu9ihp3hoCe10qrwfDV.C8zBivwGfeBWK7mFenlOPtkyZBx0gRy",
-      "role": "reception",
-      "active": true,
-      "id": "7"
     }
   ]
 }

@@ -14,18 +14,19 @@ interface Produto {
   foto: string;
   descricao: string;
   dataCadastro: string;
+  tags: string[];
 }
 
 interface ModalEditarProdutoProps {
   produto: Produto | null;
-  onClose: () => void;
-  onSave: (produto: Produto) => void;
+  onCloseAction: () => void;
+  onSaveAction: (produto: Produto) => void;
 }
 
 export default function ModalEditarProduto({
   produto,
-  onClose,
-  onSave,
+  onCloseAction,
+  onSaveAction,
 }: ModalEditarProdutoProps) {
   const [produtoEditado, setProdutoEditado] = useState<Produto | null>(null);
   const [previewFoto, setPreviewFoto] = useState<string | null>(null);
@@ -71,7 +72,7 @@ export default function ModalEditarProduto({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (produtoEditado) {
-      onSave(produtoEditado);
+      onSaveAction(produtoEditado);
     }
   };
 
@@ -84,7 +85,7 @@ export default function ModalEditarProduto({
           <FormLayout
             title="Editar Produto"
             onSubmit={handleSubmit}
-            onCancel={onClose}
+            onCancel={onCloseAction}
             submitText="Salvar Alterações"
           >
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 px-6">

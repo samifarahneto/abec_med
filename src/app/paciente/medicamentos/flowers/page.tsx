@@ -3,24 +3,31 @@
 import { useState, useEffect } from "react";
 import MainLayout from "@/components/MainLayout";
 import Image from "next/image";
+import ModalAddToCart from "@/components/ModalAddToCart";
+import { FaHeart } from "react-icons/fa";
 
 interface Produto {
   id: number;
   nome: string;
   tipo: string;
+  strain_type?: string;
   canabinoide: string;
   quantidade: number;
   preco: number;
   foto: string;
   descricao: string;
   dataCadastro: string;
-  strain_type?: string;
+  tags: string[];
 }
 
 export default function FlowersPage() {
   const [produtos, setProdutos] = useState<Produto[]>([]);
   const [loading, setLoading] = useState(true);
   const [favoritos, setFavoritos] = useState<number[]>([]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [produtoSelecionado, setProdutoSelecionado] = useState<Produto | null>(
+    null
+  );
 
   const toggleFavorito = (produtoId: number) => {
     setFavoritos((prev) => {
@@ -31,6 +38,11 @@ export default function FlowersPage() {
         return [...prev, produtoId];
       }
     });
+  };
+
+  const abrirModal = (produto: Produto) => {
+    setProdutoSelecionado(produto);
+    setIsModalOpen(true);
   };
 
   useEffect(() => {
@@ -92,24 +104,13 @@ export default function FlowersPage() {
                         : "bg-white/90 hover:bg-white shadow-md"
                     }`}
                   >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
+                    <FaHeart
                       className={`h-6 w-6 transition-all duration-300 ${
                         favoritos.includes(produto.id)
                           ? "text-[#16829E] fill-[#16829E] scale-110"
                           : "text-[#16829E]/70 hover:text-[#16829E] hover:scale-110"
                       }`}
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                      fill="none"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={1.5}
-                        d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
-                      />
-                    </svg>
+                    />
                   </button>
                   <div className="absolute top-2 right-2">
                     <span className="px-3 py-1 bg-[#16829E]/90 text-white rounded-full text-sm font-medium">
@@ -150,7 +151,10 @@ export default function FlowersPage() {
                         </span>
                         <p className="text-sm text-gray-500">à vista</p>
                       </div>
-                      <button className="bg-gradient-to-r from-[#16829E] to-[#126a7e] text-white px-4 py-2 rounded-lg hover:from-[#126a7e] hover:to-[#16829E] transition-all duration-300 flex items-center justify-center gap-2 font-medium">
+                      <button
+                        onClick={() => abrirModal(produto)}
+                        className="bg-gradient-to-r from-[#16829E] to-[#126a7e] text-white px-4 py-2 rounded-lg hover:from-[#126a7e] hover:to-[#16829E] transition-all duration-300 flex items-center justify-center gap-2 font-medium"
+                      >
                         <svg
                           xmlns="http://www.w3.org/2000/svg"
                           className="h-5 w-5"
@@ -169,6 +173,15 @@ export default function FlowersPage() {
               </div>
             ))}
           </div>
+        )}
+
+        {/* Modal de Adicionar ao Carrinho */}
+        {produtoSelecionado && (
+          <ModalAddToCart
+            isOpen={isModalOpen}
+            onCloseAction={() => setIsModalOpen(false)}
+            produto={produtoSelecionado}
+          />
         )}
       </div>
     </MainLayout>
