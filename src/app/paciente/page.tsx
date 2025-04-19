@@ -3,13 +3,17 @@
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import MainLayout from "@/components/MainLayout";
+import { useSession } from "next-auth/react";
 
 export default function PacientePage() {
   const router = useRouter();
+  const { data: session } = useSession();
 
   useEffect(() => {
-    router.push("/paciente/dashboard");
-  }, [router]);
+    if (session) {
+      router.replace("/paciente/dashboard");
+    }
+  }, [router, session]);
 
   return (
     <MainLayout>
