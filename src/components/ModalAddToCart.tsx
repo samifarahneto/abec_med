@@ -10,6 +10,7 @@ import {
   FaFlask,
   FaSeedling,
 } from "react-icons/fa";
+import { useCarrinho } from "@/contexts/CarrinhoContext";
 
 interface ModalAddToCartProps {
   isOpen: boolean;
@@ -33,13 +34,17 @@ export default function ModalAddToCart({
   produto,
 }: ModalAddToCartProps) {
   const [quantidade, setQuantidade] = useState(5);
+  const { adicionarProduto } = useCarrinho();
 
   if (!isOpen) return null;
 
   const handleAdicionarAoCarrinho = () => {
-    console.log("Adicionando ao carrinho:", {
-      ...produto,
+    adicionarProduto({
+      id: produto.id,
+      nome: produto.nome,
+      preco: produto.preco,
       quantidade,
+      foto: produto.foto,
     });
     onCloseAction();
   };

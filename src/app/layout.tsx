@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import Header from "@/components/Header";
 import AuthProvider from "@/providers/AuthProvider";
+import { CarrinhoProvider } from "@/contexts/CarrinhoContext";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -31,8 +32,10 @@ export default function RootLayout({
     <html lang="pt-BR" suppressHydrationWarning>
       <body className={inter.className} suppressHydrationWarning>
         <AuthProvider>
-          <Header />
-          <main className="min-h-screen bg-gray-50">{children}</main>
+          <CarrinhoProvider>
+            <Header />
+            <main className="min-h-screen bg-gray-50">{children}</main>
+          </CarrinhoProvider>
         </AuthProvider>
       </body>
     </html>

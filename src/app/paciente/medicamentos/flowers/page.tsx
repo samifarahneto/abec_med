@@ -79,7 +79,7 @@ export default function FlowersPage() {
             <p className="text-gray-500">Nenhum produto disponível</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-y-6 sm:gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-y-20 sm:gap-6">
             {produtos.map((produto) => (
               <div
                 key={produto.id}
@@ -140,8 +140,10 @@ export default function FlowersPage() {
                     <h3 className="text-sm font-semibold text-gray-700 mb-2">
                       Descrição
                     </h3>
-                    <p className="text-gray-600 text-sm leading-relaxed">
-                      {produto.descricao}
+                    <p className="text-gray-600 text-sm leading-relaxed line-clamp-4">
+                      {produto.descricao.length > 360
+                        ? `${produto.descricao.substring(0, 360)}...`
+                        : produto.descricao}
                     </p>
                   </div>
 

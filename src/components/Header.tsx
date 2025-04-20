@@ -18,10 +18,10 @@ import {
   FaLeaf,
   FaCookie,
   FaSignOutAlt,
-  FaChartLine,
   FaUserCircle,
   FaBox,
 } from "react-icons/fa";
+import { useCarrinho } from "@/contexts/CarrinhoContext";
 
 interface LinkItem {
   href: string;
@@ -49,9 +49,9 @@ const profileLinks: Record<string, LinkItem[]> = {
       icon: <FaBox className="w-5 h-5" />,
     },
     {
-      href: "/admin/relatorios",
-      label: "Relatórios",
-      icon: <FaChartLine className="w-5 h-5" />,
+      href: "/admin/pedidos",
+      label: "Pedidos",
+      icon: <FaShoppingCart className="w-5 h-5" />,
     },
     {
       href: "/admin/configuracoes",
@@ -160,6 +160,7 @@ export default function Header() {
       // O usuário não está autenticado
     },
   });
+  const { quantidadeProdutos } = useCarrinho();
 
   // Fecha o menu quando a rota muda
   useEffect(() => {
@@ -342,13 +343,15 @@ export default function Header() {
             <div className="flex items-center w-12">
               {role === "patient" && (
                 <Link
-                  href="/paciente/carrinho"
-                  className="relative p-2 text-gray-500 hover:text-[#16829E]"
+                  href="/paciente/checkout"
+                  className="relative text-gray-600 hover:text-[#16829E]"
                 >
                   <FaShoppingCart className="w-6 h-6" />
-                  <span className="absolute -top-1 -right-1 bg-[#16829E] text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
-                    0
-                  </span>
+                  {quantidadeProdutos > 0 && (
+                    <span className="absolute -top-1 -right-1 bg-[#16829E] text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+                      {quantidadeProdutos}
+                    </span>
+                  )}
                 </Link>
               )}
             </div>
