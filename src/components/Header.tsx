@@ -8,7 +8,6 @@ import Image from "next/image";
 import {
   FaHome,
   FaUsers,
-  FaCog,
   FaCalendarAlt,
   FaFileMedical,
   FaShoppingCart,
@@ -54,9 +53,9 @@ const profileLinks: Record<string, LinkItem[]> = {
       icon: <FaShoppingCart className="w-5 h-5" />,
     },
     {
-      href: "/admin/configuracoes",
-      label: "Configurações",
-      icon: <FaCog className="w-5 h-5" />,
+      href: "/admin/receitas",
+      label: "Receitas",
+      icon: <FaFileMedical className="w-5 h-5" />,
     },
     {
       href: "/admin/perfil",

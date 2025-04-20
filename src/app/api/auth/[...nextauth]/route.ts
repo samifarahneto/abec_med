@@ -72,14 +72,29 @@ const handler = NextAuth({
   ],
   callbacks: {
     async jwt({ token, user }) {
+      console.log("JWT Callback - Token:", token);
+      console.log("JWT Callback - User:", user);
+
       if (user) {
+        token.id = user.id;
         token.role = user.role;
+        token.email = user.email;
+        token.name = user.name;
       }
       return token;
     },
     async session({ session, token }) {
-      if (session.user) {
-        session.user.role = token.role;
+      console.log("Session Callback - Session:", session);
+      console.log("Session Callback - Token:", token);
+
+      if (token) {
+        session.user = {
+          ...session.user,
+          id: token.id as string,
+          role: token.role as string,
+          email: token.email as string,
+          name: token.name as string,
+        };
       }
       return session;
     },
@@ -89,6 +104,7 @@ const handler = NextAuth({
   },
   session: {
     strategy: "jwt",
+    maxAge: 30 * 24 * 60 * 60, // 30 dias
   },
   secret: process.env.NEXTAUTH_SECRET,
 });

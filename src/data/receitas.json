@@ -1,0 +1,21 @@
+[
+  {
+    "id": "7410de23-ff42-441e-9499-14ceb266fa5a",
+    "paciente": {
+      "id": "67ffea81f8969aab082c3e77",
+      "nome": "Sami Farah Neto",
+      "cpf": "123.456.789-00"
+    },
+    "medico": {
+      "id": "1",
+      "nome": "Médico Teste",
+      "crm": "12345-SP"
+    },
+    "medicamentos": [],
+    "dataEmissao": "2025-04-20T14:15:59.588Z",
+    "dataValidade": "2025-05-20T14:15:59.588Z",
+    "status": "pendente",
+    "arquivo": "586b91df-511a-4c63-9bf7-58011946fe8f.pdf",
+    "observacoes": ""
+  }
+]
