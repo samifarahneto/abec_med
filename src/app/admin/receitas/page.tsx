@@ -9,6 +9,9 @@ import type {
   TextMarkedContent,
 } from "pdfjs-dist/types/src/display/api";
 
+// Configuração do worker do PDF.js
+pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
+
 type TextContentItem = TextItem | TextMarkedContent;
 
 interface Medicamento {
@@ -66,7 +69,6 @@ export default function ReceitasPage() {
 
   useEffect(() => {
     fetchReceitas();
-    pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
   }, []);
 
   const fetchReceitas = async () => {
@@ -112,7 +114,7 @@ export default function ReceitasPage() {
     const updatedMedicamentos = [...editedMedicamentos];
     updatedMedicamentos[index] = {
       ...updatedMedicamentos[index],
-      [field]: value + "g/mês",
+      [field]: value,
     };
     setEditedMedicamentos(updatedMedicamentos);
   };
@@ -130,6 +132,10 @@ export default function ReceitasPage() {
         body: JSON.stringify({
           id,
           medicamentos: medicamentosToUse,
+          medico: extractedData?.medico || {
+            nome: "Médico não encontrado",
+            crm: "CRM não encontrado",
+          },
         }),
       });
 

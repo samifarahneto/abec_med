@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useRef } from "react";
-import { FaTimes } from "react-icons/fa";
+import { FaTimes, FaSearchPlus, FaSearchMinus } from "react-icons/fa";
+import Image from "next/image";
 
 interface ModalReceitasProps {
   isOpen: boolean;
@@ -18,7 +19,9 @@ export default function ModalReceitas({
   const [file, setFile] = useState<File | null>(null);
   const [observacoes, setObservacoes] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [zoom, setZoom] = useState(100);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const previewRef = useRef<HTMLDivElement>(null);
 
   if (!isOpen) return null;
 
@@ -28,6 +31,14 @@ export default function ModalReceitas({
       setFile(selectedFile);
       setError(null);
     }
+  };
+
+  const handleZoomIn = () => {
+    setZoom((prevZoom) => Math.min(prevZoom + 25, 200));
+  };
+
+  const handleZoomOut = () => {
+    setZoom((prevZoom) => Math.max(prevZoom - 25, 50));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -59,14 +70,12 @@ export default function ModalReceitas({
       const data = await response.json();
       console.log("Receita enviada com sucesso:", data);
 
-      // Limpar formulário e fechar modal
       setFile(null);
       setObservacoes("");
       if (fileInputRef.current) {
         fileInputRef.current.value = "";
       }
 
-      // Chamar o callback de sucesso se existir
       if (onUploadSuccess) {
         onUploadSuccess();
       }
@@ -84,7 +93,7 @@ export default function ModalReceitas({
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg p-6 w-full max-w-2xl">
+      <div className="bg-white rounded-lg p-6 w-full max-w-4xl">
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-xl font-bold text-[#16829E]">Enviar Receita</h2>
           <button
@@ -119,9 +128,62 @@ export default function ModalReceitas({
                 Formatos aceitos: PDF, JPG, JPEG, PNG
               </p>
               {file && (
-                <p className="mt-2 text-sm text-gray-600">
-                  Arquivo selecionado: {file.name}
-                </p>
+                <div className="mt-4">
+                  <div className="flex justify-between items-center mb-2">
+                    <p className="text-sm text-gray-600">
+                      Arquivo selecionado: {file.name}
+                    </p>
+                    <div className="flex items-center space-x-2 bg-gray-100 px-2 py-1 rounded">
+                      <button
+                        type="button"
+                        onClick={handleZoomOut}
+                        className="p-1 text-gray-600 hover:text-[#16829E]"
+                        title="Diminuir zoom"
+                      >
+                        <FaSearchMinus />
+                      </button>
+                      <span className="text-sm text-gray-600">{zoom}%</span>
+                      <button
+                        type="button"
+                        onClick={handleZoomIn}
+                        className="p-1 text-gray-600 hover:text-[#16829E]"
+                        title="Aumentar zoom"
+                      >
+                        <FaSearchPlus />
+                      </button>
+                    </div>
+                  </div>
+                  <div
+                    ref={previewRef}
+                    className="border rounded-lg overflow-hidden bg-gray-50"
+                    style={{ height: "500px" }}
+                  >
+                    {file.type === "application/pdf" ? (
+                      <iframe
+                        src={URL.createObjectURL(file)}
+                        className="w-full h-full"
+                        style={{
+                          transform: `scale(${zoom / 100})`,
+                          transformOrigin: "0 0",
+                        }}
+                        title="Preview do arquivo"
+                      />
+                    ) : (
+                      <div className="relative w-full h-full">
+                        <Image
+                          src={URL.createObjectURL(file)}
+                          alt="Preview"
+                          fill
+                          className="object-contain"
+                          style={{
+                            transform: `scale(${zoom / 100})`,
+                            transformOrigin: "0 0",
+                          }}
+                        />
+                      </div>
+                    )}
+                  </div>
+                </div>
               )}
             </div>
 
