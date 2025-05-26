@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { FaPlus, FaEdit, FaTrash } from "react-icons/fa";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
+import ModalEditarProduto from "@/components/ModalEditarProduto";
 
 interface Produto {
   id: number;
@@ -23,6 +24,7 @@ export default function Estoque() {
   const router = useRouter();
   const [produtos, setProdutos] = useState<Produto[]>([]);
   const [loading, setLoading] = useState(true);
+  const [produtoEditando, setProdutoEditando] = useState<Produto | null>(null);
 
   useEffect(() => {
     const carregarProdutos = async () => {
@@ -74,6 +76,32 @@ export default function Estoque() {
         console.error("Erro ao excluir produto:", error);
         alert("Erro ao excluir o produto");
       }
+    }
+  };
+
+  const handleEditarProduto = async (produto: Produto) => {
+    try {
+      const response = await fetch(`/api/produtos/${produto.id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(produto),
+      });
+
+      if (response.ok) {
+        setProdutos((prevProdutos) =>
+          prevProdutos.map((p) => (p.id === produto.id ? produto : p))
+        );
+        setProdutoEditando(null);
+        alert("Produto atualizado com sucesso!");
+      } else {
+        const data = await response.json();
+        alert(data.error || "Erro ao atualizar o produto");
+      }
+    } catch (error) {
+      console.error("Erro ao atualizar produto:", error);
+      alert("Erro ao atualizar o produto");
     }
   };
 
@@ -172,9 +200,7 @@ export default function Estoque() {
                     </td>
                     <td className="w-[14.28%] px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                       <button
-                        onClick={() =>
-                          router.push(`/admin/estoque/editar/${produto.id}`)
-                        }
+                        onClick={() => setProdutoEditando(produto)}
                         className="text-[#16829E] hover:text-[#126a7e] mr-4"
                       >
                         <FaEdit className="w-4 h-4" />
@@ -199,7 +225,7 @@ export default function Estoque() {
   };
 
   return (
-    <div className="w-full">
+    <div className="container mx-auto px-4 py-8">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold text-[#16829E]">Gerenciar Estoque</h1>
         <button
@@ -221,6 +247,12 @@ export default function Estoque() {
           {renderTabela("Comestíveis")}
         </>
       )}
+
+      <ModalEditarProduto
+        produto={produtoEditando}
+        onCloseAction={() => setProdutoEditando(null)}
+        onSaveAction={handleEditarProduto}
+      />
     </div>
   );
 }

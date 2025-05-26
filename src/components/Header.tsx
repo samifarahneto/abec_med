@@ -65,19 +65,24 @@ const profileLinks: Record<string, LinkItem[]> = {
   ],
   doctor: [
     {
-      href: "/medico/consultas",
-      label: "Consultas",
-      icon: <FaCalendarAlt className="w-5 h-5" />,
+      href: "/medic",
+      label: "Dashboard",
+      icon: <FaHome className="w-5 h-5" />,
     },
     {
-      href: "/medico/pacientes",
+      href: "/medic/pacientes",
       label: "Pacientes",
       icon: <FaUsers className="w-5 h-5" />,
     },
     {
-      href: "/medico/agenda",
-      label: "Agenda",
-      icon: <FaCalendarAlt className="w-5 h-5" />,
+      href: "/medic/pedidos",
+      label: "Pedidos",
+      icon: <FaShoppingCart className="w-5 h-5" />,
+    },
+    {
+      href: "/medic/medicamentos",
+      label: "Medicamentos",
+      icon: <FaPills className="w-5 h-5" />,
     },
   ],
   reception: [

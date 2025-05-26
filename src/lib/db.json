@@ -15,6 +15,14 @@
       "password": "$2b$10$hKZfAQbWnZ5PEjUG4Hz..O4r7FTEz3F2bDXOz7ZbTWJgenr2u1L4q",
       "role": "patient",
       "active": true
+    },
+    {
+      "name": "Medico",
+      "email": "medico@gmail.com",
+      "password": "$2b$10$/9bqacSR0a/ueEp0HAVEqOCMPEZgDxV8rWz.URF0BooN/NIMNHGnO",
+      "role": "doctor",
+      "active": true,
+      "id": "3"
     }
   ]
 }

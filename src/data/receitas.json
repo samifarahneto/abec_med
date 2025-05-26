@@ -33,5 +33,113 @@
     "status": "aprovada",
     "arquivo": "eba1119e-e7a4-4268-84c2-3a6b78579a46.pdf",
     "observacoes": ""
+  },
+  {
+    "id": "c9427e49-6a1f-4d28-98ad-27518db77d14",
+    "paciente": {
+      "id": "67ffea81f8969aab082c3e77",
+      "nome": "Sami Farah Neto",
+      "cpf": "123.456.789-00"
+    },
+    "medico": {
+      "id": "1",
+      "nome": "FERNANDA BACELLAR DE FREITAS",
+      "crm": "94909-4"
+    },
+    "medicamentos": [
+      {
+        "nome": "Extrato Concentrado Sem Solvente",
+        "variacao": "THC",
+        "quantidadeMensal": 30
+      },
+      {
+        "nome": "Extrato Concentrado Com Solvente",
+        "variacao": "THC",
+        "quantidadeMensal": 30
+      },
+      {
+        "nome": "Inflorescências Terapêuticas",
+        "variacao": "THC",
+        "quantidadeMensal": 60
+      }
+    ],
+    "dataEmissao": "2025-04-21T15:04:14.259Z",
+    "dataValidade": "2025-05-21T15:04:14.259Z",
+    "status": "aprovada",
+    "arquivo": "136b7872-29a2-410b-95c3-d355665bc663.pdf",
+    "observacoes": ""
+  },
+  {
+    "id": "18ef6833-2f03-40cb-a884-4faeb58400ac",
+    "paciente": {
+      "id": "67ffea81f8969aab082c3e77",
+      "nome": "Sami Farah Neto",
+      "cpf": "123.456.789-00"
+    },
+    "medico": {
+      "id": "1",
+      "nome": "FERNANDA BACELLAR DE FREITAS",
+      "crm": "94909-4"
+    },
+    "medicamentos": [
+      {
+        "nome": "Inflorescências Terapêuticas",
+        "variacao": "THC",
+        "quantidadeMensal": 60
+      }
+    ],
+    "dataEmissao": "2025-04-21T15:14:23.593Z",
+    "dataValidade": "2025-05-21T15:14:23.593Z",
+    "status": "aprovada",
+    "arquivo": "b3504d9f-d4fa-4285-a5f0-d08e3a45fde3.pdf",
+    "observacoes": ""
+  },
+  {
+    "id": "3dd22a34-4604-441f-8f6f-fcbdbaa7cfbc",
+    "paciente": {
+      "id": "67ffea81f8969aab082c3e77",
+      "nome": "Sami Farah Neto",
+      "cpf": "123.456.789-00"
+    },
+    "medico": {
+      "id": "1",
+      "nome": "FERNANDA BACELLAR DE FREITAS",
+      "crm": "94909-4"
+    },
+    "medicamentos": [
+      {
+        "quantidadeMensal": 60
+      }
+    ],
+    "dataEmissao": "2025-04-21T15:40:47.772Z",
+    "dataValidade": "2025-05-21T15:40:47.772Z",
+    "status": "aprovada",
+    "arquivo": "f5c963cf-767d-457f-8b57-597c359c27dc.pdf",
+    "observacoes": ""
+  },
+  {
+    "id": "1cea1797-8b8b-48e4-82fa-f3c12dda0d83",
+    "paciente": {
+      "id": "67ffea81f8969aab082c3e77",
+      "nome": "Sami Farah Neto",
+      "cpf": "123.456.789-00"
+    },
+    "medico": {
+      "id": "1",
+      "nome": "FERNANDA BACELLAR DE FREITAS",
+      "crm": "94909-4"
+    },
+    "medicamentos": [
+      {
+        "nome": "Inflorescências Terapêuticas",
+        "variacao": "THC",
+        "quantidadeMensal": 60
+      }
+    ],
+    "dataEmissao": "2025-04-21T16:03:43.913Z",
+    "dataValidade": "2025-05-21T16:03:43.914Z",
+    "status": "aprovada",
+    "arquivo": "77176b21-3122-4185-a6c9-5c4990d0b320.pdf",
+    "observacoes": ""
   }
 ]

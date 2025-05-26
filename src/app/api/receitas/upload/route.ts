@@ -99,8 +99,8 @@ export async function POST(request: NextRequest) {
       },
       medico: {
         id: "1", // TODO: Pegar do médico da receita
-        nome: "Médico Teste", // TODO: Pegar do médico da receita
-        crm: "12345-SP", // TODO: Pegar do médico da receita
+        nome: "Aguardando Análise", // TODO: Pegar do médico da receita
+        crm: "Aguardando Análise", // TODO: Pegar do médico da receita
       },
       medicamentos: [], // TODO: Extrair da receita
       dataEmissao: new Date().toISOString(),

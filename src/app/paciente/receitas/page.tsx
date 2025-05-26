@@ -1,11 +1,17 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import MainLayout from "@/components/MainLayout";
-import { FaUpload, FaFilePdf } from "react-icons/fa";
+import { FaUpload, FaFilePdf, FaClipboardList, FaTimes } from "react-icons/fa";
 import ModalReceitas from "@/components/ModalReceitas";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
+
+interface Medicamento {
+  nome: string;
+  variacao: string;
+  quantidadeMensal: number;
+}
 
 interface Receita {
   id: string;
@@ -19,11 +25,7 @@ interface Receita {
     nome: string;
     crm: string;
   };
-  medicamentos: {
-    nome: string;
-    dosagem: string;
-    posologia: string;
-  }[];
+  medicamentos: Medicamento[];
   dataEmissao: string;
   dataValidade: string;
   status: "pendente" | "aprovada" | "rejeitada";
@@ -43,6 +45,31 @@ export default function ReceitasPaciente() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isControleModalOpen, setIsControleModalOpen] = useState(false);
+  const [medicamentosAgrupados, setMedicamentosAgrupados] = useState<
+    Record<string, number>
+  >({});
+
+  const calcularMedicamentosAgrupados = useCallback(() => {
+    const agrupados: Record<string, number> = {};
+
+    receitas.forEach((receita) => {
+      if (receita.status === "aprovada") {
+        receita.medicamentos.forEach((med) => {
+          const chave = `${med.nome} (${med.variacao})`;
+          agrupados[chave] = (agrupados[chave] || 0) + med.quantidadeMensal;
+        });
+      }
+    });
+
+    setMedicamentosAgrupados(agrupados);
+  }, [receitas]);
+
+  useEffect(() => {
+    if (receitas.length > 0) {
+      calcularMedicamentosAgrupados();
+    }
+  }, [receitas, calcularMedicamentosAgrupados]);
 
   const recarregarReceitas = async () => {
     try {
@@ -160,13 +187,24 @@ export default function ReceitasPaciente() {
   return (
     <MainLayout>
       <div className="mb-4">
-        <button
-          onClick={() => setIsModalOpen(true)}
-          className="inline-flex items-center text-[#16829E] hover:text-[#126a7e]"
-        >
-          <FaUpload className="mr-2" />
-          Enviar receita
-        </button>
+        <div className="border-b border-gray-200">
+          <nav className="-mb-px flex space-x-8">
+            <button
+              onClick={() => setIsModalOpen(true)}
+              className="inline-flex items-center px-1 py-4 border-b-2 border-[#16829E] text-[#16829E] font-medium"
+            >
+              <FaUpload className="mr-2" />
+              Enviar receita
+            </button>
+            <button
+              onClick={() => setIsControleModalOpen(true)}
+              className="inline-flex items-center px-1 py-4 border-b-2 border-transparent text-gray-500 hover:text-[#16829E] hover:border-[#16829E] font-medium"
+            >
+              <FaClipboardList className="mr-2" />
+              Controle de receitas
+            </button>
+          </nav>
+        </div>
       </div>
 
       <div className="flex justify-between items-center mb-6">
@@ -256,6 +294,62 @@ export default function ReceitasPaciente() {
                 ))}
               </tbody>
             </table>
+          </div>
+        </div>
+      )}
+
+      {/* Modal de Controle de Receitas */}
+      {isControleModalOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 w-full max-w-2xl">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xl font-bold text-[#16829E]">
+                Controle de Medicamentos
+              </h2>
+              <button
+                onClick={() => setIsControleModalOpen(false)}
+                className="text-gray-500 hover:text-gray-700"
+              >
+                <FaTimes size={20} />
+              </button>
+            </div>
+
+            <div className="space-y-4">
+              {Object.entries(medicamentosAgrupados).length > 0 ? (
+                <div className="overflow-x-auto">
+                  <table className="min-w-full divide-y divide-gray-200">
+                    <thead className="bg-gray-50">
+                      <tr>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Medicamento
+                        </th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Quantidade Mensal
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody className="bg-white divide-y divide-gray-200">
+                      {Object.entries(medicamentosAgrupados).map(
+                        ([medicamento, quantidade]) => (
+                          <tr key={medicamento}>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                              {medicamento}
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                              {quantidade} unidades
+                            </td>
+                          </tr>
+                        )
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              ) : (
+                <p className="text-center text-gray-500">
+                  Nenhum medicamento encontrado em receitas aprovadas.
+                </p>
+              )}
+            </div>
           </div>
         </div>
       )}
