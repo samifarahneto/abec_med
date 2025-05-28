@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { FaUpload, FaTimes } from "react-icons/fa";
 import Image from "next/image";
 import FormLayout from "@/components/ui/form-layout";
+import MainLayout from "@/components/MainLayout"; // Import MainLayout
 
 interface Produto {
   id: number;
@@ -28,8 +29,8 @@ export default function NovoProduto() {
     tipo: "Flor",
     strain_type: "Sativa",
     canabinoide: "THC",
-    quantidade: 0,
-    preco: 0,
+    quantidade: "", // Initialize as string for empty input
+    preco: "", // Initialize as string for empty input
     foto: null,
     descricao: "",
     dataCadastro: new Date().toISOString(),
@@ -72,7 +73,7 @@ export default function NovoProduto() {
     const { name, value } = e.target;
     setProduto((prev) => ({
       ...prev,
-      [name]: name === "quantidade" || name === "preco" ? Number(value) : value,
+      [name]: value, // Keep value as string for controlled inputs
     }));
   };
 
@@ -90,15 +91,17 @@ export default function NovoProduto() {
 
   const validarFormulario = () => {
     const novosErros: Partial<Produto> = {};
+    const quantidadeNum = Number(produto.quantidade);
+    const precoNum = Number(produto.preco);
 
     if (!produto.nome) novosErros.nome = "Nome é obrigatório";
     if (!produto.tipo) novosErros.tipo = "Tipo é obrigatório";
     if (!produto.canabinoide)
-      novosErros.canabinoide = "Canabinoide é obrigatório";
-    if (typeof produto.quantidade === "number" && produto.quantidade < 0)
-      novosErros.quantidade = "Quantidade não pode ser negativa";
-    if (typeof produto.preco === "number" && produto.preco < 0)
-      novosErros.preco = "Preço não pode ser negativo";
+      novosErros.canabinoide = "Canabinóide é obrigatório";
+    if (isNaN(quantidadeNum) || quantidadeNum < 0)
+      novosErros.quantidade = "Quantidade inválida ou negativa";
+    if (isNaN(precoNum) || precoNum < 0)
+      novosErros.preco = "Preço inválido ou negativo";
 
     setErros(novosErros);
     return Object.keys(novosErros).length === 0;
@@ -109,7 +112,6 @@ export default function NovoProduto() {
 
     if (validarFormulario()) {
       try {
-        // Se houver uma foto, converte para base64
         let fotoBase64 = null;
         if (produto.foto instanceof File) {
           fotoBase64 = await new Promise((resolve) => {
@@ -121,17 +123,16 @@ export default function NovoProduto() {
           });
         }
 
-        // Cria o objeto de produto com a foto em base64 e as tags
         const produtoParaEnviar = {
           ...produto,
+          quantidade: Number(produto.quantidade),
+          preco: Number(produto.preco),
           foto: fotoBase64 || "/produtos/sem-foto.jpg",
           tags: [
             ...selectedTags,
             ...negativeTags.map((tag) => `negativo:${tag}`),
           ],
         };
-
-        console.log("Enviando produto:", produtoParaEnviar); // Debug
 
         const response = await fetch("/api/produtos", {
           method: "POST",
@@ -142,12 +143,11 @@ export default function NovoProduto() {
         });
 
         const data = await response.json();
-        console.log("Resposta da API:", data); // Debug
 
         if (data.success) {
           router.push("/admin/estoque");
         } else {
-          alert("Erro ao salvar o produto. Por favor, tente novamente.");
+          alert(data.error || "Erro ao salvar o produto. Por favor, tente novamente.");
         }
       } catch (error) {
         console.error("Erro ao salvar o produto:", error);
@@ -157,263 +157,270 @@ export default function NovoProduto() {
   };
 
   return (
-    <FormLayout
-      title="Novo Produto"
-      onBack={() => router.push("/admin/estoque")}
-      onSubmit={handleSubmit}
-      onCancel={() => router.push("/admin/estoque")}
-    >
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 px-6">
-        {/* Nome */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700">
-            Nome do Produto *
-          </label>
-          <input
-            type="text"
-            name="nome"
-            value={produto.nome}
-            onChange={handleChange}
-            className={`mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#16829E] focus:ring-[#16829E] text-gray-900 ${
-              erros.nome ? "border-red-500" : ""
-            }`}
-            placeholder="Digite o nome do produto"
-          />
-          {erros.nome && (
-            <p className="mt-1 text-sm text-red-500">{erros.nome}</p>
-          )}
-        </div>
-
-        {/* Tipo de Produto */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700">
-            Tipo de Produto *
-          </label>
-          <select
-            name="tipo"
-            value={produto.tipo}
-            onChange={handleChange}
-            className={`mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#16829E] focus:ring-[#16829E] text-gray-900 ${
-              erros.tipo ? "border-red-500" : ""
-            }`}
-          >
-            <option value="Flor">Flor</option>
-            <option value="Óleo">Óleo</option>
-            <option value="Concentrado">Concentrado</option>
-            <option value="Comestíveis">Comestíveis</option>
-          </select>
-          {erros.tipo && (
-            <p className="mt-1 text-sm text-red-500">{erros.tipo}</p>
-          )}
-        </div>
-
-        {/* Strain Type - Apenas para Flores */}
-        {produto.tipo === "Flor" && (
+    // Wrap the entire page content with MainLayout
+    <MainLayout>
+      {/* FormLayout now sits inside MainLayout */}
+      <FormLayout
+        title="Novo Produto"
+        onBack={() => router.push("/admin/estoque")}
+        onSubmit={handleSubmit}
+        onCancel={() => router.push("/admin/estoque")}
+      >
+        {/* Form fields remain inside FormLayout's children */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* Nome */}
           <div>
             <label className="block text-sm font-medium text-gray-700">
-              Tipo de Strain *
+              Nome do Produto *
             </label>
-            <select
-              name="strain_type"
-              value={produto.strain_type}
+            <input
+              type="text"
+              name="nome"
+              value={produto.nome}
               onChange={handleChange}
               className={`mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#16829E] focus:ring-[#16829E] text-gray-900 ${
-                erros.strain_type ? "border-red-500" : ""
+                erros.nome ? "border-red-500" : ""
+              }`}
+              placeholder="Digite o nome do produto"
+            />
+            {erros.nome && (
+              <p className="mt-1 text-sm text-red-500">{erros.nome}</p>
+            )}
+          </div>
+
+          {/* Tipo de Produto */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700">
+              Tipo de Produto *
+            </label>
+            <select
+              name="tipo"
+              value={produto.tipo}
+              onChange={handleChange}
+              className={`mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#16829E] focus:ring-[#16829E] text-gray-900 ${
+                erros.tipo ? "border-red-500" : ""
               }`}
             >
-              <option value="Sativa">Sativa</option>
-              <option value="Indica">Indica</option>
-              <option value="Híbrida">Híbrida</option>
+              <option value="Flor">Flor</option>
+              <option value="Óleo">Óleo</option>
+              <option value="Concentrado">Concentrado</option>
+              <option value="Comestíveis">Comestíveis</option>
             </select>
-            {erros.strain_type && (
-              <p className="mt-1 text-sm text-red-500">{erros.strain_type}</p>
+            {erros.tipo && (
+              <p className="mt-1 text-sm text-red-500">{erros.tipo}</p>
             )}
           </div>
-        )}
 
-        {/* Canabinóide */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700">
-            Canabinóide *
-          </label>
-          <select
-            name="canabinoide"
-            value={produto.canabinoide}
-            onChange={handleChange}
-            className={`mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#16829E] focus:ring-[#16829E] text-gray-900 ${
-              erros.canabinoide ? "border-red-500" : ""
-            }`}
-          >
-            <option value="THC">THC</option>
-            <option value="CBD">CBD</option>
-            <option value="CBG">CBG</option>
-            <option value="CBN">CBN</option>
-          </select>
-          {erros.canabinoide && (
-            <p className="mt-1 text-sm text-red-500">{erros.canabinoide}</p>
-          )}
-        </div>
-
-        {/* Quantidade */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700">
-            Quantidade *
-          </label>
-          <input
-            type="number"
-            name="quantidade"
-            value={produto.quantidade}
-            onChange={handleChange}
-            className={`mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#16829E] focus:ring-[#16829E] text-gray-900 ${
-              erros.quantidade ? "border-red-500" : ""
-            }`}
-            placeholder="Digite a quantidade"
-          />
-          {erros.quantidade && (
-            <p className="mt-1 text-sm text-red-500">{erros.quantidade}</p>
-          )}
-        </div>
-
-        {/* Preço */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700">
-            Preço *
-          </label>
-          <input
-            type="number"
-            name="preco"
-            value={produto.preco}
-            onChange={handleChange}
-            step="0.01"
-            className={`mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#16829E] focus:ring-[#16829E] text-gray-900 ${
-              erros.preco ? "border-red-500" : ""
-            }`}
-            placeholder="Digite o preço"
-          />
-          {erros.preco && (
-            <p className="mt-1 text-sm text-red-500">{erros.preco}</p>
-          )}
-        </div>
-
-        {/* Foto */}
-        <div className="md:col-span-2">
-          <label className="block text-sm font-medium text-gray-700">
-            Foto do Produto
-          </label>
-          <div className="mt-1 flex items-center gap-4">
-            <div className="flex-1">
-              <input
-                type="file"
-                accept="image/*"
-                onChange={handleFotoChange}
-                className="hidden"
-                id="foto"
-              />
-              <label
-                htmlFor="foto"
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors flex items-center justify-center gap-2 text-gray-600"
-              >
-                <FaUpload className="w-5 h-5" />
-                Clique para selecionar uma foto do produto
+          {/* Strain Type - Apenas para Flores */}
+          {produto.tipo === "Flor" && (
+            <div>
+              <label className="block text-sm font-medium text-gray-700">
+                Tipo de Strain *
               </label>
+              <select
+                name="strain_type"
+                value={produto.strain_type}
+                onChange={handleChange}
+                className={`mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#16829E] focus:ring-[#16829E] text-gray-900 ${
+                  erros.strain_type ? "border-red-500" : ""
+                }`}
+              >
+                <option value="Sativa">Sativa</option>
+                <option value="Indica">Indica</option>
+                <option value="Híbrida">Híbrida</option>
+              </select>
+              {erros.strain_type && (
+                <p className="mt-1 text-sm text-red-500">{erros.strain_type}</p>
+              )}
             </div>
-            {previewFoto && (
-              <div className="w-24 h-24 border rounded-lg overflow-hidden relative">
-                <Image
-                  src={previewFoto}
-                  alt="Preview"
-                  fill
-                  className="object-cover"
-                />
-              </div>
+          )}
+
+          {/* Canabinóide */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700">
+              Canabinóide *
+            </label>
+            <select
+              name="canabinoide"
+              value={produto.canabinoide}
+              onChange={handleChange}
+              className={`mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#16829E] focus:ring-[#16829E] text-gray-900 ${
+                erros.canabinoide ? "border-red-500" : ""
+              }`}
+            >
+              <option value="THC">THC</option>
+              <option value="CBD">CBD</option>
+              <option value="CBG">CBG</option>
+              <option value="CBN">CBN</option>
+            </select>
+            {erros.canabinoide && (
+              <p className="mt-1 text-sm text-red-500">{erros.canabinoide}</p>
             )}
           </div>
-        </div>
 
-        {/* Descrição */}
-        <div className="md:col-span-2">
-          <label className="block text-sm font-medium text-gray-700">
-            Descrição
-          </label>
-          <textarea
-            name="descricao"
-            value={produto.descricao}
-            onChange={handleChange}
-            rows={4}
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#16829E] focus:ring-[#16829E] text-gray-900"
-            placeholder="Descreva as características do produto..."
-          />
-        </div>
+          {/* Quantidade */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700">
+              Quantidade *
+            </label>
+            <input
+              type="number"
+              name="quantidade"
+              value={produto.quantidade}
+              onChange={handleChange}
+              min="0" // Add min attribute
+              className={`mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#16829E] focus:ring-[#16829E] text-gray-900 ${
+                erros.quantidade ? "border-red-500" : ""
+              }`}
+              placeholder="Digite a quantidade"
+            />
+            {erros.quantidade && (
+              <p className="mt-1 text-sm text-red-500">{erros.quantidade}</p>
+            )}
+          </div>
 
-        {/* Tags */}
-        <div className="md:col-span-2">
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Tags Positivas
-          </label>
+          {/* Preço */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700">
+              Preço *
+            </label>
+            <input
+              type="number"
+              name="preco"
+              value={produto.preco}
+              onChange={handleChange}
+              step="0.01"
+              min="0" // Add min attribute
+              className={`mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#16829E] focus:ring-[#16829E] text-gray-900 ${
+                erros.preco ? "border-red-500" : ""
+              }`}
+              placeholder="Digite o preço"
+            />
+            {erros.preco && (
+              <p className="mt-1 text-sm text-red-500">{erros.preco}</p>
+            )}
+          </div>
+
+          {/* Foto */}
+          <div className="md:col-span-2">
+            <label className="block text-sm font-medium text-gray-700">
+              Foto do Produto
+            </label>
+            <div className="mt-1 flex items-center gap-4">
+              <div className="flex-1">
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleFotoChange}
+                  className="hidden"
+                  id="foto"
+                />
+                <label
+                  htmlFor="foto"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors flex items-center justify-center gap-2 text-gray-600"
+                >
+                  <FaUpload className="w-5 h-5" />
+                  Clique para selecionar uma foto do produto
+                </label>
+              </div>
+              {previewFoto && (
+                <div className="w-24 h-24 border rounded-lg overflow-hidden relative flex-shrink-0">
+                  <Image
+                    src={previewFoto}
+                    alt="Preview"
+                    fill
+                    sizes="96px" // Added sizes attribute
+                    className="object-cover"
+                  />
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Descrição */}
+          <div className="md:col-span-2">
+            <label className="block text-sm font-medium text-gray-700">
+              Descrição
+            </label>
+            <textarea
+              name="descricao"
+              value={produto.descricao}
+              onChange={handleChange}
+              rows={4}
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#16829E] focus:ring-[#16829E] text-gray-900"
+              placeholder="Descreva as características do produto..."
+            />
+          </div>
 
           {/* Tags Positivas */}
-          <div className="flex flex-wrap gap-2">
-            {availableTags.map((tag) => (
-              <button
-                key={tag}
-                type="button"
-                onClick={() => toggleTag(tag)}
-                className={`px-3 py-1.5 rounded-full text-sm font-medium transition-all duration-200 flex items-center gap-2 ${
-                  selectedTags.includes(tag)
-                    ? "bg-[#16829E] text-white"
-                    : "bg-[#16829E]/10 text-[#16829E] hover:bg-[#16829E]/20"
-                }`}
-              >
-                {tag}
-                {selectedTags.includes(tag) && <FaTimes className="w-3 h-3" />}
-              </button>
-            ))}
+          <div className="md:col-span-2">
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Tags Positivas (Efeitos Terapêuticos)
+            </label>
+            <div className="flex flex-wrap gap-2">
+              {availableTags.map((tag) => (
+                <button
+                  key={tag}
+                  type="button"
+                  onClick={() => toggleTag(tag)}
+                  className={`px-3 py-1.5 rounded-full text-sm font-medium transition-all duration-200 flex items-center gap-2 ${
+                    selectedTags.includes(tag)
+                      ? "bg-[#16829E] text-white"
+                      : "bg-[#16829E]/10 text-[#16829E] hover:bg-[#16829E]/20"
+                  }`}
+                >
+                  {tag}
+                  {selectedTags.includes(tag) && <FaTimes className="w-3 h-3" />}
+                </button>
+              ))}
+            </div>
           </div>
-        </div>
 
-        {/* Tags Negativas */}
-        <div className="md:col-span-2">
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Efeitos Colaterais
-          </label>
-          <div className="flex flex-wrap gap-2">
-            {[
-              "Sonolência",
-              "Tontura",
-              "Boca Seca",
-              "Fome",
-              "Ansiedade",
-              "Paranoia",
-              "Náusea",
-              "Dor de Cabeça",
-              "Insônia",
-              "Fadiga",
-            ].map((tag) => (
-              <button
-                key={tag}
-                type="button"
-                onClick={() => {
-                  setNegativeTags((prev) => {
-                    if (prev.includes(tag)) {
-                      return prev.filter((t) => t !== tag);
-                    } else {
-                      return [...prev, tag];
-                    }
-                  });
-                }}
-                className={`px-3 py-1.5 rounded-full text-sm font-medium transition-all duration-200 flex items-center gap-2 ${
-                  negativeTags.includes(tag)
-                    ? "bg-red-500 text-white"
-                    : "bg-red-100 text-red-500 hover:bg-red-200"
-                }`}
-              >
-                {tag}
-                {negativeTags.includes(tag) && <FaTimes className="w-3 h-3" />}
-              </button>
-            ))}
+          {/* Tags Negativas */}
+          <div className="md:col-span-2">
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Tags Negativas (Efeitos Colaterais)
+            </label>
+            <div className="flex flex-wrap gap-2">
+              {[
+                "Sonolência",
+                "Tontura",
+                "Boca Seca",
+                "Fome",
+                "Ansiedade",
+                "Paranoia",
+                "Náusea",
+                "Dor de Cabeça",
+                "Insônia",
+                "Fadiga",
+              ].map((tag) => (
+                <button
+                  key={tag}
+                  type="button"
+                  onClick={() => {
+                    setNegativeTags((prev) => {
+                      if (prev.includes(tag)) {
+                        return prev.filter((t) => t !== tag);
+                      } else {
+                        return [...prev, tag];
+                      }
+                    });
+                  }}
+                  className={`px-3 py-1.5 rounded-full text-sm font-medium transition-all duration-200 flex items-center gap-2 ${
+                    negativeTags.includes(tag)
+                      ? "bg-red-500 text-white"
+                      : "bg-red-100 text-red-500 hover:bg-red-200"
+                  }`}
+                >
+                  {tag}
+                  {negativeTags.includes(tag) && <FaTimes className="w-3 h-3" />}
+                </button>
+              ))}
+            </div>
           </div>
         </div>
-      </div>
-    </FormLayout>
+      </FormLayout>
+    </MainLayout>
   );
 }
+

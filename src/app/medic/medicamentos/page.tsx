@@ -3,72 +3,122 @@
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
-import { FaSearch, FaPills } from "react-icons/fa";
+import { FaSearch } from "react-icons/fa";
 import MainLayout from "@/components/MainLayout";
 
+// Interfaces para os tipos de medicamentos
 interface Medicamento {
-  id: string;
+  id: number;
   nome: string;
   tipo: string;
-  concentracao: string;
-  apresentacao: string;
+  strain_type?: string;
+  canabinoide: string;
   quantidade: number;
-  status: "disponivel" | "baixo" | "indisponivel";
+  preco: number;
+  foto: string;
 }
 
 export default function MedicamentosPage() {
   const router = useRouter();
   const { data: session, status } = useSession();
-  const [medicamentos, setMedicamentos] = useState<Medicamento[]>([]);
   const [busca, setBusca] = useState("");
+
+  // Estados para cada categoria de medicamento
+  const [oleos, setOleos] = useState<Medicamento[]>([]);
+  const [flores, setFlores] = useState<Medicamento[]>([]);
+  const [concentrados, setConcentrados] = useState<Medicamento[]>([]);
+  const [comestiveis, setComestiveis] = useState<Medicamento[]>([]);
+  const [loadingData, setLoadingData] = useState(true);
+  const [errorLoading, setErrorLoading] = useState<string | null>(null);
 
   useEffect(() => {
     if (status === "unauthenticated") {
       router.push("/login");
-    } else if (session?.user?.role !== "doctor") {
+    } else if (status === "authenticated" && session?.user?.role !== "doctor") {
       router.push("/");
-    } else {
+    } else if (status === "authenticated") {
       carregarMedicamentos();
     }
   }, [session, status, router]);
 
-  const carregarMedicamentos = () => {
-    // Simulando dados de medicamentos
-    setMedicamentos([
-      {
-        id: "1",
-        nome: "Paracetamol",
-        tipo: "Analgésico",
-        concentracao: "500mg",
-        apresentacao: "Comprimido",
-        quantidade: 100,
-        status: "disponivel",
-      },
-      {
-        id: "2",
-        nome: "Dipirona",
-        tipo: "Analgésico",
-        concentracao: "1g",
-        apresentacao: "Comprimido",
-        quantidade: 50,
-        status: "baixo",
-      },
-      {
-        id: "3",
-        nome: "Amoxicilina",
-        tipo: "Antibiótico",
-        concentracao: "500mg",
-        apresentacao: "Cápsula",
-        quantidade: 0,
-        status: "indisponivel",
-      },
-    ]);
+  const carregarMedicamentos = async () => {
+    setLoadingData(true);
+    setErrorLoading(null);
+    try {
+      // Usando fetch para carregar os arquivos da pasta public
+      const [oleosRes, floresRes, concentradosRes, comestiveisRes] =
+        await Promise.all([
+          fetch("/oleos.json"),
+          fetch("/flores.json"),
+          fetch("/concentrados.json"),
+          fetch("/comestiveis.json"),
+        ]);
+
+      // Verificando se todos os arquivos foram carregados com sucesso
+      if (
+        !oleosRes.ok ||
+        !floresRes.ok ||
+        !concentradosRes.ok ||
+        !comestiveisRes.ok
+      ) {
+        throw new Error("Falha ao carregar dados dos medicamentos");
+      }
+
+      // Convertendo as respostas para JSON
+      const [oleosData, floresData, concentradosData, comestiveisData] =
+        await Promise.all([
+          oleosRes.json(),
+          floresRes.json(),
+          concentradosRes.json(),
+          comestiveisRes.json(),
+        ]);
+
+      // Atualizando os estados com os dados carregados
+      setOleos(oleosData.produtos || []);
+      setFlores(floresData.produtos || []);
+      setConcentrados(concentradosData.produtos || []);
+      setComestiveis(comestiveisData.produtos || []);
+    } catch (error) {
+      console.error("Erro ao carregar medicamentos:", error);
+      setErrorLoading(
+        "Não foi possível carregar os dados dos medicamentos. Verifique se os arquivos JSON estão na pasta 'public' do projeto."
+      );
+    } finally {
+      setLoadingData(false);
+    }
   };
 
-  const medicamentosFiltrados = medicamentos.filter(
+  // Filtragem de medicamentos com base na busca
+  const oleosFiltrados = oleos.filter(
     (med) =>
       med.nome.toLowerCase().includes(busca.toLowerCase()) ||
-      med.tipo.toLowerCase().includes(busca.toLowerCase())
+      med.tipo.toLowerCase().includes(busca.toLowerCase()) ||
+      (med.canabinoide &&
+        med.canabinoide.toLowerCase().includes(busca.toLowerCase()))
+  );
+
+  const floresFiltradas = flores.filter(
+    (med) =>
+      med.nome.toLowerCase().includes(busca.toLowerCase()) ||
+      med.tipo.toLowerCase().includes(busca.toLowerCase()) ||
+      (med.canabinoide &&
+        med.canabinoide.toLowerCase().includes(busca.toLowerCase()))
+  );
+
+  const concentradosFiltrados = concentrados.filter(
+    (med) =>
+      med.nome.toLowerCase().includes(busca.toLowerCase()) ||
+      med.tipo.toLowerCase().includes(busca.toLowerCase()) ||
+      (med.canabinoide &&
+        med.canabinoide.toLowerCase().includes(busca.toLowerCase()))
+  );
+
+  const comestiveisFiltrados = comestiveis.filter(
+    (med) =>
+      med.nome.toLowerCase().includes(busca.toLowerCase()) ||
+      med.tipo.toLowerCase().includes(busca.toLowerCase()) ||
+      (med.canabinoide &&
+        med.canabinoide.toLowerCase().includes(busca.toLowerCase()))
   );
 
   if (status === "loading") {
@@ -79,10 +129,79 @@ export default function MedicamentosPage() {
     );
   }
 
+  // Função para renderizar um card de medicamento
+  const renderMedicamentoCard = (medicamento: Medicamento) => (
+    <div
+      key={`${medicamento.tipo}-${medicamento.id}`}
+      className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300 flex flex-col"
+    >
+      <div className="p-4 flex-grow">
+        <div className="mb-4 h-40 overflow-hidden flex items-center justify-center bg-gray-100 rounded">
+          {medicamento.foto ? (
+            <div className="relative w-full h-full">
+              <div
+                className="w-full h-full bg-contain bg-center bg-no-repeat"
+                style={{ backgroundImage: `url(${medicamento.foto})` }}
+              />
+            </div>
+          ) : (
+            <div className="text-gray-400">Sem imagem</div>
+          )}
+        </div>
+        <h3
+          className="text-lg font-semibold text-[#16829E] mb-2 truncate"
+          title={medicamento.nome}
+        >
+          {medicamento.nome}
+        </h3>
+
+        <div className="space-y-1 text-sm text-gray-600">
+          <p>
+            <span className="font-medium">Tipo:</span> {medicamento.tipo}
+          </p>
+          {medicamento.strain_type && (
+            <p>
+              <span className="font-medium">Strain Type:</span>{" "}
+              {medicamento.strain_type}
+            </p>
+          )}
+          {medicamento.canabinoide && (
+            <p>
+              <span className="font-medium">Canabinoide:</span>{" "}
+              {medicamento.canabinoide}
+            </p>
+          )}
+          <p>
+            <span className="font-medium">Quantidade:</span>{" "}
+            {medicamento.quantidade}
+          </p>
+          <p>
+            <span className="font-medium">Preço:</span> R${" "}
+            {medicamento.preco ? medicamento.preco.toFixed(2) : "N/A"}
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+
+  // Função para renderizar uma seção de categoria
+  const renderCategoria = (titulo: string, medicamentos: Medicamento[]) => {
+    if (medicamentos.length === 0) return null;
+
+    return (
+      <div className="mb-10">
+        <h2 className="text-xl font-bold text-[#16829E] mb-4">{titulo}</h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+          {medicamentos.map(renderMedicamentoCard)}
+        </div>
+      </div>
+    );
+  };
+
   return (
     <MainLayout>
-      <div className="px-6">
-        <div className="flex justify-between items-center mb-6">
+      <div className="px-6 py-4">
+        <div className="flex flex-wrap justify-between items-center mb-6 gap-4">
           <h1 className="text-2xl font-bold text-[#16829E]">Medicamentos</h1>
           <div className="relative">
             <input
@@ -90,83 +209,39 @@ export default function MedicamentosPage() {
               placeholder="Buscar medicamentos..."
               value={busca}
               onChange={(e) => setBusca(e.target.value)}
-              className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#16829E] focus:border-transparent"
+              className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#16829E] focus:border-transparent w-full sm:w-auto"
             />
             <FaSearch className="absolute left-3 top-3 text-gray-400" />
           </div>
         </div>
 
-        <div className="bg-white rounded-lg shadow-md overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
-                <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Medicamento
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Tipo
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Concentração
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Apresentação
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Quantidade
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Status
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
-                {medicamentosFiltrados.map((medicamento) => (
-                  <tr key={medicamento.id}>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="flex items-center">
-                        <FaPills className="h-5 w-5 text-[#16829E] mr-2" />
-                        <div className="text-sm font-medium text-gray-900">
-                          {medicamento.nome}
-                        </div>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {medicamento.tipo}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {medicamento.concentracao}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {medicamento.apresentacao}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {medicamento.quantidade}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span
-                        className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                          medicamento.status === "disponivel"
-                            ? "bg-green-100 text-green-800"
-                            : medicamento.status === "baixo"
-                            ? "bg-yellow-100 text-yellow-800"
-                            : "bg-red-100 text-red-800"
-                        }`}
-                      >
-                        {medicamento.status === "disponivel"
-                          ? "Disponível"
-                          : medicamento.status === "baixo"
-                          ? "Baixo Estoque"
-                          : "Indisponível"}
-                      </span>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+        {loadingData ? (
+          <div className="min-h-[300px] flex items-center justify-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#16829E]"></div>
           </div>
-        </div>
+        ) : errorLoading ? (
+          <div className="text-center py-10 text-red-600 bg-red-50 p-4 rounded-lg">
+            <p>{errorLoading}</p>
+          </div>
+        ) : (
+          <div className="space-y-8">
+            {renderCategoria("Óleos", oleosFiltrados)}
+            {renderCategoria("Flores", floresFiltradas)}
+            {renderCategoria("Concentrados", concentradosFiltrados)}
+            {renderCategoria("Comestíveis", comestiveisFiltrados)}
+
+            {oleosFiltrados.length === 0 &&
+              floresFiltradas.length === 0 &&
+              concentradosFiltrados.length === 0 &&
+              comestiveisFiltrados.length === 0 && (
+                <div className="text-center py-10">
+                  <p className="text-gray-500">
+                    Nenhum medicamento encontrado para &quot;{busca}&quot;.
+                  </p>
+                </div>
+              )}
+          </div>
+        )}
       </div>
     </MainLayout>
   );
