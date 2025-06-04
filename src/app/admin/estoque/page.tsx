@@ -114,7 +114,7 @@ export default function Estoque() {
         </h2>
         <div className="bg-white rounded-lg shadow-md overflow-hidden">
           <div className="overflow-x-auto">
-            <table className="w-full min-w-[800px]"> {/* Added min-width for better responsiveness */}
+            <table className="w-full min-w-[800px]">
               <thead className="bg-gray-50">
                 <tr>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -152,7 +152,10 @@ export default function Estoque() {
                   </tr>
                 ) : (
                   produtosFiltrados.map((produto) => (
-                    <tr key={`${produto.tipo}-${produto.id}`} className="hover:bg-gray-50">
+                    <tr
+                      key={`${produto.tipo}-${produto.id}`}
+                      className="hover:bg-gray-50"
+                    >
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="w-10 h-10 relative rounded-lg overflow-hidden flex-shrink-0">
                           {typeof produto.foto === "string" &&
@@ -162,7 +165,7 @@ export default function Estoque() {
                               src={produto.foto}
                               alt={produto.nome}
                               fill
-                              sizes="40px" // Added sizes attribute
+                              sizes="40px"
                               className="object-cover"
                             />
                           ) : (
@@ -234,7 +237,9 @@ export default function Estoque() {
       {/* Apply inner padding consistent with other pages */}
       <div className="px-6">
         <div className="flex justify-between items-center mb-6">
-          <h1 className="text-2xl font-bold text-[#16829E]">Gerenciar Estoque</h1>
+          <h1 className="text-2xl font-bold text-[#16829E]">
+            Gerenciar Estoque
+          </h1>
           <button
             onClick={() => router.push("/admin/estoque/novo")}
             className="bg-[#16829E] text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-[#126a7e] transition-colors"
@@ -265,4 +270,3 @@ export default function Estoque() {
     </MainLayout>
   );
 }
-
