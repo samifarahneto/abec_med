@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { signIn } from "next-auth/react";
+import { signIn, getSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 
 export default function LoginPage() {
@@ -19,17 +19,19 @@ export default function LoginPage() {
     const password = formData.get("password") as string;
 
     try {
-      console.log("Tentando fazer login com:", email);
+      console.log("=== INICIANDO LOGIN ===");
+      console.log("Email:", email);
+
       const result = await signIn("credentials", {
         email,
         password,
-        redirect: false,
+        redirect: false, // Não redirecionar automaticamente
       });
 
-      console.log("Resultado do login:", result);
+      console.log("Resultado do signIn:", result);
 
       if (result?.error) {
-        console.error("Erro no login:", result.error);
+        console.error("❌ Erro no login:", result.error);
         if (result.error === "CredentialsSignin") {
           setError("Email ou senha incorretos");
         } else {
@@ -37,19 +39,46 @@ export default function LoginPage() {
             "Ocorreu um erro ao fazer login. Por favor, tente novamente."
           );
         }
-      } else {
-        console.log("Login bem sucedido, redirecionando...");
-        router.push("/paciente/dashboard");
-        router.refresh();
+      } else if (result?.ok) {
+        console.log("✅ Login bem-sucedido! Obtendo sessão...");
+
+        // Obter a sessão atualizada para pegar o role do usuário
+        const session = await getSession();
+        console.log("Sessão obtida:", session);
+
+        if (session?.user?.role) {
+          const redirectPath = getRedirectPath(session.user.role);
+          console.log(`🚀 Redirecionando para: ${redirectPath}`);
+
+          // Forçar refresh da página para garantir que a sessão seja reconhecida
+          router.push(redirectPath);
+          router.refresh();
+        } else {
+          console.log("⚠️ Role não encontrado, usando redirecionamento padrão");
+          router.push("/paciente/dashboard");
+          router.refresh();
+        }
       }
     } catch (err) {
-      console.error("Erro ao fazer login:", err);
-      setError(
-        "Ocorreu um erro ao tentar fazer login. Por favor, tente novamente."
-      );
+      console.error("💥 Erro geral no login:", err);
+      setError("Ocorreu um erro inesperado. Tente novamente.");
     } finally {
       setLoading(false);
     }
+  };
+
+  const getRedirectPath = (role: string): string => {
+    const roleRedirects: { [key: string]: string } = {
+      admin: "/admin/dashboard",
+      medico: "/medic",
+      doctor: "/medic",
+      reception: "/acolhimento/agendamentos",
+      recepcao: "/acolhimento/agendamentos",
+      paciente: "/paciente/dashboard",
+      patient: "/paciente/dashboard",
+    };
+
+    return roleRedirects[role.toLowerCase()] || "/paciente/dashboard";
   };
 
   return (
@@ -59,7 +88,11 @@ export default function LoginPage() {
           <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
             Entre na sua conta
           </h2>
+          <p className="mt-2 text-center text-sm text-gray-600">
+            Sistema ABEC Med
+          </p>
         </div>
+
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           <div className="rounded-md shadow-sm -space-y-px">
             <div>
@@ -93,19 +126,95 @@ export default function LoginPage() {
           </div>
 
           {error && (
-            <div className="text-red-600 text-sm text-center">{error}</div>
+            <div className="text-red-600 text-sm text-center bg-red-50 p-3 rounded-md">
+              {error}
+            </div>
           )}
 
           <div>
             <button
               type="submit"
               disabled={loading}
-              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-[#16829E] hover:bg-[#126a7e] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#16829E]"
+              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-[#16829E] hover:bg-[#126a7e] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#16829E] disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {loading ? "Entrando..." : "Entrar"}
+              {loading ? (
+                <span className="flex items-center">
+                  <svg
+                    className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                    ></circle>
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                    ></path>
+                  </svg>
+                  Entrando...
+                </span>
+              ) : (
+                "Entrar"
+              )}
             </button>
           </div>
         </form>
+
+        {/* Informações de debug em desenvolvimento */}
+        {process.env.NODE_ENV === "development" && (
+          <div className="mt-4 space-y-3">
+            <div className="p-3 bg-gray-100 rounded text-xs space-y-1">
+              <p>
+                <strong>Status:</strong> {loading ? "Processando..." : "Pronto"}
+              </p>
+              <p>
+                <strong>Sessão:</strong> JWT com cookies (30 dias)
+              </p>
+              <p>
+                <strong>API:</strong> AbecMed Externa Exclusiva
+              </p>
+            </div>
+
+            <div className="p-3 bg-blue-50 border border-blue-200 rounded text-xs">
+              <p className="font-semibold text-blue-800 mb-2">
+                🌐 Sistema API Externa:
+              </p>
+              <div className="space-y-1 text-blue-700">
+                <p>
+                  <strong>Endpoint:</strong> AbecMed API
+                </p>
+                <p>
+                  <strong>Autenticação:</strong> Exclusivamente via API externa
+                </p>
+                <p>
+                  <strong>Roles:</strong> ADMIN→admin, DOCTOR→medico, etc.
+                </p>
+              </div>
+            </div>
+
+            <div className="p-3 bg-green-50 border border-green-200 rounded text-xs">
+              <p className="font-semibold text-green-800 mb-2">
+                🔐 Credenciais:
+              </p>
+              <div className="space-y-1 text-green-700">
+                <p>
+                  <strong>Use suas credenciais do sistema AbecMed</strong>
+                </p>
+                <p>
+                  <em>Redirecionamento automático baseado no seu role</em>
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
