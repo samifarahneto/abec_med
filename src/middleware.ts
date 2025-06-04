@@ -77,6 +77,7 @@ export default withAuth(
           "/api/test-env",
           "/api/debug",
           "/api/test-vars",
+          "/api/produtos",
           "/unauthorized",
         ];
         const isPublicRoute = publicRoutes.some((route) =>
@@ -97,6 +98,6 @@ export default withAuth(
 export const config = {
   matcher: [
     // Proteger todas as rotas exceto as públicas
-    "/((?!api/auth|api/debug|api/test-env|api/test-vars|login|_next/static|_next/image|favicon.ico|public).*)",
+    "/((?!api/auth|api/debug|api/test-env|api/test-vars|api/produtos|login|_next/static|_next/image|favicon.ico|public).*)",
   ],
 };

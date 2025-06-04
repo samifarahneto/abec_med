@@ -81,13 +81,44 @@ export async function GET(request: Request) {
     const { searchParams } = new URL(request.url);
     const tipo = searchParams.get("tipo");
 
+    // Se não especificar tipo, buscar todos os produtos
     if (!tipo) {
-      return NextResponse.json(
-        { success: false, error: "Tipo de produto não especificado" },
-        { status: 400 }
-      );
+      const todosProdutos: Produto[] = [];
+      const tipos = ["Flor", "Óleo", "Concentrado", "Comestíveis"];
+
+      for (const tipoAtual of tipos) {
+        try {
+          const arquivo = getArquivoPorTipo(tipoAtual);
+          const caminhoArquivo = path.join(
+            process.cwd(),
+            "src",
+            "data",
+            arquivo
+          );
+
+          if (fs.existsSync(caminhoArquivo)) {
+            const dados = JSON.parse(fs.readFileSync(caminhoArquivo, "utf-8"));
+            if (dados.produtos && Array.isArray(dados.produtos)) {
+              // Adicionar o tipo aos produtos para identificação
+              const produtosComTipo = dados.produtos.map(
+                (produto: Produto) => ({
+                  ...produto,
+                  tipo: tipoAtual,
+                })
+              );
+              todosProdutos.push(...produtosComTipo);
+            }
+          }
+        } catch (error) {
+          console.error(`Erro ao ler produtos do tipo ${tipoAtual}:`, error);
+          // Continue com outros tipos mesmo se um falhar
+        }
+      }
+
+      return NextResponse.json({ success: true, produtos: todosProdutos });
     }
 
+    // Lógica original para buscar por tipo específico
     const arquivo = getArquivoPorTipo(tipo);
     const caminhoArquivo = path.join(process.cwd(), "src", "data", arquivo);
 
