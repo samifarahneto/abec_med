@@ -59,13 +59,6 @@ export default function ModalAddToCart({
     }
   };
 
-  const handleQuantidadeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = Number(e.target.value);
-    if (value >= 5 && value % 5 === 0) {
-      setQuantidade(value);
-    }
-  };
-
   return (
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50">
       <div className="bg-white rounded-2xl max-w-5xl w-full max-h-[90vh] overflow-y-auto">
@@ -234,8 +227,8 @@ export default function ModalAddToCart({
                       min="5"
                       step="5"
                       value={quantidade}
-                      onChange={handleQuantidadeChange}
-                      className="w-12 sm:w-16 text-center font-semibold text-base sm:text-lg text-black focus:outline-none"
+                      onChange={(e) => setQuantidade(Number(e.target.value))}
+                      className="w-12 sm:w-16 text-center font-semibold text-base sm:text-lg text-gray-700 focus:outline-none"
                     />
                     <button
                       onClick={incrementarQuantidade}

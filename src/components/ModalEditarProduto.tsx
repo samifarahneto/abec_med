@@ -85,7 +85,7 @@ export default function ModalEditarProduto({
                 name="nome"
                 value={formData.nome}
                 onChange={handleChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#16829E] text-black"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#16829E] text-gray-700"
                 required
               />
             </div>
@@ -98,7 +98,7 @@ export default function ModalEditarProduto({
                 name="tipo"
                 value={formData.tipo}
                 onChange={handleChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#16829E] text-black"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#16829E] text-gray-700"
                 required
               >
                 <option value="Flor">Flor</option>
@@ -117,7 +117,7 @@ export default function ModalEditarProduto({
                 name="strain_type"
                 value={formData.strain_type || ""}
                 onChange={handleChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#16829E] text-black"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#16829E] text-gray-700"
               />
             </div>
 
@@ -130,7 +130,7 @@ export default function ModalEditarProduto({
                 name="canabinoide"
                 value={formData.canabinoide}
                 onChange={handleChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#16829E] text-black"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#16829E] text-gray-700"
                 required
               />
             </div>
@@ -144,7 +144,7 @@ export default function ModalEditarProduto({
                 name="quantidade"
                 value={formData.quantidade}
                 onChange={handleChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#16829E] text-black"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#16829E] text-gray-700"
                 required
                 min="0"
               />
@@ -159,7 +159,7 @@ export default function ModalEditarProduto({
                 name="preco"
                 value={formData.preco}
                 onChange={handleChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#16829E] text-black"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#16829E] text-gray-700"
                 required
                 min="0"
                 step="0.01"
@@ -176,7 +176,7 @@ export default function ModalEditarProduto({
               value={formData.descricao}
               onChange={handleChange}
               rows={4}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#16829E] text-black"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#16829E] text-gray-700"
             />
           </div>
 

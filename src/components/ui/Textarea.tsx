@@ -10,7 +10,7 @@ interface TextareaProps
 const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
   ({ label, error, helperText, className = "", ...props }, ref) => {
     const baseClasses =
-      "w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[#16829E] focus:border-[#16829E] text-gray-900 resize-vertical";
+      "w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[#16829E] focus:border-[#16829E] text-gray-700 resize-vertical";
     const errorClasses = error
       ? "border-red-500 focus:ring-red-500 focus:border-red-500"
       : "";

@@ -410,7 +410,7 @@ export default function Checkout() {
                     onChange={(e) =>
                       setEndereco({ ...endereco, cep: e.target.value })
                     }
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#16829E] focus:ring-[#16829E] text-black py-2 sm:py-3 text-sm sm:text-base"
+                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#16829E] focus:ring-[#16829E] text-gray-700 py-2 sm:py-3 text-sm sm:text-base"
                     required
                   />
                 </div>
@@ -424,7 +424,7 @@ export default function Checkout() {
                     onChange={(e) =>
                       setEndereco({ ...endereco, rua: e.target.value })
                     }
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#16829E] focus:ring-[#16829E] text-black py-2 sm:py-3 text-sm sm:text-base"
+                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#16829E] focus:ring-[#16829E] text-gray-700 py-2 sm:py-3 text-sm sm:text-base"
                     required
                   />
                 </div>
@@ -438,7 +438,7 @@ export default function Checkout() {
                     onChange={(e) =>
                       setEndereco({ ...endereco, numero: e.target.value })
                     }
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#16829E] focus:ring-[#16829E] text-black py-2 sm:py-3 text-sm sm:text-base"
+                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#16829E] focus:ring-[#16829E] text-gray-700 py-2 sm:py-3 text-sm sm:text-base"
                     required
                   />
                 </div>
@@ -452,7 +452,7 @@ export default function Checkout() {
                     onChange={(e) =>
                       setEndereco({ ...endereco, complemento: e.target.value })
                     }
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#16829E] focus:ring-[#16829E] text-black py-2 sm:py-3 text-sm sm:text-base"
+                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#16829E] focus:ring-[#16829E] text-gray-700 py-2 sm:py-3 text-sm sm:text-base"
                   />
                 </div>
                 <div>
@@ -465,7 +465,7 @@ export default function Checkout() {
                     onChange={(e) =>
                       setEndereco({ ...endereco, bairro: e.target.value })
                     }
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#16829E] focus:ring-[#16829E] text-black py-2 sm:py-3 text-sm sm:text-base"
+                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#16829E] focus:ring-[#16829E] text-gray-700 py-2 sm:py-3 text-sm sm:text-base"
                     required
                   />
                 </div>
@@ -479,7 +479,7 @@ export default function Checkout() {
                     onChange={(e) =>
                       setEndereco({ ...endereco, cidade: e.target.value })
                     }
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#16829E] focus:ring-[#16829E] text-black py-2 sm:py-3 text-sm sm:text-base"
+                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#16829E] focus:ring-[#16829E] text-gray-700 py-2 sm:py-3 text-sm sm:text-base"
                     required
                   />
                 </div>
@@ -493,7 +493,7 @@ export default function Checkout() {
                     onChange={(e) =>
                       setEndereco({ ...endereco, estado: e.target.value })
                     }
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#16829E] focus:ring-[#16829E] text-black py-2 sm:py-3 text-sm sm:text-base"
+                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#16829E] focus:ring-[#16829E] text-gray-700 py-2 sm:py-3 text-sm sm:text-base"
                     required
                   />
                 </div>
@@ -526,7 +526,7 @@ export default function Checkout() {
                       numeroCartao: value,
                     });
                   }}
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#16829E] focus:ring-[#16829E] text-black py-2 sm:py-3 text-sm sm:text-base"
+                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#16829E] focus:ring-[#16829E] text-gray-700 py-2 sm:py-3 text-sm sm:text-base"
                   required
                   maxLength={16}
                   placeholder="Digite apenas números"
@@ -546,7 +546,7 @@ export default function Checkout() {
                         validade: e.target.value,
                       })
                     }
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#16829E] focus:ring-[#16829E] text-black py-2 sm:py-3 text-sm sm:text-base"
+                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#16829E] focus:ring-[#16829E] text-gray-700 py-2 sm:py-3 text-sm sm:text-base"
                     required
                   />
                 </div>
@@ -563,7 +563,7 @@ export default function Checkout() {
                         cvv: e.target.value,
                       })
                     }
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#16829E] focus:ring-[#16829E] text-black py-2 sm:py-3 text-sm sm:text-base"
+                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#16829E] focus:ring-[#16829E] text-gray-700 py-2 sm:py-3 text-sm sm:text-base"
                     required
                   />
                 </div>
@@ -581,7 +581,7 @@ export default function Checkout() {
                       nomeTitular: e.target.value,
                     })
                   }
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#16829E] focus:ring-[#16829E] text-black py-2 sm:py-3 text-sm sm:text-base"
+                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#16829E] focus:ring-[#16829E] text-gray-700 py-2 sm:py-3 text-sm sm:text-base"
                   required
                 />
               </div>

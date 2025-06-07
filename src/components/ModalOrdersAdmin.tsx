@@ -370,10 +370,10 @@ export default function ModalOrdersAdmin({
                 <input
                   type="text"
                   id="trackingCode"
+                  placeholder="Código de rastreamento..."
                   value={trackingCode}
                   onChange={(e) => setTrackingCode(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#16829E] focus:border-transparent text-black"
-                  placeholder="Digite o código de rastreio"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#16829E] focus:border-transparent text-gray-700"
                 />
               </div>
 
