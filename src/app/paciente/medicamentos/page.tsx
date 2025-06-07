@@ -28,34 +28,61 @@ export default function MedicamentosPaciente() {
   const fetchMedicamentos = async () => {
     try {
       setLoading(true);
-      // Simulando dados para funcionar sem backend por enquanto
+      // Dados mockados com categorias corretas: flores, óleos, concentrados, comestíveis
       const mockData: Medicamento[] = [
         {
           id: 1,
           nome: "Cannabis Oil 20ml",
           fabricante: "Farmacorp",
-          categoria: "óleo",
+          categoria: "óleos",
           concentracao: "10mg/ml THC",
           preco: 150.0,
           quantidadeEstoque: 25,
         },
         {
           id: 2,
-          nome: "CBD Cápsula",
+          nome: "Flor Sativa Premium",
           fabricante: "MedCannabis",
-          categoria: "cápsula",
-          concentracao: "25mg CBD",
+          categoria: "flores",
+          concentracao: "18% THC",
           preco: 89.9,
-          quantidadeEstoque: 0,
+          quantidadeEstoque: 15,
         },
         {
           id: 3,
-          nome: "Extrato Premium",
+          nome: "Concentrado CBD",
           fabricante: "PharmaCBD",
-          categoria: "extract",
+          categoria: "concentrados",
           concentracao: "50mg/ml CBD",
           preco: 280.0,
           quantidadeEstoque: 12,
+        },
+        {
+          id: 4,
+          nome: "Gomas CBD",
+          fabricante: "CannaSweet",
+          categoria: "comestíveis",
+          concentracao: "10mg CBD/unidade",
+          preco: 45.0,
+          quantidadeEstoque: 30,
+        },
+        {
+          id: 5,
+          nome: "Óleo Full Spectrum",
+          fabricante: "BioCanabis",
+          categoria: "óleos",
+          concentracao: "15mg/ml CBD + THC",
+          preco: 220.0,
+          quantidadeEstoque: 8,
+        },
+        {
+          id: 6,
+          nome: "Flor Indica",
+          fabricante: "GreenMed",
+          categoria: "flores",
+          concentracao: "20% CBD",
+          preco: 95.0,
+          quantidadeEstoque: 0,
         },
       ];
       setMedicamentos(mockData);
@@ -98,7 +125,7 @@ export default function MedicamentosPaciente() {
                 placeholder="Buscar medicamentos..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full sm:w-64 pl-10 pr-4 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#16829E] focus:border-transparent"
+                className="w-full sm:w-64 pl-10 pr-4 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#16829E] focus:border-transparent text-gray-900 placeholder:text-gray-400 bg-white"
               />
               <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
             </div>
@@ -109,9 +136,10 @@ export default function MedicamentosPaciente() {
               className="w-full sm:w-auto px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#16829E] focus:border-transparent bg-white"
             >
               <option value="">Todas as categorias</option>
-              <option value="óleo">Óleo</option>
-              <option value="cápsula">Cápsula</option>
-              <option value="extract">Extrato</option>
+              <option value="flores">Flores</option>
+              <option value="óleos">Óleos</option>
+              <option value="concentrados">Concentrados</option>
+              <option value="comestíveis">Comestíveis</option>
             </select>
           </div>
         </div>
