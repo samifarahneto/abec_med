@@ -65,27 +65,29 @@ export default function FlowersPage() {
 
   return (
     <MainLayout>
-      <div className="px-0 sm:px-6">
-        <h1 className="text-2xl font-bold text-[#16829E] mb-6 px-0 sm:px-6">
-          Flores
-        </h1>
+      <div className="space-y-4 sm:space-y-6">
+        <h1 className="text-xl sm:text-2xl font-bold text-[#16829E]">Flores</h1>
 
         {loading ? (
-          <div className="text-center py-8">
-            <p className="text-gray-500">Carregando produtos...</p>
+          <div className="text-center py-6 sm:py-8">
+            <p className="text-gray-500 text-sm sm:text-base">
+              Carregando produtos...
+            </p>
           </div>
         ) : produtos.length === 0 ? (
-          <div className="text-center py-8">
-            <p className="text-gray-500">Nenhum produto disponível</p>
+          <div className="text-center py-6 sm:py-8">
+            <p className="text-gray-500 text-sm sm:text-base">
+              Nenhum produto disponível
+            </p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-y-20 sm:gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
             {produtos.map((produto) => (
               <div
                 key={produto.id}
-                className="bg-white rounded-none sm:rounded-xl shadow-xl overflow-hidden hover:shadow-2xl transition-all duration-300 h-[600px] flex flex-col group"
+                className="bg-white rounded-lg sm:rounded-xl shadow-md hover:shadow-lg transition-shadow duration-300 overflow-hidden flex flex-col"
               >
-                <div className="relative h-72">
+                <div className="relative h-48 sm:h-56 md:h-64">
                   {produto.foto && produto.foto !== "/produtos/sem-foto.jpg" ? (
                     <Image
                       src={produto.foto}
@@ -95,19 +97,21 @@ export default function FlowersPage() {
                     />
                   ) : (
                     <div className="w-full h-full bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center">
-                      <span className="text-gray-400">Sem foto</span>
+                      <span className="text-gray-400 text-sm sm:text-base">
+                        Sem foto
+                      </span>
                     </div>
                   )}
                   <button
                     onClick={() => toggleFavorito(produto.id)}
-                    className={`absolute top-2 left-2 p-2.5 rounded-full transition-all duration-300 ${
+                    className={`absolute top-2 left-2 p-2 rounded-full transition-all duration-300 ${
                       favoritos.includes(produto.id)
                         ? "bg-[#16829E]/10 shadow-lg"
                         : "bg-white/90 hover:bg-white shadow-md"
                     }`}
                   >
                     <FaHeart
-                      className={`h-6 w-6 transition-all duration-300 ${
+                      className={`h-4 w-4 sm:h-5 sm:w-5 transition-all duration-300 ${
                         favoritos.includes(produto.id)
                           ? "text-[#16829E] fill-[#16829E] scale-110"
                           : "text-[#16829E]/70 hover:text-[#16829E] hover:scale-110"
@@ -115,53 +119,55 @@ export default function FlowersPage() {
                     />
                   </button>
                   <div className="absolute top-2 right-2">
-                    <span className="px-3 py-1 bg-[#16829E]/90 text-white rounded-full text-sm font-medium">
+                    <span className="px-2 py-1 bg-[#16829E]/90 text-white rounded-full text-xs sm:text-sm font-medium">
                       {produto.strain_type || "Sem tipo"}
                     </span>
                   </div>
                 </div>
 
-                <div className="p-4 sm:p-6 flex flex-col flex-grow">
-                  <div className="mb-4 text-center">
-                    <h2 className="text-xl font-bold text-gray-800 mb-2">
+                <div className="p-3 sm:p-4 md:p-6 flex flex-col flex-grow">
+                  <div className="mb-3 sm:mb-4 text-center">
+                    <h2 className="text-base sm:text-lg md:text-xl font-bold text-gray-800 mb-2">
                       {produto.nome}
                     </h2>
-                    <div className="flex items-center justify-center gap-2">
-                      <span className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-medium">
+                    <div className="flex items-center justify-center gap-2 flex-wrap">
+                      <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-xs sm:text-sm font-medium">
                         {produto.canabinoide}
                       </span>
-                      <span className="px-3 py-1 bg-purple-100 text-purple-800 rounded-full text-sm font-medium">
+                      <span className="px-2 py-1 bg-purple-100 text-purple-800 rounded-full text-xs sm:text-sm font-medium">
                         {produto.tipo}
                       </span>
                     </div>
                   </div>
 
-                  <div className="mb-4">
-                    <h3 className="text-sm font-semibold text-gray-700 mb-2">
+                  <div className="mb-3 sm:mb-4 flex-grow">
+                    <h3 className="text-xs sm:text-sm font-semibold text-gray-700 mb-2">
                       Descrição
                     </h3>
-                    <p className="text-gray-600 text-sm leading-relaxed line-clamp-4">
-                      {produto.descricao.length > 360
-                        ? `${produto.descricao.substring(0, 360)}...`
+                    <p className="text-gray-600 text-xs sm:text-sm leading-relaxed line-clamp-3 sm:line-clamp-4">
+                      {produto.descricao.length > 120
+                        ? `${produto.descricao.substring(0, 120)}...`
                         : produto.descricao}
                     </p>
                   </div>
 
-                  <div className="mt-auto pt-4 border-t border-gray-200">
-                    <div className="flex justify-between items-center mb-4">
-                      <div>
-                        <span className="text-2xl font-bold text-[#16829E]">
+                  <div className="mt-auto pt-3 sm:pt-4 border-t border-gray-200">
+                    <div className="flex flex-col sm:flex-row justify-between items-center gap-3 sm:gap-4">
+                      <div className="text-center sm:text-left">
+                        <span className="text-lg sm:text-xl md:text-2xl font-bold text-[#16829E]">
                           R$ {produto.preco.toFixed(2)}
                         </span>
-                        <p className="text-sm text-gray-500">à vista</p>
+                        <p className="text-xs sm:text-sm text-gray-500">
+                          à vista
+                        </p>
                       </div>
                       <button
                         onClick={() => abrirModal(produto)}
-                        className="bg-gradient-to-r from-[#16829E] to-[#126a7e] text-white px-4 py-2 rounded-lg hover:from-[#126a7e] hover:to-[#16829E] transition-all duration-300 flex items-center justify-center gap-2 font-medium"
+                        className="w-full sm:w-auto bg-gradient-to-r from-[#16829E] to-[#126a7e] text-white px-3 sm:px-4 py-2 rounded-lg hover:from-[#126a7e] hover:to-[#16829E] transition-all duration-300 flex items-center justify-center gap-2 font-medium text-sm sm:text-base"
                       >
                         <svg
                           xmlns="http://www.w3.org/2000/svg"
-                          className="h-5 w-5"
+                          className="h-4 w-4 sm:h-5 sm:w-5"
                           viewBox="0 0 20 20"
                           fill="currentColor"
                         >

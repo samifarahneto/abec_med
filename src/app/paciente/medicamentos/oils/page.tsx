@@ -41,25 +41,29 @@ export default function OilsPage() {
 
   return (
     <MainLayout>
-      <div className="px-6">
-        <h1 className="text-2xl font-bold text-[#16829E] mb-6">Óleos</h1>
+      <div className="space-y-4 sm:space-y-6">
+        <h1 className="text-xl sm:text-2xl font-bold text-[#16829E]">Óleos</h1>
 
         {loading ? (
-          <div className="text-center py-8">
-            <p className="text-gray-500">Carregando produtos...</p>
+          <div className="text-center py-6 sm:py-8">
+            <p className="text-gray-500 text-sm sm:text-base">
+              Carregando produtos...
+            </p>
           </div>
         ) : produtos.length === 0 ? (
-          <div className="text-center py-8">
-            <p className="text-gray-500">Nenhum produto disponível</p>
+          <div className="text-center py-6 sm:py-8">
+            <p className="text-gray-500 text-sm sm:text-base">
+              Nenhum produto disponível
+            </p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
             {produtos.map((produto) => (
               <div
                 key={produto.id}
-                className="bg-white rounded-lg shadow-xl overflow-hidden hover:shadow-2xl transition-shadow h-[500px] flex flex-col"
+                className="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow overflow-hidden flex flex-col"
               >
-                <div className="relative h-64">
+                <div className="relative h-48 sm:h-56 md:h-64">
                   {produto.foto && produto.foto !== "/produtos/sem-foto.jpg" ? (
                     <Image
                       src={produto.foto}
@@ -69,19 +73,21 @@ export default function OilsPage() {
                     />
                   ) : (
                     <div className="w-full h-full bg-gray-200 flex items-center justify-center">
-                      <span className="text-gray-400">Sem foto</span>
+                      <span className="text-gray-400 text-sm sm:text-base">
+                        Sem foto
+                      </span>
                     </div>
                   )}
                 </div>
-                <div className="p-4 flex flex-col flex-grow">
-                  <h2 className="text-lg font-semibold text-gray-800 mb-2">
+                <div className="p-3 sm:p-4 flex flex-col flex-grow">
+                  <h2 className="text-base sm:text-lg font-semibold text-gray-800 mb-2">
                     {produto.nome}
                   </h2>
-                  <div className="flex items-center gap-2 mb-2">
+                  <div className="flex items-center gap-2 mb-2 flex-wrap">
                     <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-xs">
                       {produto.canabinoide}
                     </span>
-                    <span className="text-gray-500 text-sm">
+                    <span className="text-gray-500 text-xs sm:text-sm">
                       {produto.quantidade} unidades
                     </span>
                   </div>
@@ -90,7 +96,7 @@ export default function OilsPage() {
                       {[...Array(5)].map((_, i) => (
                         <svg
                           key={i}
-                          className="w-4 h-4"
+                          className="w-3 h-3 sm:w-4 sm:h-4"
                           fill="currentColor"
                           viewBox="0 0 20 20"
                         >
@@ -98,16 +104,18 @@ export default function OilsPage() {
                         </svg>
                       ))}
                     </div>
-                    <span className="text-gray-500 text-sm ml-2">(4.5)</span>
+                    <span className="text-gray-500 text-xs sm:text-sm ml-2">
+                      (4.5)
+                    </span>
                   </div>
-                  <p className="text-gray-600 text-sm mb-4 flex-grow">
+                  <p className="text-gray-600 text-xs sm:text-sm mb-3 sm:mb-4 flex-grow line-clamp-3">
                     {produto.descricao}
                   </p>
-                  <div className="flex justify-between items-center mt-auto">
-                    <span className="text-lg font-bold text-[#16829E]">
+                  <div className="flex flex-col sm:flex-row justify-between items-center gap-2 sm:gap-0 mt-auto">
+                    <span className="text-base sm:text-lg font-bold text-[#16829E]">
                       R$ {produto.preco.toFixed(2)}
                     </span>
-                    <button className="bg-[#16829E] text-white px-4 py-2 rounded-lg hover:bg-[#126a7e] transition-colors">
+                    <button className="w-full sm:w-auto bg-[#16829E] text-white px-3 sm:px-4 py-2 rounded-lg hover:bg-[#126a7e] transition-colors text-sm sm:text-base">
                       Adicionar ao Carrinho
                     </button>
                   </div>

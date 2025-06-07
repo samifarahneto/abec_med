@@ -1,14 +1,13 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import MainLayout from "@/components/MainLayout";
 import {
-  FaCheckCircle,
-  FaTimesCircle,
   FaChevronDown,
   FaChevronUp,
+  FaCheckCircle,
+  FaTimesCircle,
 } from "react-icons/fa";
-import Image from "next/image";
 
 interface Order {
   id: string;
@@ -45,9 +44,8 @@ interface Order {
 
 export default function PedidosPaciente() {
   const [orders, setOrders] = useState<Order[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [expandedOrders, setExpandedOrders] = useState<Set<string>>(new Set());
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchOrders = async () => {
@@ -75,8 +73,6 @@ export default function PedidosPaciente() {
           "Erro ao carregar pedidos. Por favor, tente novamente mais tarde."
         );
         setOrders([]);
-      } finally {
-        setLoading(false);
       }
     };
 
@@ -108,163 +104,210 @@ export default function PedidosPaciente() {
 
   return (
     <MainLayout>
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold text-[#16829E]">Meus Pedidos</h1>
-      </div>
+      <div className="space-y-4 sm:space-y-6">
+        <div className="flex justify-between items-center">
+          <h1 className="text-xl sm:text-2xl font-bold text-[#16829E]">
+            Meus Pedidos
+          </h1>
+        </div>
 
-      {loading ? (
-        <div className="text-center py-8">
-          <p className="text-gray-600">Carregando pedidos...</p>
-        </div>
-      ) : error ? (
-        <div className="text-center py-8">
-          <p className="text-red-600 font-medium">
-            Erro ao carregar pedidos. Por favor, tente novamente mais tarde.
-          </p>
-        </div>
-      ) : orders.length === 0 ? (
-        <div className="text-center py-8">
-          <p className="text-gray-600 font-medium">Nenhum pedido encontrado</p>
-        </div>
-      ) : (
-        <div className="space-y-4">
-          {orders.map((order) => (
-            <div
-              key={order.id}
-              className="bg-white rounded-lg shadow-md overflow-hidden"
-            >
+        {error ? (
+          <div className="text-center py-6 sm:py-8">
+            <p className="text-red-600 text-sm sm:text-base">{error}</p>
+          </div>
+        ) : orders.length === 0 ? (
+          <div className="text-center py-6 sm:py-8">
+            <p className="text-gray-600 text-sm sm:text-base">
+              Nenhum pedido encontrado
+            </p>
+          </div>
+        ) : (
+          <div className="space-y-3 sm:space-y-4">
+            {orders.map((order) => (
               <div
-                className="p-4 cursor-pointer hover:bg-gray-50 flex justify-between items-center"
-                onClick={() => toggleOrder(order.id)}
+                key={order.id}
+                className="bg-white border border-gray-200 rounded-lg shadow-sm"
               >
-                <div className="flex items-center space-x-4">
-                  <div className="text-gray-700">
-                    {expandedOrders.has(order.id) ? (
-                      <FaChevronUp />
-                    ) : (
-                      <FaChevronDown />
-                    )}
-                  </div>
-                  <div>
-                    <div className="font-medium text-black">
-                      Pedido #{order.id}
+                <div
+                  className="p-4 cursor-pointer hover:bg-gray-50 transition-colors duration-200"
+                  onClick={() => toggleOrder(order.id)}
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="flex-1 min-w-0">
+                      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-2 sm:space-y-0">
+                        <div>
+                          <h3 className="text-sm sm:text-base font-medium text-gray-900">
+                            Pedido #{order.id}
+                          </h3>
+                          <p className="text-xs sm:text-sm text-gray-500">
+                            {formatDate(order.timestamp)}
+                          </p>
+                        </div>
+
+                        <div className="flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0 sm:space-x-4">
+                          <span
+                            className={`px-2 py-1 text-xs font-semibold rounded-full w-fit ${
+                              order.status === "success"
+                                ? "bg-green-100 text-green-800"
+                                : "bg-red-100 text-red-800"
+                            }`}
+                          >
+                            {order.status === "success" ? (
+                              <span className="flex items-center text-green-600">
+                                <FaCheckCircle className="mr-1" /> Sucesso
+                              </span>
+                            ) : (
+                              <span className="flex items-center text-red-600">
+                                <FaTimesCircle className="mr-1" /> Falha
+                              </span>
+                            )}
+                          </span>
+
+                          <div className="text-sm sm:text-base font-medium text-[#16829E]">
+                            R$ {order.total.toFixed(2).replace(".", ",")}
+                          </div>
+                        </div>
+                      </div>
                     </div>
-                    <div className="text-sm text-gray-700">
-                      {formatDate(order.timestamp)}
-                    </div>
-                  </div>
-                </div>
-                <div className="flex items-center space-x-4">
-                  <div className="text-right">
-                    <div className="font-medium text-black">
-                      R${order.total.toFixed(2)}
-                    </div>
-                    <div className="text-sm">
-                      {order.status === "success" ? (
-                        <span className="flex items-center text-green-600">
-                          <FaCheckCircle className="mr-1" /> Sucesso
-                        </span>
+
+                    <div className="ml-3 flex-shrink-0">
+                      {expandedOrders.has(order.id) ? (
+                        <FaChevronUp className="h-4 w-4 sm:h-5 sm:w-5 text-gray-400" />
                       ) : (
-                        <span className="flex items-center text-red-600">
-                          <FaTimesCircle className="mr-1" /> Falha
-                        </span>
+                        <FaChevronDown className="h-4 w-4 sm:h-5 sm:w-5 text-gray-400" />
                       )}
                     </div>
                   </div>
                 </div>
-              </div>
 
-              {expandedOrders.has(order.id) && (
-                <div className="border-t p-4">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                      <h3 className="font-medium text-black mb-2">Produtos</h3>
-                      <ul className="space-y-4">
+                {expandedOrders.has(order.id) && (
+                  <div className="border-t border-gray-200 p-4 bg-gray-50">
+                    <div className="space-y-4">
+                      {/* Desktop Table */}
+                      <div className="hidden sm:block">
+                        <table className="min-w-full divide-y divide-gray-200">
+                          <thead className="bg-gray-100">
+                            <tr>
+                              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Produto
+                              </th>
+                              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Quantidade
+                              </th>
+                              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Preço Unit.
+                              </th>
+                              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Subtotal
+                              </th>
+                            </tr>
+                          </thead>
+                          <tbody className="bg-white divide-y divide-gray-200">
+                            {order.products.map((product) => (
+                              <tr key={product.id}>
+                                <td className="px-4 py-3 text-sm text-gray-900">
+                                  {product.name}
+                                </td>
+                                <td className="px-4 py-3 text-sm text-gray-900">
+                                  {product.quantity}
+                                </td>
+                                <td className="px-4 py-3 text-sm text-gray-900">
+                                  R${" "}
+                                  {product.price.toFixed(2).replace(".", ",")}
+                                </td>
+                                <td className="px-4 py-3 text-sm font-medium text-gray-900">
+                                  R${" "}
+                                  {(product.price * product.quantity)
+                                    .toFixed(2)
+                                    .replace(".", ",")}
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+
+                      {/* Mobile Cards */}
+                      <div className="sm:hidden space-y-3">
                         {order.products.map((product) => (
                           <div
                             key={product.id}
-                            className="flex items-center gap-4 p-4 bg-gray-50 rounded-lg"
+                            className="bg-white rounded-lg p-3 border border-gray-100"
                           >
-                            <div className="relative w-16 h-16">
-                              <Image
-                                src={product.image}
-                                alt={product.name}
-                                fill
-                                className="object-cover rounded-lg"
-                              />
-                            </div>
-                            <div className="flex-1">
-                              <p className="font-medium text-black">
+                            <div className="flex justify-between items-start mb-2">
+                              <h4 className="text-sm font-medium text-gray-900 flex-1">
                                 {product.name}
-                              </p>
-                              <p className="text-gray-700">
-                                {product.quantity} x R${" "}
-                                {product.price.toFixed(2)}
-                              </p>
+                              </h4>
+                              <div className="text-sm font-medium text-[#16829E] ml-2">
+                                R${" "}
+                                {(product.price * product.quantity)
+                                  .toFixed(2)
+                                  .replace(".", ",")}
+                              </div>
                             </div>
-                            <p className="text-black font-semibold">
-                              R$ {(product.price * product.quantity).toFixed(2)}
-                            </p>
+
+                            <div className="grid grid-cols-2 gap-3 text-xs text-gray-600">
+                              <div>
+                                <span className="font-medium">Qtd:</span>{" "}
+                                {product.quantity}
+                              </div>
+                              <div>
+                                <span className="font-medium">Unit:</span> R${" "}
+                                {product.price.toFixed(2).replace(".", ",")}
+                              </div>
+                            </div>
                           </div>
                         ))}
-                      </ul>
-                    </div>
-
-                    <div>
-                      <h3 className="font-medium text-black mb-2">
-                        Endereço de Entrega
-                      </h3>
-                      <div className="text-sm text-gray-800">
-                        <p>
-                          {order.address.rua}, {order.address.numero}
-                        </p>
-                        {order.address.complemento && (
-                          <p>{order.address.complemento}</p>
-                        )}
-                        <p>{order.address.bairro}</p>
-                        <p>
-                          {order.address.cidade} - {order.address.estado}
-                        </p>
-                        <p>CEP: {order.address.cep}</p>
                       </div>
-                    </div>
 
-                    <div>
-                      <h3 className="font-medium text-black mb-2">Pagamento</h3>
-                      <div className="text-sm text-gray-800">
-                        <p>Tipo: {order.payment.tipo}</p>
-                        <p>
-                          Cartão: **** **** ****{" "}
-                          {order.payment.numeroCartao.slice(-4)}
-                        </p>
-                        <p>Titular: {order.payment.nomeTitular}</p>
-                        <p>Validade: {order.payment.validade}</p>
-                      </div>
-                    </div>
+                      {/* Informações do pedido */}
+                      <div className="border-t border-gray-200 pt-4 mt-4">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
+                          <div>
+                            <h4 className="font-medium text-gray-900 mb-2">
+                              Endereço de Entrega
+                            </h4>
+                            <p className="text-gray-600 text-xs sm:text-sm">
+                              {order.address.rua}, {order.address.numero}
+                              {order.address.complemento &&
+                                `, ${order.address.complemento}`}
+                              <br />
+                              {order.address.bairro} - {order.address.cidade},{" "}
+                              {order.address.estado}
+                              <br />
+                              CEP: {order.address.cep}
+                            </p>
+                          </div>
 
-                    <div>
-                      <h3 className="font-medium text-black mb-2">
-                        Rastreamento
-                      </h3>
-                      <div className="text-sm">
-                        {order.trackingCode ? (
-                          <span className="text-[#16829E] font-medium">
-                            Código: {order.trackingCode}
-                          </span>
-                        ) : (
-                          <span className="text-gray-600">
-                            Aguardando código de rastreamento
-                          </span>
-                        )}
+                          <div>
+                            <h4 className="font-medium text-gray-900 mb-2">
+                              Forma de Pagamento
+                            </h4>
+                            <p className="text-gray-600 text-xs sm:text-sm capitalize">
+                              {order.payment.tipo}
+                            </p>
+
+                            <div className="mt-3 pt-3 border-t border-gray-200">
+                              <div className="flex justify-between text-sm">
+                                <span className="font-medium text-gray-900">
+                                  Total do Pedido:
+                                </span>
+                                <span className="font-bold text-[#16829E] text-base">
+                                  R$ {order.total.toFixed(2).replace(".", ",")}
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
-              )}
-            </div>
-          ))}
-        </div>
-      )}
+                )}
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
     </MainLayout>
   );
 }

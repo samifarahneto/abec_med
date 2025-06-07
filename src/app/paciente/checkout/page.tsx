@@ -224,15 +224,19 @@ export default function Checkout() {
 
   if (produtos.length === 0 && etapa === "pedido") {
     return (
-      <div className="max-w-4xl mx-auto p-4">
-        <div className="flex items-center mb-6">
-          <h1 className="text-2xl font-bold text-[#16829E]">Checkout</h1>
+      <div className="max-w-4xl mx-auto p-3 sm:p-4">
+        <div className="flex items-center mb-4 sm:mb-6">
+          <h1 className="text-xl sm:text-2xl font-bold text-[#16829E]">
+            Checkout
+          </h1>
         </div>
-        <div className="bg-white rounded-lg shadow-md p-6 text-center">
-          <p className="text-gray-600 mb-4">Seu carrinho está vazio</p>
+        <div className="bg-white rounded-lg shadow-md p-4 sm:p-6 text-center">
+          <p className="text-gray-600 mb-4 text-sm sm:text-base">
+            Seu carrinho está vazio
+          </p>
           <button
             onClick={() => router.push("/paciente/medicamentos")}
-            className="bg-[#16829E] text-white px-6 py-2 rounded-lg hover:bg-[#126a7e] transition-colors"
+            className="w-full sm:w-auto bg-[#16829E] text-white px-6 py-2 rounded-lg hover:bg-[#126a7e] transition-colors text-sm sm:text-base"
           >
             Voltar para Medicamentos
           </button>
@@ -242,60 +246,80 @@ export default function Checkout() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="container mx-auto px-3 sm:px-4 py-4 sm:py-8">
       <div className="max-w-4xl mx-auto">
         {/* Etapas do checkout */}
-        <div className="grid grid-cols-4 gap-4 mb-8">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-4 mb-6 sm:mb-8">
           <div
-            className={`flex items-center gap-2 ${
+            className={`flex flex-col sm:flex-row items-center gap-1 sm:gap-2 text-xs sm:text-sm ${
               etapa === "pedido" ? "text-[#16829E]" : "text-gray-400"
             }`}
           >
-            <FaShoppingCart />
+            <FaShoppingCart className="text-sm sm:text-base" />
             <span>Pedido</span>
           </div>
           <div
-            className={`flex items-center gap-2 ${
+            className={`flex flex-col sm:flex-row items-center gap-1 sm:gap-2 text-xs sm:text-sm ${
               etapa === "endereco" ? "text-[#16829E]" : "text-gray-400"
             }`}
           >
-            <FaMapMarkerAlt />
+            <FaMapMarkerAlt className="text-sm sm:text-base" />
             <span>Endereço</span>
           </div>
           <div
-            className={`flex items-center gap-2 ${
+            className={`flex flex-col sm:flex-row items-center gap-1 sm:gap-2 text-xs sm:text-sm ${
               etapa === "pagamento" ? "text-[#16829E]" : "text-gray-400"
             }`}
           >
-            <FaCreditCard />
+            <FaCreditCard className="text-sm sm:text-base" />
             <span>Pagamento</span>
           </div>
           <div
-            className={`flex items-center gap-2 ${
+            className={`flex flex-col sm:flex-row items-center gap-1 sm:gap-2 text-xs sm:text-sm ${
               etapa === "confirmacao" ? "text-[#16829E]" : "text-gray-400"
             }`}
           >
-            <FaCheckCircle />
+            <FaCheckCircle className="text-sm sm:text-base" />
             <span>Confirmação</span>
           </div>
         </div>
 
         {/* Conteúdo da etapa atual */}
         {etapa === "pedido" && (
-          <div className="bg-white rounded-lg shadow-md p-6">
-            <h2 className="text-xl font-semibold mb-6 text-[#16829E]">
+          <div className="bg-white rounded-lg shadow-md p-4 sm:p-6">
+            <h2 className="text-lg sm:text-xl font-semibold mb-4 sm:mb-6 text-[#16829E]">
               Detalhes do Pedido
             </h2>
 
             {/* Lista de produtos */}
-            <div className="space-y-6">
+            <div className="space-y-4 sm:space-y-6">
               {produtos.map((produto) => (
                 <div
                   key={produto.id}
-                  className="flex items-end gap-6 p-4 bg-gray-50 rounded-lg"
+                  className="flex flex-col sm:flex-row items-start sm:items-end gap-3 sm:gap-6 p-3 sm:p-4 bg-gray-50 rounded-lg"
                 >
-                  {/* Foto */}
-                  <div className="relative w-24 h-24">
+                  {/* Mobile: Foto e Nome juntos */}
+                  <div className="flex items-center gap-3 w-full sm:hidden">
+                    <div className="relative w-16 h-16 flex-shrink-0">
+                      <Image
+                        src={produto.foto}
+                        alt={produto.nome}
+                        fill
+                        className="object-cover rounded-lg"
+                      />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <h3 className="font-medium text-sm text-gray-800 truncate">
+                        {produto.nome}
+                      </h3>
+                      <p className="text-[#16829E] font-semibold text-sm">
+                        R$ {produto.preco.toFixed(2)}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Desktop: Layout horizontal */}
+                  <div className="hidden sm:block relative w-24 h-24 flex-shrink-0">
                     <Image
                       src={produto.foto}
                       alt={produto.nome}
@@ -304,62 +328,63 @@ export default function Checkout() {
                     />
                   </div>
 
-                  {/* Nome */}
-                  <div className="flex-1">
+                  <div className="hidden sm:block flex-1">
                     <h3 className="font-medium text-lg text-gray-800">
                       {produto.nome}
                     </h3>
                   </div>
 
-                  {/* Preço */}
-                  <div className="w-32">
+                  <div className="hidden sm:block w-32">
                     <p className="text-[#16829E] font-semibold">
                       R$ {produto.preco.toFixed(2)}
                     </p>
                   </div>
 
-                  {/* Controle de Quantidade */}
-                  <div className="flex items-center border rounded-lg">
-                    <button
-                      onClick={() => handleAjustarQuantidade(produto.id, -1)}
-                      className="w-10 h-10 flex items-center justify-center text-black hover:bg-gray-100 rounded-l-lg"
-                    >
-                      -
-                    </button>
-                    <span className="w-10 h-10 flex items-center justify-center border-x text-black">
-                      {produto.quantidade}
-                    </span>
-                    <button
-                      onClick={() => handleAjustarQuantidade(produto.id, 1)}
-                      className="w-10 h-10 flex items-center justify-center text-black hover:bg-gray-100 rounded-r-lg"
-                    >
-                      +
-                    </button>
-                  </div>
+                  {/* Controle de Quantidade e Subtotal */}
+                  <div className="flex justify-between items-center w-full sm:w-auto sm:gap-4">
+                    <div className="flex items-center border rounded-lg">
+                      <button
+                        onClick={() => handleAjustarQuantidade(produto.id, -1)}
+                        className="w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center text-black hover:bg-gray-100 rounded-l-lg text-sm sm:text-base"
+                      >
+                        -
+                      </button>
+                      <span className="w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center border-x text-black text-sm sm:text-base">
+                        {produto.quantidade}
+                      </span>
+                      <button
+                        onClick={() => handleAjustarQuantidade(produto.id, 1)}
+                        className="w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center text-black hover:bg-gray-100 rounded-r-lg text-sm sm:text-base"
+                      >
+                        +
+                      </button>
+                    </div>
 
-                  {/* Subtotal */}
-                  <div className="w-32 text-right">
-                    <p className="text-gray-600">Subtotal</p>
-                    <p className="text-[#16829E] font-semibold">
-                      R$ {(produto.preco * produto.quantidade).toFixed(2)}
-                    </p>
+                    <div className="text-right">
+                      <p className="text-gray-600 text-xs sm:text-sm">
+                        Subtotal
+                      </p>
+                      <p className="text-[#16829E] font-semibold text-sm sm:text-base">
+                        R$ {(produto.preco * produto.quantidade).toFixed(2)}
+                      </p>
+                    </div>
                   </div>
                 </div>
               ))}
             </div>
 
             {/* Resumo do pedido */}
-            <div className="mt-8 pt-6 border-t">
-              <div className="space-y-3">
-                <div className="flex justify-between text-gray-600">
+            <div className="mt-6 sm:mt-8 pt-4 sm:pt-6 border-t">
+              <div className="space-y-2 sm:space-y-3">
+                <div className="flex justify-between text-gray-600 text-sm sm:text-base">
                   <span>Subtotal</span>
                   <span>R$ {total.toFixed(2)}</span>
                 </div>
-                <div className="flex justify-between text-gray-600">
+                <div className="flex justify-between text-gray-600 text-sm sm:text-base">
                   <span>Frete</span>
                   <span>Grátis</span>
                 </div>
-                <div className="flex justify-between text-lg font-semibold text-[#16829E] pt-3 border-t">
+                <div className="flex justify-between text-base sm:text-lg font-semibold text-[#16829E] pt-2 sm:pt-3 border-t">
                   <span>Total</span>
                   <span>R$ {total.toFixed(2)}</span>
                 </div>
@@ -369,10 +394,12 @@ export default function Checkout() {
         )}
 
         {etapa === "endereco" && (
-          <div className="bg-white rounded-lg shadow-md p-6">
-            <h2 className="text-xl font-semibold mb-4">Endereço de Entrega</h2>
+          <div className="bg-white rounded-lg shadow-md p-4 sm:p-6">
+            <h2 className="text-lg sm:text-xl font-semibold mb-4">
+              Endereço de Entrega
+            </h2>
             <form onSubmit={handleSubmitEndereco} className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700">
                     CEP
@@ -383,7 +410,7 @@ export default function Checkout() {
                     onChange={(e) =>
                       setEndereco({ ...endereco, cep: e.target.value })
                     }
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#16829E] focus:ring-[#16829E] text-black"
+                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#16829E] focus:ring-[#16829E] text-black py-2 sm:py-3 text-sm sm:text-base"
                     required
                   />
                 </div>
@@ -397,7 +424,7 @@ export default function Checkout() {
                     onChange={(e) =>
                       setEndereco({ ...endereco, rua: e.target.value })
                     }
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#16829E] focus:ring-[#16829E] text-black"
+                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#16829E] focus:ring-[#16829E] text-black py-2 sm:py-3 text-sm sm:text-base"
                     required
                   />
                 </div>
@@ -411,7 +438,7 @@ export default function Checkout() {
                     onChange={(e) =>
                       setEndereco({ ...endereco, numero: e.target.value })
                     }
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#16829E] focus:ring-[#16829E] text-black"
+                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#16829E] focus:ring-[#16829E] text-black py-2 sm:py-3 text-sm sm:text-base"
                     required
                   />
                 </div>
@@ -425,7 +452,7 @@ export default function Checkout() {
                     onChange={(e) =>
                       setEndereco({ ...endereco, complemento: e.target.value })
                     }
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#16829E] focus:ring-[#16829E] text-black"
+                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#16829E] focus:ring-[#16829E] text-black py-2 sm:py-3 text-sm sm:text-base"
                   />
                 </div>
                 <div>
@@ -438,7 +465,7 @@ export default function Checkout() {
                     onChange={(e) =>
                       setEndereco({ ...endereco, bairro: e.target.value })
                     }
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#16829E] focus:ring-[#16829E] text-black"
+                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#16829E] focus:ring-[#16829E] text-black py-2 sm:py-3 text-sm sm:text-base"
                     required
                   />
                 </div>
@@ -452,7 +479,7 @@ export default function Checkout() {
                     onChange={(e) =>
                       setEndereco({ ...endereco, cidade: e.target.value })
                     }
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#16829E] focus:ring-[#16829E] text-black"
+                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#16829E] focus:ring-[#16829E] text-black py-2 sm:py-3 text-sm sm:text-base"
                     required
                   />
                 </div>
@@ -466,7 +493,7 @@ export default function Checkout() {
                     onChange={(e) =>
                       setEndereco({ ...endereco, estado: e.target.value })
                     }
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#16829E] focus:ring-[#16829E] text-black"
+                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#16829E] focus:ring-[#16829E] text-black py-2 sm:py-3 text-sm sm:text-base"
                     required
                   />
                 </div>
@@ -476,11 +503,11 @@ export default function Checkout() {
         )}
 
         {etapa === "pagamento" && (
-          <div className="bg-white rounded-lg shadow-md p-6">
-            <h2 className="text-xl font-semibold mb-4">Pagamento</h2>
+          <div className="bg-white rounded-lg shadow-md p-4 sm:p-6">
+            <h2 className="text-lg sm:text-xl font-semibold mb-4">Pagamento</h2>
             {paymentStatus === "failed" && (
-              <div className="mb-4 p-4 bg-red-100 text-red-700 rounded-lg flex items-center gap-2">
-                <FaTimesCircle />
+              <div className="mb-4 p-3 sm:p-4 bg-red-100 text-red-700 rounded-lg flex items-center gap-2 text-sm sm:text-base">
+                <FaTimesCircle className="flex-shrink-0" />
                 <span>Pagamento falhou. Verifique os dados do cartão.</span>
               </div>
             )}
@@ -493,20 +520,19 @@ export default function Checkout() {
                   type="text"
                   value={pagamento.numeroCartao}
                   onChange={(e) => {
-                    // Remove caracteres não numéricos
                     const value = e.target.value.replace(/\D/g, "");
                     setPagamento({
                       ...pagamento,
                       numeroCartao: value,
                     });
                   }}
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#16829E] focus:ring-[#16829E] text-black"
+                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#16829E] focus:ring-[#16829E] text-black py-2 sm:py-3 text-sm sm:text-base"
                   required
                   maxLength={16}
                   placeholder="Digite apenas números"
                 />
               </div>
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700">
                     Validade
@@ -520,7 +546,7 @@ export default function Checkout() {
                         validade: e.target.value,
                       })
                     }
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#16829E] focus:ring-[#16829E] text-black"
+                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#16829E] focus:ring-[#16829E] text-black py-2 sm:py-3 text-sm sm:text-base"
                     required
                   />
                 </div>
@@ -537,7 +563,7 @@ export default function Checkout() {
                         cvv: e.target.value,
                       })
                     }
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#16829E] focus:ring-[#16829E] text-black"
+                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#16829E] focus:ring-[#16829E] text-black py-2 sm:py-3 text-sm sm:text-base"
                     required
                   />
                 </div>
@@ -555,14 +581,14 @@ export default function Checkout() {
                       nomeTitular: e.target.value,
                     })
                   }
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#16829E] focus:ring-[#16829E] text-black"
+                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#16829E] focus:ring-[#16829E] text-black py-2 sm:py-3 text-sm sm:text-base"
                   required
                 />
               </div>
               <div className="mt-6">
                 <button
                   type="submit"
-                  className="w-full bg-[#16829E] text-white px-6 py-3 rounded-lg hover:bg-[#16829E]/90 transition-colors"
+                  className="w-full bg-[#16829E] text-white px-6 py-3 rounded-lg hover:bg-[#16829E]/90 transition-colors text-sm sm:text-base"
                 >
                   Finalizar Compra
                 </button>
@@ -572,26 +598,26 @@ export default function Checkout() {
         )}
 
         {etapa === "confirmacao" && (
-          <div className="bg-white rounded-lg shadow-md p-6">
+          <div className="bg-white rounded-lg shadow-md p-4 sm:p-6">
             <div className="text-center">
               {paymentStatus === "success" ? (
                 <>
-                  <FaCheckCircle className="w-16 h-16 text-green-500 mx-auto mb-4" />
-                  <h2 className="text-2xl font-semibold text-gray-800 mb-2">
+                  <FaCheckCircle className="w-12 h-12 sm:w-16 sm:h-16 text-green-500 mx-auto mb-4" />
+                  <h2 className="text-xl sm:text-2xl font-semibold text-gray-800 mb-2">
                     Pedido Confirmado!
                   </h2>
-                  <p className="text-gray-600 mb-6">
+                  <p className="text-gray-600 mb-6 text-sm sm:text-base">
                     Seu pedido foi recebido e está sendo processado. Você
                     receberá um e-mail com os detalhes.
                   </p>
                 </>
               ) : (
                 <>
-                  <FaTimesCircle className="w-16 h-16 text-red-500 mx-auto mb-4" />
-                  <h2 className="text-2xl font-semibold text-gray-800 mb-2">
+                  <FaTimesCircle className="w-12 h-12 sm:w-16 sm:h-16 text-red-500 mx-auto mb-4" />
+                  <h2 className="text-xl sm:text-2xl font-semibold text-gray-800 mb-2">
                     Falha no Pagamento
                   </h2>
-                  <p className="text-gray-600 mb-6">
+                  <p className="text-gray-600 mb-6 text-sm sm:text-base">
                     Ocorreu um erro ao processar seu pagamento. Por favor, tente
                     novamente.
                   </p>
@@ -599,7 +625,7 @@ export default function Checkout() {
               )}
               <button
                 onClick={handleFinalizarCompra}
-                className="bg-[#16829E] text-white px-6 py-3 rounded-lg hover:bg-[#16829E]/90 transition-colors"
+                className="bg-[#16829E] text-white px-6 py-3 rounded-lg hover:bg-[#16829E]/90 transition-colors text-sm sm:text-base"
               >
                 Voltar para a Loja
               </button>
@@ -608,21 +634,25 @@ export default function Checkout() {
         )}
 
         {/* Botões de navegação */}
-        <div className="flex justify-between mt-6">
+        <div className="flex flex-col sm:flex-row justify-between mt-4 sm:mt-6 gap-3 sm:gap-0">
           {etapa !== "pedido" && etapa !== "confirmacao" && (
             <button
               onClick={handleVoltar}
-              className="flex items-center gap-2 text-gray-600 hover:text-gray-800"
+              className="flex items-center justify-center sm:justify-start gap-2 text-gray-600 hover:text-gray-800 px-4 py-2 border border-gray-300 rounded-lg sm:border-none sm:px-0 sm:py-0 text-sm sm:text-base"
             >
               <FaArrowLeft />
               Voltar
             </button>
           )}
           {etapa !== "confirmacao" && etapa !== "pagamento" && (
-            <div className={`${etapa === "pedido" ? "ml-auto" : ""}`}>
+            <div
+              className={`${
+                etapa === "pedido" ? "sm:ml-auto" : ""
+              } w-full sm:w-auto`}
+            >
               <button
                 onClick={handleContinuar}
-                className="flex items-center gap-2 bg-[#16829E] text-white px-6 py-3 rounded-lg hover:bg-[#16829E]/90 transition-colors"
+                className="w-full sm:w-auto flex items-center justify-center gap-2 bg-[#16829E] text-white px-6 py-3 rounded-lg hover:bg-[#16829E]/90 transition-colors text-sm sm:text-base"
               >
                 Continuar
                 <FaArrowRight />

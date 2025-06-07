@@ -135,8 +135,8 @@ export default function MedicamentosPage() {
       key={`${medicamento.tipo}-${medicamento.id}`}
       className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300 flex flex-col"
     >
-      <div className="p-4 flex-grow">
-        <div className="mb-4 h-40 overflow-hidden flex items-center justify-center bg-gray-100 rounded">
+      <div className="p-3 sm:p-4 flex-grow">
+        <div className="mb-3 sm:mb-4 h-32 sm:h-40 overflow-hidden flex items-center justify-center bg-gray-100 rounded">
           {medicamento.foto ? (
             <div className="relative w-full h-full">
               <div
@@ -145,17 +145,17 @@ export default function MedicamentosPage() {
               />
             </div>
           ) : (
-            <div className="text-gray-400">Sem imagem</div>
+            <div className="text-gray-400 text-xs sm:text-sm">Sem imagem</div>
           )}
         </div>
         <h3
-          className="text-lg font-semibold text-[#16829E] mb-2 truncate"
+          className="text-sm sm:text-lg font-semibold text-[#16829E] mb-2 truncate"
           title={medicamento.nome}
         >
           {medicamento.nome}
         </h3>
 
-        <div className="space-y-1 text-sm text-gray-600">
+        <div className="space-y-1 text-xs sm:text-sm text-gray-600">
           <p>
             <span className="font-medium">Tipo:</span> {medicamento.tipo}
           </p>
@@ -189,9 +189,11 @@ export default function MedicamentosPage() {
     if (medicamentos.length === 0) return null;
 
     return (
-      <div className="mb-10">
-        <h2 className="text-xl font-bold text-[#16829E] mb-4">{titulo}</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+      <div className="mb-8 sm:mb-10">
+        <h2 className="text-lg sm:text-xl font-bold text-[#16829E] mb-3 sm:mb-4">
+          {titulo}
+        </h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-6">
           {medicamentos.map(renderMedicamentoCard)}
         </div>
       </div>
@@ -200,16 +202,18 @@ export default function MedicamentosPage() {
 
   return (
     <MainLayout>
-      <div className="px-6 py-4">
-        <div className="flex flex-wrap justify-between items-center mb-6 gap-4">
-          <h1 className="text-2xl font-bold text-[#16829E]">Medicamentos</h1>
-          <div className="relative">
+      <div className="space-y-4 sm:space-y-6">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-3 sm:space-y-0">
+          <h1 className="text-xl sm:text-2xl font-bold text-[#16829E]">
+            Medicamentos
+          </h1>
+          <div className="relative w-full sm:w-auto">
             <input
               type="text"
               placeholder="Buscar medicamentos..."
               value={busca}
               onChange={(e) => setBusca(e.target.value)}
-              className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#16829E] focus:border-transparent w-full sm:w-auto"
+              className="w-full sm:w-64 pl-10 pr-4 py-2 sm:py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#16829E] focus:border-transparent text-sm sm:text-base"
             />
             <FaSearch className="absolute left-3 top-3 text-gray-400" />
           </div>
@@ -217,14 +221,14 @@ export default function MedicamentosPage() {
 
         {loadingData ? (
           <div className="min-h-[300px] flex items-center justify-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#16829E]"></div>
+            <div className="animate-spin rounded-full h-8 w-8 sm:h-12 sm:w-12 border-t-2 border-b-2 border-[#16829E]"></div>
           </div>
         ) : errorLoading ? (
-          <div className="text-center py-10 text-red-600 bg-red-50 p-4 rounded-lg">
-            <p>{errorLoading}</p>
+          <div className="text-center py-8 sm:py-10 text-red-600 bg-red-50 p-4 rounded-lg">
+            <p className="text-sm sm:text-base">{errorLoading}</p>
           </div>
         ) : (
-          <div className="space-y-8">
+          <div className="space-y-6 sm:space-y-8">
             {renderCategoria("Óleos", oleosFiltrados)}
             {renderCategoria("Flores", floresFiltradas)}
             {renderCategoria("Concentrados", concentradosFiltrados)}
@@ -234,8 +238,8 @@ export default function MedicamentosPage() {
               floresFiltradas.length === 0 &&
               concentradosFiltrados.length === 0 &&
               comestiveisFiltrados.length === 0 && (
-                <div className="text-center py-10">
-                  <p className="text-gray-500">
+                <div className="text-center py-8 sm:py-10">
+                  <p className="text-gray-500 text-sm sm:text-base">
                     Nenhum medicamento encontrado para &quot;{busca}&quot;.
                   </p>
                 </div>

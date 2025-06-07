@@ -40,7 +40,6 @@ export default function NovoProduto() {
   const [erros, setErros] = useState<Partial<Produto>>({});
   const [previewFoto, setPreviewFoto] = useState<string | null>(null);
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
-  const [negativeTags, setNegativeTags] = useState<string[]>([]);
 
   const availableTags = [
     "Analgésico",
@@ -128,10 +127,7 @@ export default function NovoProduto() {
           quantidade: Number(produto.quantidade),
           preco: Number(produto.preco),
           foto: fotoBase64 || "/produtos/sem-foto.jpg",
-          tags: [
-            ...selectedTags,
-            ...negativeTags.map((tag) => `negativo:${tag}`),
-          ],
+          tags: [...selectedTags],
         };
 
         const response = await fetch("/api/produtos", {
@@ -147,7 +143,10 @@ export default function NovoProduto() {
         if (data.success) {
           router.push("/admin/estoque");
         } else {
-          alert(data.error || "Erro ao salvar o produto. Por favor, tente novamente.");
+          alert(
+            data.error ||
+              "Erro ao salvar o produto. Por favor, tente novamente."
+          );
         }
       } catch (error) {
         console.error("Erro ao salvar o produto:", error);
@@ -167,10 +166,10 @@ export default function NovoProduto() {
         onCancel={() => router.push("/admin/estoque")}
       >
         {/* Form fields remain inside FormLayout's children */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
           {/* Nome */}
           <div>
-            <label className="block text-sm font-medium text-gray-700">
+            <label className="block text-sm font-medium text-gray-700 mb-1">
               Nome do Produto *
             </label>
             <input
@@ -178,73 +177,74 @@ export default function NovoProduto() {
               name="nome"
               value={produto.nome}
               onChange={handleChange}
-              className={`mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#16829E] focus:ring-[#16829E] text-gray-900 ${
+              className={`w-full px-3 py-2 text-sm sm:text-base rounded-md border border-gray-300 shadow-sm focus:border-[#16829E] focus:ring-2 focus:ring-[#16829E] focus:ring-opacity-50 text-gray-900 ${
                 erros.nome ? "border-red-500" : ""
               }`}
               placeholder="Digite o nome do produto"
             />
             {erros.nome && (
-              <p className="mt-1 text-sm text-red-500">{erros.nome}</p>
+              <p className="mt-1 text-xs sm:text-sm text-red-500">
+                {erros.nome}
+              </p>
             )}
           </div>
 
           {/* Tipo de Produto */}
           <div>
-            <label className="block text-sm font-medium text-gray-700">
+            <label className="block text-sm font-medium text-gray-700 mb-1">
               Tipo de Produto *
             </label>
             <select
               name="tipo"
               value={produto.tipo}
               onChange={handleChange}
-              className={`mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#16829E] focus:ring-[#16829E] text-gray-900 ${
+              className={`w-full px-3 py-2 text-sm sm:text-base rounded-md border border-gray-300 shadow-sm focus:border-[#16829E] focus:ring-2 focus:ring-[#16829E] focus:ring-opacity-50 text-gray-900 bg-white ${
                 erros.tipo ? "border-red-500" : ""
               }`}
             >
               <option value="Flor">Flor</option>
+              <option value="Extract">Extract</option>
               <option value="Óleo">Óleo</option>
-              <option value="Concentrado">Concentrado</option>
-              <option value="Comestíveis">Comestíveis</option>
+              <option value="Cápsula">Cápsula</option>
+              <option value="Tópico">Tópico</option>
+              <option value="Acessório">Acessório</option>
             </select>
             {erros.tipo && (
-              <p className="mt-1 text-sm text-red-500">{erros.tipo}</p>
+              <p className="mt-1 text-xs sm:text-sm text-red-500">
+                {erros.tipo}
+              </p>
             )}
           </div>
 
-          {/* Strain Type - Apenas para Flores */}
+          {/* Strain Type (só para Flor) */}
           {produto.tipo === "Flor" && (
             <div>
-              <label className="block text-sm font-medium text-gray-700">
-                Tipo de Strain *
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Tipo de Strain
               </label>
               <select
                 name="strain_type"
-                value={produto.strain_type}
+                value={produto.strain_type || ""}
                 onChange={handleChange}
-                className={`mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#16829E] focus:ring-[#16829E] text-gray-900 ${
-                  erros.strain_type ? "border-red-500" : ""
-                }`}
+                className="w-full px-3 py-2 text-sm sm:text-base rounded-md border border-gray-300 shadow-sm focus:border-[#16829E] focus:ring-2 focus:ring-[#16829E] focus:ring-opacity-50 text-gray-900 bg-white"
               >
                 <option value="Sativa">Sativa</option>
                 <option value="Indica">Indica</option>
                 <option value="Híbrida">Híbrida</option>
               </select>
-              {erros.strain_type && (
-                <p className="mt-1 text-sm text-red-500">{erros.strain_type}</p>
-              )}
             </div>
           )}
 
-          {/* Canabinóide */}
+          {/* Canabinóide Principal */}
           <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Canabinóide *
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Canabinóide Principal *
             </label>
             <select
               name="canabinoide"
               value={produto.canabinoide}
               onChange={handleChange}
-              className={`mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#16829E] focus:ring-[#16829E] text-gray-900 ${
+              className={`w-full px-3 py-2 text-sm sm:text-base rounded-md border border-gray-300 shadow-sm focus:border-[#16829E] focus:ring-2 focus:ring-[#16829E] focus:ring-opacity-50 text-gray-900 bg-white ${
                 erros.canabinoide ? "border-red-500" : ""
               }`}
             >
@@ -252,175 +252,164 @@ export default function NovoProduto() {
               <option value="CBD">CBD</option>
               <option value="CBG">CBG</option>
               <option value="CBN">CBN</option>
+              <option value="THCV">THCV</option>
+              <option value="Misto">Misto</option>
             </select>
             {erros.canabinoide && (
-              <p className="mt-1 text-sm text-red-500">{erros.canabinoide}</p>
+              <p className="mt-1 text-xs sm:text-sm text-red-500">
+                {erros.canabinoide}
+              </p>
             )}
           </div>
 
           {/* Quantidade */}
           <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Quantidade *
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Quantidade em Estoque *
             </label>
             <input
               type="number"
               name="quantidade"
               value={produto.quantidade}
               onChange={handleChange}
-              min="0" // Add min attribute
-              className={`mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#16829E] focus:ring-[#16829E] text-gray-900 ${
+              min="0"
+              className={`w-full px-3 py-2 text-sm sm:text-base rounded-md border border-gray-300 shadow-sm focus:border-[#16829E] focus:ring-2 focus:ring-[#16829E] focus:ring-opacity-50 text-gray-900 ${
                 erros.quantidade ? "border-red-500" : ""
               }`}
-              placeholder="Digite a quantidade"
+              placeholder="Ex: 100"
             />
             {erros.quantidade && (
-              <p className="mt-1 text-sm text-red-500">{erros.quantidade}</p>
+              <p className="mt-1 text-xs sm:text-sm text-red-500">
+                {erros.quantidade}
+              </p>
             )}
           </div>
 
           {/* Preço */}
           <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Preço *
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Preço (R$) *
             </label>
             <input
               type="number"
               name="preco"
               value={produto.preco}
               onChange={handleChange}
+              min="0"
               step="0.01"
-              min="0" // Add min attribute
-              className={`mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#16829E] focus:ring-[#16829E] text-gray-900 ${
+              className={`w-full px-3 py-2 text-sm sm:text-base rounded-md border border-gray-300 shadow-sm focus:border-[#16829E] focus:ring-2 focus:ring-[#16829E] focus:ring-opacity-50 text-gray-900 ${
                 erros.preco ? "border-red-500" : ""
               }`}
-              placeholder="Digite o preço"
+              placeholder="Ex: 29.90"
             />
             {erros.preco && (
-              <p className="mt-1 text-sm text-red-500">{erros.preco}</p>
+              <p className="mt-1 text-xs sm:text-sm text-red-500">
+                {erros.preco}
+              </p>
             )}
           </div>
+        </div>
 
-          {/* Foto */}
-          <div className="md:col-span-2">
-            <label className="block text-sm font-medium text-gray-700">
-              Foto do Produto
-            </label>
-            <div className="mt-1 flex items-center gap-4">
-              <div className="flex-1">
+        {/* Descrição - Span full width */}
+        <div className="mt-4 sm:mt-6">
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Descrição
+          </label>
+          <textarea
+            name="descricao"
+            value={produto.descricao}
+            onChange={handleChange}
+            rows={4}
+            className="w-full px-3 py-2 text-sm sm:text-base rounded-md border border-gray-300 shadow-sm focus:border-[#16829E] focus:ring-2 focus:ring-[#16829E] focus:ring-opacity-50 text-gray-900 resize-vertical"
+            placeholder="Descreva o produto, suas características e benefícios..."
+          />
+        </div>
+
+        {/* Upload de Foto */}
+        <div className="mt-4 sm:mt-6">
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Foto do Produto
+          </label>
+          <div className="flex flex-col sm:flex-row gap-4">
+            <div className="flex-1">
+              <div className="border-2 border-dashed border-gray-300 rounded-md p-4 sm:p-6 text-center hover:border-[#16829E] transition-colors">
                 <input
                   type="file"
                   accept="image/*"
                   onChange={handleFotoChange}
                   className="hidden"
-                  id="foto"
+                  id="foto-upload"
                 />
                 <label
-                  htmlFor="foto"
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors flex items-center justify-center gap-2 text-gray-600"
+                  htmlFor="foto-upload"
+                  className="cursor-pointer flex flex-col items-center"
                 >
-                  <FaUpload className="w-5 h-5" />
-                  Clique para selecionar uma foto do produto
+                  <FaUpload className="h-8 w-8 sm:h-12 sm:w-12 text-gray-400 mb-2" />
+                  <span className="text-sm sm:text-base text-gray-600">
+                    Clique para fazer upload
+                  </span>
+                  <span className="text-xs text-gray-500 mt-1">
+                    PNG, JPG até 5MB
+                  </span>
                 </label>
               </div>
-              {previewFoto && (
-                <div className="w-24 h-24 border rounded-lg overflow-hidden relative flex-shrink-0">
+            </div>
+
+            {previewFoto && (
+              <div className="flex-shrink-0">
+                <div className="relative w-24 h-24 sm:w-32 sm:h-32">
                   <Image
                     src={previewFoto}
                     alt="Preview"
                     fill
-                    sizes="96px" // Added sizes attribute
-                    className="object-cover"
+                    className="object-cover rounded-md"
                   />
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setProduto((prev) => ({ ...prev, foto: null }));
+                      setPreviewFoto(null);
+                    }}
+                    className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600 transition-colors"
+                  >
+                    <FaTimes className="h-3 w-3" />
+                  </button>
                 </div>
-              )}
-            </div>
+              </div>
+            )}
           </div>
+        </div>
 
-          {/* Descrição */}
-          <div className="md:col-span-2">
-            <label className="block text-sm font-medium text-gray-700">
-              Descrição
-            </label>
-            <textarea
-              name="descricao"
-              value={produto.descricao}
-              onChange={handleChange}
-              rows={4}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#16829E] focus:ring-[#16829E] text-gray-900"
-              placeholder="Descreva as características do produto..."
-            />
+        {/* Tags de Efeitos */}
+        <div className="mt-4 sm:mt-6">
+          <label className="block text-sm font-medium text-gray-700 mb-3">
+            Efeitos Terapêuticos
+          </label>
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2 sm:gap-3">
+            {availableTags.map((tag) => (
+              <button
+                key={tag}
+                type="button"
+                onClick={() => toggleTag(tag)}
+                className={`px-2 sm:px-3 py-1 sm:py-2 text-xs sm:text-sm rounded-md border transition-colors ${
+                  selectedTags.includes(tag)
+                    ? "bg-[#16829E] text-white border-[#16829E]"
+                    : "bg-white text-gray-700 border-gray-300 hover:border-[#16829E]"
+                }`}
+              >
+                {tag}
+              </button>
+            ))}
           </div>
-
-          {/* Tags Positivas */}
-          <div className="md:col-span-2">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Tags Positivas (Efeitos Terapêuticos)
-            </label>
-            <div className="flex flex-wrap gap-2">
-              {availableTags.map((tag) => (
-                <button
-                  key={tag}
-                  type="button"
-                  onClick={() => toggleTag(tag)}
-                  className={`px-3 py-1.5 rounded-full text-sm font-medium transition-all duration-200 flex items-center gap-2 ${
-                    selectedTags.includes(tag)
-                      ? "bg-[#16829E] text-white"
-                      : "bg-[#16829E]/10 text-[#16829E] hover:bg-[#16829E]/20"
-                  }`}
-                >
-                  {tag}
-                  {selectedTags.includes(tag) && <FaTimes className="w-3 h-3" />}
-                </button>
-              ))}
+          {selectedTags.length > 0 && (
+            <div className="mt-3">
+              <p className="text-xs sm:text-sm text-gray-600">
+                Selecionados: {selectedTags.join(", ")}
+              </p>
             </div>
-          </div>
-
-          {/* Tags Negativas */}
-          <div className="md:col-span-2">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Tags Negativas (Efeitos Colaterais)
-            </label>
-            <div className="flex flex-wrap gap-2">
-              {[
-                "Sonolência",
-                "Tontura",
-                "Boca Seca",
-                "Fome",
-                "Ansiedade",
-                "Paranoia",
-                "Náusea",
-                "Dor de Cabeça",
-                "Insônia",
-                "Fadiga",
-              ].map((tag) => (
-                <button
-                  key={tag}
-                  type="button"
-                  onClick={() => {
-                    setNegativeTags((prev) => {
-                      if (prev.includes(tag)) {
-                        return prev.filter((t) => t !== tag);
-                      } else {
-                        return [...prev, tag];
-                      }
-                    });
-                  }}
-                  className={`px-3 py-1.5 rounded-full text-sm font-medium transition-all duration-200 flex items-center gap-2 ${
-                    negativeTags.includes(tag)
-                      ? "bg-red-500 text-white"
-                      : "bg-red-100 text-red-500 hover:bg-red-200"
-                  }`}
-                >
-                  {tag}
-                  {negativeTags.includes(tag) && <FaTimes className="w-3 h-3" />}
-                </button>
-              ))}
-            </div>
-          </div>
+          )}
         </div>
       </FormLayout>
     </MainLayout>
   );
 }
-
