@@ -263,21 +263,20 @@ export default function Header() {
   // Para usuários autenticados - Layout com Header fixo e Sidebar abaixo
   const role = session?.user?.role as keyof typeof profileLinks;
   const links = profileLinks[role] || [];
-  const sidebarWidth = isSidebarExpanded ? "w-64" : "w-16";
 
   return (
     <div className="relative">
       {/* Header Fixo */}
       <header className="fixed top-0 left-0 right-0 bg-white shadow-md z-50">
-        <nav className="w-full px-6">
+        <nav className="w-full px-4 sm:px-6">
           <div className="flex justify-between h-16">
             {/* Menu Button à esquerda */}
             <div className="flex items-center">
               <button
                 onClick={() => setIsSidebarExpanded(!isSidebarExpanded)}
-                className="p-2 rounded-md text-gray-500 hover:text-[#16829E] hover:bg-gray-100 mr-4"
+                className="p-2 rounded-md text-gray-500 hover:text-[#16829E] hover:bg-gray-100 mr-2 sm:mr-4"
               >
-                <FaBars className="w-5 h-5" />
+                <FaBars className="w-4 h-4 sm:w-5 sm:h-5" />
               </button>
 
               {/* Logo */}
@@ -288,20 +287,20 @@ export default function Header() {
                   width={200}
                   height={40}
                   priority
-                  className="w-[150px] md:w-[200px]"
+                  className="w-[120px] sm:w-[150px] md:w-[200px]"
                 />
               </Link>
             </div>
 
             {/* Área direita: Carrinho + Saudação + Menu do usuário */}
-            <div className="flex items-center space-x-4">
+            <div className="flex items-center space-x-2 sm:space-x-4">
               {/* Carrinho de Compras (apenas para pacientes) */}
               {role === "patient" && (
                 <Link
                   href="/paciente/checkout"
-                  className="relative text-gray-600 hover:text-[#16829E]"
+                  className="relative text-gray-600 hover:text-[#16829E] p-2"
                 >
-                  <FaShoppingCart className="w-6 h-6" />
+                  <FaShoppingCart className="w-5 h-5 sm:w-6 sm:h-6" />
                   {quantidadeProdutos > 0 && (
                     <span className="absolute -top-1 -right-1 bg-[#16829E] text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
                       {quantidadeProdutos}
@@ -311,8 +310,8 @@ export default function Header() {
               )}
 
               {/* Saudação + Menu do usuário */}
-              <div className="flex items-center space-x-3">
-                <span className="text-sm text-gray-700 hidden sm:inline">
+              <div className="flex items-center space-x-2 sm:space-x-3">
+                <span className="text-sm text-gray-700 hidden md:inline truncate max-w-[100px] lg:max-w-none">
                   Olá, {session?.user?.name}
                 </span>
 
@@ -373,12 +372,13 @@ export default function Header() {
 
       {/* Sidebar abaixo do Header */}
       <aside
-        className={`fixed top-16 left-0 bottom-0 bg-white shadow-lg z-40 transition-all duration-300 ${sidebarWidth} overflow-hidden`}
+        className={`fixed top-16 left-0 bottom-0 bg-white shadow-lg z-40 transition-all duration-300 overflow-hidden
+          ${isSidebarExpanded ? "w-64 sm:w-72" : "w-12 sm:w-16"}`}
       >
         <div className="flex flex-col h-full">
           {/* Links de Navegação */}
           <nav
-            className={`flex-1 py-4 min-h-0 ${
+            className={`flex-1 py-2 sm:py-4 min-h-0 ${
               isSidebarExpanded ? "overflow-y-auto" : "overflow-hidden"
             }`}
           >
@@ -392,7 +392,7 @@ export default function Header() {
                         isActive(link.href)
                           ? "text-[#16829E] bg-blue-50"
                           : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
-                      } flex items-center px-4 py-3 text-sm transition-colors duration-200 ${
+                      } flex items-center px-2 sm:px-4 py-2 sm:py-3 text-sm transition-colors duration-200 ${
                         !isSidebarExpanded ? "justify-center" : ""
                       }`}
                       title={!isSidebarExpanded ? link.label : ""}
@@ -400,7 +400,7 @@ export default function Header() {
                       {link.icon && (
                         <span
                           className={`${
-                            isSidebarExpanded ? "mr-3" : ""
+                            isSidebarExpanded ? "mr-2 sm:mr-3" : ""
                           } flex-shrink-0`}
                         >
                           {link.icon}
@@ -408,10 +408,12 @@ export default function Header() {
                       )}
                       {isSidebarExpanded && (
                         <>
-                          <span className="truncate">{link.label}</span>
+                          <span className="truncate text-xs sm:text-sm">
+                            {link.label}
+                          </span>
                           {link.submenu && (
                             <svg
-                              className="ml-auto h-4 w-4 flex-shrink-0"
+                              className="ml-auto h-3 w-3 sm:h-4 sm:w-4 flex-shrink-0"
                               fill="none"
                               stroke="currentColor"
                               viewBox="0 0 24 24"
@@ -430,7 +432,7 @@ export default function Header() {
 
                     {/* Tooltip para modo mini */}
                     {!isSidebarExpanded && (
-                      <div className="absolute left-full top-0 ml-2 px-2 py-1 bg-gray-800 text-white text-sm rounded opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 whitespace-nowrap z-50">
+                      <div className="absolute left-full top-0 ml-2 px-2 py-1 bg-gray-800 text-white text-xs sm:text-sm rounded opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 whitespace-nowrap z-50">
                         {link.label}
                         <div className="absolute top-1/2 left-0 transform -translate-y-1/2 -translate-x-full border-4 border-transparent border-r-gray-800"></div>
                       </div>
@@ -447,7 +449,7 @@ export default function Header() {
                                 isActive(subitem.href)
                                   ? "text-[#16829E] bg-blue-50"
                                   : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
-                              } flex items-center px-3 py-2 text-sm transition-colors duration-200`}
+                              } flex items-center px-2 sm:px-3 py-2 text-xs sm:text-sm transition-colors duration-200`}
                             >
                               {subitem.icon && (
                                 <span className="mr-2 flex-shrink-0">
@@ -470,9 +472,8 @@ export default function Header() {
 
       {/* Conteúdo Principal */}
       <main
-        className={`transition-all duration-300 pt-16 ${
-          isSidebarExpanded ? "ml-64" : "ml-16"
-        }`}
+        className={`transition-all duration-300 pt-16
+          ${isSidebarExpanded ? "ml-64 sm:ml-72" : "ml-12 sm:ml-16"}`}
       >
         {/* Aqui será renderizado o conteúdo da página */}
       </main>

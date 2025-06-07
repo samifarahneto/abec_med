@@ -105,49 +105,49 @@ const HeroH6: React.FC<HeroH6Props> = ({ className = "" }) => {
 
   return (
     <div
-      className={`relative w-full min-h-[900px] flex items-center justify-center bg-white ${className}`}
+      className={`relative w-full min-h-[700px] sm:min-h-[800px] md:min-h-[900px] flex items-center justify-center bg-white ${className}`}
     >
       {/* Conteúdo */}
-      <div className="relative z-10 w-full max-w-7xl mx-auto px-0 sm:px-8 md:px-12 lg:px-16">
+      <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16">
         {/* Título Principal */}
-        <div className="text-center mb-16 pt-8 md:pt-0">
-          <h2 className="text-4xl sm:text-5xl md:text-6xl font-bold text-[#16829E] mb-4">
-            <span className="block text-[#16829E]/80 font-light mb-2 text-4xl sm:text-5xl md:text-6xl">
+        <div className="text-center mb-8 sm:mb-12 md:mb-16 pt-6 sm:pt-8 md:pt-0">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold text-[#16829E] mb-3 sm:mb-4">
+            <span className="block text-[#16829E]/80 font-light mb-2 text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl">
               Tire Suas Dúvidas
             </span>
-            <span className="[text-shadow:_0_1px_0_rgb(0_0_0_/_40%)] text-2xl sm:text-3xl">
+            <span className="[text-shadow:_0_1px_0_rgb(0_0_0_/_40%)] text-lg sm:text-xl md:text-2xl lg:text-3xl">
               Dúvidas Frequentes
             </span>
           </h2>
-          <p className="text-gray-600 text-lg max-w-3xl mx-auto">
+          <p className="text-gray-600 text-sm sm:text-base md:text-lg max-w-3xl mx-auto px-4 sm:px-0">
             Encontre respostas para as principais questões sobre cannabis
             medicinal e nossos serviços
           </p>
-          <div className="w-24 h-0.5 bg-gradient-to-r from-transparent via-[#16829E]/50 to-transparent mx-auto mt-4" />
+          <div className="w-16 sm:w-20 md:w-24 h-0.5 bg-gradient-to-r from-transparent via-[#16829E]/50 to-transparent mx-auto mt-3 sm:mt-4" />
         </div>
 
         {/* Grid de FAQs */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 md:gap-8">
           {/* Lista de FAQs */}
-          <div className="bg-white rounded-none sm:rounded-xl shadow-md border border-gray-100 overflow-hidden relative h-fit">
-            <div className="p-4 space-y-2">
+          <div className="bg-white rounded-lg sm:rounded-xl shadow-md border border-gray-100 overflow-hidden relative h-fit">
+            <div className="p-3 sm:p-4 space-y-2">
               {faqs.map((faq) => (
                 <button
                   key={faq.id}
                   onClick={() => setActiveFaq(faq.id)}
-                  className={`w-full p-4 flex items-center rounded-none sm:rounded-lg transition-all duration-300 relative ${
+                  className={`w-full p-3 sm:p-4 flex items-center rounded-lg transition-all duration-300 relative ${
                     activeFaq === faq.id
                       ? "bg-[#16829E] text-white shadow-lg"
                       : "hover:bg-gray-50 text-gray-800 hover:shadow-md"
                   }`}
                 >
                   <faq.icon
-                    className={`text-2xl mr-3 ${
+                    className={`text-lg sm:text-xl md:text-2xl mr-2 sm:mr-3 flex-shrink-0 ${
                       activeFaq === faq.id ? "text-white" : "text-[#16829E]"
                     }`}
                   />
                   <h3
-                    className={`text-lg font-semibold ${
+                    className={`text-sm sm:text-base md:text-lg font-semibold text-left ${
                       activeFaq === faq.id ? "text-white" : "text-gray-800"
                     }`}
                   >
@@ -159,29 +159,31 @@ const HeroH6: React.FC<HeroH6Props> = ({ className = "" }) => {
           </div>
 
           {/* Conteúdo da FAQ Ativa */}
-          <div className="bg-white rounded-none sm:rounded-xl shadow-md border border-gray-100 overflow-hidden relative min-h-[400px]">
-            <div className="p-6">
+          <div className="bg-white rounded-lg sm:rounded-xl shadow-md border border-gray-100 overflow-hidden relative min-h-[350px] sm:min-h-[400px]">
+            <div className="p-4 sm:p-5 md:p-6">
               {activeFaqData && (
-                <div className="space-y-6">
-                  <div className="flex items-center mb-6">
-                    <activeFaqData.icon className="text-[#16829E] text-2xl mr-3" />
-                    <h3 className="text-xl font-semibold text-[#16829E]">
+                <div className="space-y-4 sm:space-y-6">
+                  <div className="flex items-center mb-4 sm:mb-6">
+                    <activeFaqData.icon className="text-[#16829E] text-lg sm:text-xl md:text-2xl mr-2 sm:mr-3 flex-shrink-0" />
+                    <h3 className="text-base sm:text-lg md:text-xl font-semibold text-[#16829E]">
                       {activeFaqData.title}
                     </h3>
                   </div>
-                  <div className="space-y-4">
+                  <div className="space-y-3 sm:space-y-4">
                     {activeFaqData.questions.map(
                       (item: Question, index: number) => (
                         <div
                           key={index}
-                          className="border-b border-gray-100 last:border-0 pb-4 last:pb-0"
+                          className="border-b border-gray-100 last:border-0 pb-3 sm:pb-4 last:pb-0"
                         >
-                          <h4 className="font-semibold text-gray-800 mb-2">
+                          <h4 className="font-semibold text-gray-800 mb-2 text-sm sm:text-base">
                             {item.question}
                           </h4>
-                          <p className="text-gray-600">{item.answer}</p>
+                          <p className="text-gray-600 text-sm sm:text-base leading-relaxed">
+                            {item.answer}
+                          </p>
                           {item.list && (
-                            <ul className="list-disc list-inside text-gray-600 mt-2 space-y-1">
+                            <ul className="list-disc list-inside text-gray-600 mt-2 space-y-1 text-sm sm:text-base">
                               {item.list.map(
                                 (listItem: string, listIndex: number) => (
                                   <li key={listIndex}>{listItem}</li>
@@ -198,25 +200,28 @@ const HeroH6: React.FC<HeroH6Props> = ({ className = "" }) => {
             </div>
           </div>
         </div>
-      </div>
 
-      {/* Efeito de Balão */}
-      <style jsx>{`
-        @media (min-width: 768px) {
-          .bg-white.rounded-xl:first-of-type button.bg-\\[\\#16829E\\]::after {
-            content: "";
-            position: absolute;
-            right: -16px;
-            top: 50%;
-            transform: translateY(-50%);
-            width: 0;
-            height: 0;
-            border-top: 12px solid transparent;
-            border-bottom: 12px solid transparent;
-            border-left: 16px solid #16829e;
-          }
-        }
-      `}</style>
+        {/* Seção de Call to Action */}
+        <div className="text-center mt-8 sm:mt-12 md:mt-16 pb-6 sm:pb-8">
+          <div className="bg-gradient-to-r from-[#16829E] to-[#1E3A8A] p-6 sm:p-8 md:p-12 rounded-lg sm:rounded-xl text-white">
+            <h3 className="text-xl sm:text-2xl md:text-3xl font-bold mb-3 sm:mb-4">
+              Não encontrou sua resposta?
+            </h3>
+            <p className="text-sm sm:text-base md:text-lg mb-4 sm:mb-6 opacity-90 max-w-2xl mx-auto">
+              Nossa equipe está pronta para esclarecer todas as suas dúvidas
+              sobre tratamentos com cannabis medicinal
+            </p>
+            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center items-center">
+              <button className="w-full sm:w-auto bg-white text-[#16829E] px-6 sm:px-8 py-2 sm:py-3 rounded-lg font-semibold hover:bg-gray-50 transition-colors duration-200 text-sm sm:text-base">
+                Fale Conosco
+              </button>
+              <button className="w-full sm:w-auto border-2 border-white text-white px-6 sm:px-8 py-2 sm:py-3 rounded-lg font-semibold hover:bg-white hover:text-[#16829E] transition-all duration-200 text-sm sm:text-base">
+                Agendar Consulta
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 };

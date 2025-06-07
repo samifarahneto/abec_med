@@ -263,12 +263,14 @@ export default function ReceitasPage() {
 
   return (
     <MainLayout>
-      <div className="px-6">
-        <h1 className="text-2xl font-bold text-[#16829E] mb-6">Receitas</h1>
+      <div className="space-y-4 sm:space-y-6">
+        <h1 className="text-xl sm:text-2xl font-bold text-[#16829E]">
+          Receitas
+        </h1>
 
-        <div className="bg-white rounded-lg shadow-md p-6">
-          <div className="flex justify-between items-center mb-6">
-            <div className="relative w-64">
+        <div className="bg-white rounded-lg shadow-md p-4 sm:p-6">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 sm:mb-6 space-y-3 sm:space-y-0">
+            <div className="relative w-full sm:w-64">
               <Input
                 variant="search"
                 type="text"
@@ -280,23 +282,24 @@ export default function ReceitasPage() {
             </div>
           </div>
 
-          <div className="overflow-x-auto rounded-lg border border-gray-200">
+          {/* Desktop Table */}
+          <div className="hidden lg:block overflow-x-auto rounded-lg border border-gray-200">
             <table className="min-w-full divide-y divide-gray-200">
               <thead className="bg-gray-50">
                 <tr>
-                  <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider bg-gray-100">
+                  <th className="px-4 sm:px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider bg-gray-100">
                     Paciente
                   </th>
-                  <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider bg-gray-100">
+                  <th className="px-4 sm:px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider bg-gray-100">
                     Médico
                   </th>
-                  <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider bg-gray-100">
+                  <th className="px-4 sm:px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider bg-gray-100">
                     Data Emissão
                   </th>
-                  <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider bg-gray-100">
+                  <th className="px-4 sm:px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider bg-gray-100">
                     Status
                   </th>
-                  <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider bg-gray-100">
+                  <th className="px-4 sm:px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider bg-gray-100">
                     Ações
                   </th>
                 </tr>
@@ -307,7 +310,7 @@ export default function ReceitasPage() {
                     key={receita.id}
                     className="hover:bg-gray-50 transition-colors duration-150"
                   >
-                    <td className="px-6 py-4 whitespace-nowrap text-center">
+                    <td className="px-4 sm:px-6 py-4 whitespace-nowrap text-center">
                       <div className="text-sm font-medium text-black">
                         {receita.paciente.nome}
                       </div>
@@ -315,7 +318,7 @@ export default function ReceitasPage() {
                         {receita.paciente.cpf}
                       </div>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-center">
+                    <td className="px-4 sm:px-6 py-4 whitespace-nowrap text-center">
                       <div className="text-sm font-medium text-black">
                         {receita.medico.nome}
                       </div>
@@ -323,7 +326,7 @@ export default function ReceitasPage() {
                         CRM: {receita.medico.crm}
                       </div>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-center">
+                    <td className="px-4 sm:px-6 py-4 whitespace-nowrap text-center">
                       <div className="text-sm text-gray-700">
                         {new Date(receita.dataEmissao).toLocaleDateString()}
                       </div>
@@ -332,7 +335,7 @@ export default function ReceitasPage() {
                         {new Date(receita.dataValidade).toLocaleDateString()}
                       </div>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-center">
+                    <td className="px-4 sm:px-6 py-4 whitespace-nowrap text-center">
                       <span
                         className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
                           receita.status === "aprovada"
@@ -346,7 +349,7 @@ export default function ReceitasPage() {
                           receita.status.slice(1)}
                       </span>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-center">
+                    <td className="px-4 sm:px-6 py-4 whitespace-nowrap text-center">
                       <div className="flex justify-center space-x-2">
                         <button
                           className="inline-flex items-center px-2.5 py-1.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 hover:bg-blue-200 transition-colors duration-200"
@@ -378,17 +381,92 @@ export default function ReceitasPage() {
             </table>
           </div>
 
+          {/* Mobile Cards */}
+          <div className="lg:hidden space-y-4">
+            {filteredReceitas.map((receita) => (
+              <div
+                key={receita.id}
+                className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm"
+              >
+                <div className="flex justify-between items-start mb-3">
+                  <div className="flex-1 min-w-0">
+                    <h3 className="text-sm font-medium text-gray-900 truncate">
+                      {receita.paciente.nome}
+                    </h3>
+                    <p className="text-xs text-gray-500">
+                      {receita.paciente.cpf}
+                    </p>
+                  </div>
+                  <span
+                    className={`px-2 py-1 text-xs font-semibold rounded-full ml-2 flex-shrink-0 ${
+                      receita.status === "aprovada"
+                        ? "bg-green-100 text-green-800"
+                        : receita.status === "rejeitada"
+                        ? "bg-red-100 text-red-800"
+                        : "bg-yellow-100 text-yellow-800"
+                    }`}
+                  >
+                    {receita.status.charAt(0).toUpperCase() +
+                      receita.status.slice(1)}
+                  </span>
+                </div>
+
+                <div className="space-y-2 mb-3">
+                  <div>
+                    <p className="text-xs text-gray-500">Médico</p>
+                    <p className="text-sm text-gray-900">
+                      {receita.medico.nome}
+                    </p>
+                    <p className="text-xs text-gray-500">
+                      CRM: {receita.medico.crm}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-gray-500">Data de Emissão</p>
+                    <p className="text-sm text-gray-900">
+                      {new Date(receita.dataEmissao).toLocaleDateString()}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex space-x-2">
+                  <button
+                    className="flex-1 inline-flex items-center justify-center px-3 py-2 text-xs font-medium bg-blue-100 text-blue-800 hover:bg-blue-200 transition-colors duration-200 rounded-md"
+                    onClick={() => handleViewReceita(receita)}
+                  >
+                    <FaEye className="mr-1" />
+                    Ver
+                  </button>
+                  <button
+                    className="flex-1 inline-flex items-center justify-center px-3 py-2 text-xs font-medium bg-green-100 text-green-800 hover:bg-green-200 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed rounded-md"
+                    onClick={() => handleValidateClick(receita)}
+                    disabled={receita.status === "aprovada"}
+                  >
+                    <FaCheck className="mr-1" />
+                    Validar
+                  </button>
+                  <button
+                    className="flex-shrink-0 inline-flex items-center justify-center px-3 py-2 text-xs font-medium bg-red-100 text-red-800 hover:bg-red-200 transition-colors duration-200 rounded-md"
+                    onClick={() => handleDelete(receita.id)}
+                  >
+                    <FaTrash />
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+
           {/* Modal */}
           {isModalOpen && selectedReceita && (
-            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-              <div className="bg-white rounded-lg p-6 max-w-4xl w-full mx-4 h-[90vh] flex flex-col">
+            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-2 sm:p-4">
+              <div className="bg-white rounded-lg p-4 sm:p-6 max-w-4xl w-full h-[90vh] sm:h-[85vh] flex flex-col">
                 <div className="flex justify-between items-center mb-4">
-                  <h2 className="text-xl font-bold text-gray-800">
+                  <h2 className="text-lg sm:text-xl font-bold text-gray-800">
                     Visualização da Receita
                   </h2>
                   <button
                     onClick={closeModal}
-                    className="text-gray-500 hover:text-gray-700"
+                    className="text-gray-500 hover:text-gray-700 p-1"
                   >
                     <FaTimes size={20} />
                   </button>
@@ -397,13 +475,13 @@ export default function ReceitasPage() {
                 <div className="flex-1 overflow-hidden">
                   <iframe
                     src={`/uploads/receitas/${selectedReceita.arquivo}`}
-                    className="w-full h-full border-0"
+                    className="w-full h-full border-0 rounded"
                     title="Visualização da Receita"
                   />
                 </div>
 
                 <div className="mt-4 pt-4 border-t">
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                       <h3 className="text-sm font-medium text-gray-500">
                         Paciente
@@ -452,10 +530,10 @@ export default function ReceitasPage() {
 
           {/* Modal de Validação */}
           {isValidationModalOpen && selectedReceita && (
-            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 overflow-y-auto">
-              <div className="bg-white rounded-lg p-6 w-[1352px] mx-4 my-8 flex flex-col">
+            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 overflow-y-auto p-2 sm:p-4">
+              <div className="bg-white rounded-lg p-4 sm:p-6 w-full max-w-6xl my-4 sm:my-8 flex flex-col max-h-[95vh]">
                 <div className="flex justify-between items-center mb-4">
-                  <h2 className="text-xl font-bold text-gray-800">
+                  <h2 className="text-lg sm:text-xl font-bold text-gray-800">
                     Validar Receita
                   </h2>
                   <button

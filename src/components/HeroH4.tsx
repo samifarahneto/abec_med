@@ -51,19 +51,19 @@ const HeroH4: React.FC<HeroH4Props> = ({ className = "" }) => {
 
   return (
     <div
-      className={`relative w-full min-h-[600px] bg-white py-16 ${className}`}
+      className={`relative w-full min-h-[500px] sm:min-h-[600px] bg-white py-8 sm:py-12 md:py-16 ${className}`}
     >
-      <div className="relative z-10 w-full max-w-7xl mx-auto px-0 sm:px-8 md:px-12 lg:px-16">
-        <div className="text-center mb-16">
-          <h2 className="text-4xl sm:text-5xl md:text-6xl font-bold text-[#16829E] mb-4">
-            <span className="block text-[#16829E]/80 font-light mb-2 text-2xl sm:text-3xl">
+      <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16">
+        <div className="text-center mb-8 sm:mb-12 md:mb-16">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold text-[#16829E] mb-3 sm:mb-4">
+            <span className="block text-[#16829E]/80 font-light mb-2 text-base sm:text-lg md:text-xl lg:text-2xl xl:text-3xl">
               Depoimentos
             </span>
             <span className="[text-shadow:_0_1px_0_rgb(0_0_0_/_40%)]">
               O que nossos pacientes dizem
             </span>
           </h2>
-          <div className="w-24 h-0.5 bg-gradient-to-r from-transparent via-[#16829E]/50 to-transparent mx-auto" />
+          <div className="w-16 sm:w-20 md:w-24 h-0.5 bg-gradient-to-r from-transparent via-[#16829E]/50 to-transparent mx-auto" />
         </div>
 
         <div className="relative">
@@ -75,10 +75,10 @@ const HeroH4: React.FC<HeroH4Props> = ({ className = "" }) => {
               }}
             >
               {slides.map((slide, index) => (
-                <div key={index} className="w-full flex-shrink-0 px-4 sm:px-0">
-                  <div className="bg-white rounded-none sm:rounded-xl shadow-lg p-8 mx-0 sm:mx-4">
-                    <div className="flex items-center mb-6">
-                      <div className="relative w-16 h-16 rounded-full overflow-hidden mr-4">
+                <div key={index} className="w-full flex-shrink-0 px-2 sm:px-4">
+                  <div className="bg-white rounded-lg sm:rounded-xl shadow-lg p-4 sm:p-6 md:p-8">
+                    <div className="flex flex-col sm:flex-row items-center sm:items-start mb-4 sm:mb-6 text-center sm:text-left">
+                      <div className="relative w-12 h-12 sm:w-16 sm:h-16 rounded-full overflow-hidden mb-3 sm:mb-0 sm:mr-4 flex-shrink-0">
                         <Image
                           src={slide.image}
                           alt={slide.name}
@@ -86,20 +86,20 @@ const HeroH4: React.FC<HeroH4Props> = ({ className = "" }) => {
                           className="object-cover"
                         />
                       </div>
-                      <div>
-                        <h3 className="text-xl font-semibold text-[#16829E]">
+                      <div className="min-w-0">
+                        <h3 className="text-lg sm:text-xl font-semibold text-[#16829E] truncate">
                           {slide.name}
                         </h3>
-                        <p className="text-gray-500">
+                        <p className="text-sm sm:text-base text-gray-500">
                           Associado desde {slide.since}
                         </p>
                       </div>
                     </div>
-                    <div className="flex mb-4">
+                    <div className="flex justify-center sm:justify-start mb-3 sm:mb-4">
                       {[...Array(slide.rating)].map((_, i) => (
                         <svg
                           key={i}
-                          className="w-5 h-5 text-yellow-400"
+                          className="w-4 h-4 sm:w-5 sm:h-5 text-yellow-400"
                           fill="currentColor"
                           viewBox="0 0 20 20"
                         >
@@ -107,7 +107,7 @@ const HeroH4: React.FC<HeroH4Props> = ({ className = "" }) => {
                         </svg>
                       ))}
                     </div>
-                    <p className="text-gray-600 leading-relaxed">
+                    <p className="text-sm sm:text-base text-gray-600 leading-relaxed text-center sm:text-left">
                       {slide.text}
                     </p>
                   </div>
@@ -116,8 +116,9 @@ const HeroH4: React.FC<HeroH4Props> = ({ className = "" }) => {
             </div>
           </div>
 
+          {/* Botões de navegação - ocultos em mobile */}
           <button
-            className="absolute left-0 top-1/2 transform -translate-y-1/2 bg-white/80 hover:bg-white text-[#16829E] p-2 rounded-full shadow-lg z-10"
+            className="absolute left-2 sm:left-0 top-1/2 transform -translate-y-1/2 bg-white/80 hover:bg-white text-[#16829E] p-1.5 sm:p-2 rounded-full shadow-lg z-10 hidden sm:block"
             onClick={() =>
               setCurrentSlide(
                 (prev) => (prev - 1 + slides.length) % slides.length
@@ -125,7 +126,7 @@ const HeroH4: React.FC<HeroH4Props> = ({ className = "" }) => {
             }
           >
             <svg
-              className="w-6 h-6"
+              className="w-4 h-4 sm:w-6 sm:h-6"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -140,13 +141,13 @@ const HeroH4: React.FC<HeroH4Props> = ({ className = "" }) => {
           </button>
 
           <button
-            className="absolute right-0 top-1/2 transform -translate-y-1/2 bg-white/80 hover:bg-white text-[#16829E] p-2 rounded-full shadow-lg z-10"
+            className="absolute right-2 sm:right-0 top-1/2 transform -translate-y-1/2 bg-white/80 hover:bg-white text-[#16829E] p-1.5 sm:p-2 rounded-full shadow-lg z-10 hidden sm:block"
             onClick={() =>
               setCurrentSlide((prev) => (prev + 1) % slides.length)
             }
           >
             <svg
-              className="w-6 h-6"
+              className="w-4 h-4 sm:w-6 sm:h-6"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -159,6 +160,19 @@ const HeroH4: React.FC<HeroH4Props> = ({ className = "" }) => {
               />
             </svg>
           </button>
+
+          {/* Indicadores de slide */}
+          <div className="flex justify-center mt-4 sm:mt-6 space-x-2">
+            {slides.map((_, index) => (
+              <button
+                key={index}
+                className={`w-2 h-2 sm:w-3 sm:h-3 rounded-full transition-colors duration-200 ${
+                  index === currentSlide ? "bg-[#16829E]" : "bg-gray-300"
+                }`}
+                onClick={() => setCurrentSlide(index)}
+              />
+            ))}
+          </div>
         </div>
       </div>
     </div>

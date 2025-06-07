@@ -123,13 +123,13 @@ export default function GerenciarUsuarios() {
 
   return (
     <MainLayout>
-      <div className="px-6">
-        <div className="flex justify-between items-center mb-6">
-          <h1 className="text-2xl font-bold text-[#16829E]">
+      <div className="space-y-4 sm:space-y-6">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-3 sm:space-y-0">
+          <h1 className="text-xl sm:text-2xl font-bold text-[#16829E]">
             Gerenciar Usuários
           </h1>
           <button
-            className="bg-[#16829E] text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-[#126a7e] transition-colors"
+            className="w-full sm:w-auto bg-[#16829E] text-white px-4 py-2 rounded-lg flex items-center justify-center gap-2 hover:bg-[#126a7e] transition-colors text-sm sm:text-base"
             onClick={() => router.push("/admin/usuarios/novo")}
           >
             <FaPlus className="w-4 h-4" />
@@ -138,37 +138,35 @@ export default function GerenciarUsuarios() {
         </div>
 
         {/* Barra de Pesquisa */}
-        <div className="mb-6">
-          <div className="relative">
-            <input
-              type="text"
-              placeholder="Buscar usuários..."
-              className="w-full px-4 py-2 pl-10 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#16829E]"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
-            <FaSearch className="absolute left-3 top-3 text-gray-400" />
-          </div>
+        <div className="relative">
+          <input
+            type="text"
+            placeholder="Buscar usuários..."
+            className="w-full px-4 py-2 sm:py-3 pl-10 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#16829E] text-sm sm:text-base"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+          <FaSearch className="absolute left-3 top-3 text-gray-400" />
         </div>
 
-        {/* Tabela de Usuários */}
-        <div className="bg-white rounded-lg shadow-md overflow-hidden">
+        {/* Desktop Table */}
+        <div className="hidden lg:block bg-white rounded-lg shadow-md overflow-hidden">
           <table className="min-w-full table-fixed">
             <thead className="bg-gray-50">
               <tr>
-                <th className="w-1/5 px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="w-1/5 px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Nome
                 </th>
-                <th className="w-1/5 px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="w-1/5 px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Email
                 </th>
-                <th className="w-1/5 px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="w-1/5 px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Tipo
                 </th>
-                <th className="w-1/5 px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="w-1/5 px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Status
                 </th>
-                <th className="w-1/5 px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="w-1/5 px-4 sm:px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Ações
                 </th>
               </tr>
@@ -178,7 +176,7 @@ export default function GerenciarUsuarios() {
                 <tr>
                   <td
                     colSpan={5}
-                    className="px-6 py-4 text-center text-gray-500"
+                    className="px-4 sm:px-6 py-4 text-center text-gray-500"
                   >
                     Carregando...
                   </td>
@@ -187,7 +185,7 @@ export default function GerenciarUsuarios() {
                 <tr>
                   <td
                     colSpan={5}
-                    className="px-6 py-4 text-center text-gray-500"
+                    className="px-4 sm:px-6 py-4 text-center text-gray-500"
                   >
                     Nenhum usuário encontrado
                   </td>
@@ -195,22 +193,22 @@ export default function GerenciarUsuarios() {
               ) : (
                 filteredUsuarios.map((usuario) => (
                   <tr key={usuario.id} className="hover:bg-gray-50">
-                    <td className="px-6 py-4 whitespace-nowrap">
+                    <td className="px-4 sm:px-6 py-4 whitespace-nowrap">
                       <div className="text-sm font-medium text-gray-900">
                         {usuario.name}
                       </div>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
+                    <td className="px-4 sm:px-6 py-4 whitespace-nowrap">
                       <div className="text-sm text-gray-500">
                         {usuario.email}
                       </div>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
+                    <td className="px-4 sm:px-6 py-4 whitespace-nowrap">
                       <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
                         {getRoleLabel(usuario.role)}
                       </span>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
+                    <td className="px-4 sm:px-6 py-4 whitespace-nowrap">
                       <span
                         className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
                           usuario.active
@@ -221,7 +219,7 @@ export default function GerenciarUsuarios() {
                         {getStatusLabel(usuario.active)}
                       </span>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                    <td className="px-4 sm:px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                       <button
                         onClick={() => handleEditar(usuario)}
                         className="text-[#16829E] hover:text-[#126a7e] mr-4"
@@ -242,8 +240,68 @@ export default function GerenciarUsuarios() {
           </table>
         </div>
 
+        {/* Mobile Cards */}
+        <div className="lg:hidden space-y-4">
+          {loading ? (
+            <div className="bg-white rounded-lg shadow-md p-4 text-center text-gray-500">
+              Carregando...
+            </div>
+          ) : filteredUsuarios.length === 0 ? (
+            <div className="bg-white rounded-lg shadow-md p-4 text-center text-gray-500">
+              Nenhum usuário encontrado
+            </div>
+          ) : (
+            filteredUsuarios.map((usuario) => (
+              <div
+                key={usuario.id}
+                className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm"
+              >
+                <div className="flex justify-between items-start mb-3">
+                  <div className="flex-1 min-w-0">
+                    <h3 className="text-sm font-medium text-gray-900 truncate">
+                      {usuario.name}
+                    </h3>
+                    <p className="text-xs text-gray-500 truncate">
+                      {usuario.email}
+                    </p>
+                  </div>
+                  <div className="flex space-x-2 ml-2">
+                    <button
+                      onClick={() => handleEditar(usuario)}
+                      className="p-2 text-[#16829E] hover:text-[#126a7e] hover:bg-blue-50 rounded-md transition-colors"
+                    >
+                      <FaEdit className="w-4 h-4" />
+                    </button>
+                    <button
+                      onClick={() => handleExcluir(usuario)}
+                      className="p-2 text-red-600 hover:text-red-800 hover:bg-red-50 rounded-md transition-colors"
+                    >
+                      <FaTrash className="w-4 h-4" />
+                    </button>
+                  </div>
+                </div>
+
+                <div className="flex flex-wrap gap-2">
+                  <span className="px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800">
+                    {getRoleLabel(usuario.role)}
+                  </span>
+                  <span
+                    className={`px-2 py-1 text-xs font-semibold rounded-full ${
+                      usuario.active
+                        ? "bg-green-100 text-green-800"
+                        : "bg-red-100 text-red-800"
+                    }`}
+                  >
+                    {getStatusLabel(usuario.active)}
+                  </span>
+                </div>
+              </div>
+            ))
+          )}
+        </div>
+
         {/* Paginação */}
-        <div className="mt-4 flex justify-between items-center">
+        <div className="flex justify-between items-center">
           <div className="text-sm text-gray-500">
             Mostrando {filteredUsuarios.length} de {usuarios.length} usuários
           </div>
@@ -259,7 +317,7 @@ export default function GerenciarUsuarios() {
           {usuarioSelecionado && (
             <form onSubmit={handleSalvar} className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700">
+                <label className="block text-sm font-medium text-gray-700 mb-1">
                   Nome
                 </label>
                 <input
@@ -271,12 +329,12 @@ export default function GerenciarUsuarios() {
                       name: e.target.value,
                     })
                   }
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#16829E] focus:ring-[#16829E] sm:text-sm text-black"
+                  className="block w-full rounded-md border-gray-300 shadow-sm focus:border-[#16829E] focus:ring-[#16829E] text-sm sm:text-base text-black px-3 py-2 sm:py-3"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700">
+                <label className="block text-sm font-medium text-gray-700 mb-1">
                   Email
                 </label>
                 <input
@@ -288,12 +346,12 @@ export default function GerenciarUsuarios() {
                       email: e.target.value,
                     })
                   }
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#16829E] focus:ring-[#16829E] sm:text-sm text-black"
+                  className="block w-full rounded-md border-gray-300 shadow-sm focus:border-[#16829E] focus:ring-[#16829E] text-sm sm:text-base text-black px-3 py-2 sm:py-3"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700">
+                <label className="block text-sm font-medium text-gray-700 mb-1">
                   Tipo
                 </label>
                 <select
@@ -304,7 +362,7 @@ export default function GerenciarUsuarios() {
                       role: e.target.value,
                     })
                   }
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#16829E] focus:ring-[#16829E] sm:text-sm text-black"
+                  className="block w-full rounded-md border-gray-300 shadow-sm focus:border-[#16829E] focus:ring-[#16829E] text-sm sm:text-base text-black px-3 py-2 sm:py-3"
                 >
                   <option value="admin">Administrador</option>
                   <option value="doctor">Médico</option>
@@ -314,7 +372,7 @@ export default function GerenciarUsuarios() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700">
+                <label className="block text-sm font-medium text-gray-700 mb-1">
                   Status
                 </label>
                 <select
@@ -325,7 +383,7 @@ export default function GerenciarUsuarios() {
                       active: e.target.value === "true",
                     })
                   }
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#16829E] focus:ring-[#16829E] sm:text-sm text-black"
+                  className="block w-full rounded-md border-gray-300 shadow-sm focus:border-[#16829E] focus:ring-[#16829E] text-sm sm:text-base text-black px-3 py-2 sm:py-3"
                 >
                   <option value="true">Ativo</option>
                   <option value="false">Inativo</option>
