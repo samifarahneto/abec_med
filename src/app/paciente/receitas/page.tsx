@@ -207,7 +207,7 @@ export default function ReceitasPaciente() {
         </div>
 
         <div className="flex justify-between items-center">
-          <h1 className="text-xl sm:text-2xl font-bold text-[#16829E]">
+          <h1 className="text-xl sm:text-2xl font-bold text-[#16829E] text-center sm:text-left">
             Minhas Receitas
           </h1>
         </div>

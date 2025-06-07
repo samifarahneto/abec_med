@@ -106,7 +106,7 @@ export default function PedidosPaciente() {
     <MainLayout>
       <div className="space-y-4 sm:space-y-6">
         <div className="flex justify-between items-center">
-          <h1 className="text-xl sm:text-2xl font-bold text-[#16829E]">
+          <h1 className="text-xl sm:text-2xl font-bold text-[#16829E] text-center sm:text-left">
             Meus Pedidos
           </h1>
         </div>

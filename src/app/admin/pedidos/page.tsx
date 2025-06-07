@@ -76,9 +76,17 @@ export default function Pedidos() {
   return (
     <MainLayout>
       <div className="space-y-4 sm:space-y-6">
-        <div className="flex justify-between items-center">
-          <h1 className="text-xl sm:text-2xl font-bold text-[#16829E]">
-            Pedidos
+        {/* Mobile: H1 centralizado em container separado */}
+        <div className="sm:hidden">
+          <h1 className="text-xl font-bold text-[#16829E] text-center">
+            Gerenciar Pedidos
+          </h1>
+        </div>
+
+        {/* Desktop: Layout flexível */}
+        <div className="hidden sm:flex justify-between items-center">
+          <h1 className="text-2xl font-bold text-[#16829E]">
+            Gerenciar Pedidos
           </h1>
         </div>
 

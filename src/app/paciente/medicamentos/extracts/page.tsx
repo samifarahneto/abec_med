@@ -41,7 +41,7 @@ export default function ExtractsPage() {
   return (
     <MainLayout>
       <div className="space-y-4 sm:space-y-6">
-        <h1 className="text-xl sm:text-2xl font-bold text-[#16829E]">
+        <h1 className="text-xl sm:text-2xl font-bold text-[#16829E] text-center sm:text-left">
           Concentrados
         </h1>
 

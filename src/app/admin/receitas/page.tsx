@@ -264,9 +264,19 @@ export default function ReceitasPage() {
   return (
     <MainLayout>
       <div className="space-y-4 sm:space-y-6">
-        <h1 className="text-xl sm:text-2xl font-bold text-[#16829E]">
-          Receitas
-        </h1>
+        {/* Mobile: H1 centralizado em container separado */}
+        <div className="sm:hidden">
+          <h1 className="text-xl font-bold text-[#16829E] text-center">
+            Gerenciar Receitas
+          </h1>
+        </div>
+
+        {/* Desktop: Layout flexível */}
+        <div className="hidden sm:flex justify-between items-center">
+          <h1 className="text-2xl font-bold text-[#16829E]">
+            Gerenciar Receitas
+          </h1>
+        </div>
 
         <div className="bg-white rounded-lg shadow-md p-4 sm:p-6">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 sm:mb-6 space-y-3 sm:space-y-0">

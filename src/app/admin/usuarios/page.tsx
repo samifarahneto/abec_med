@@ -124,13 +124,28 @@ export default function GerenciarUsuarios() {
   return (
     <MainLayout>
       <div className="space-y-4 sm:space-y-6">
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-3 sm:space-y-0">
-          <h1 className="text-xl sm:text-2xl font-bold text-[#16829E]">
+        {/* Mobile: H1 centralizado em container separado */}
+        <div className="sm:hidden">
+          <h1 className="text-xl font-bold text-[#16829E] text-center mb-4">
             Gerenciar Usuários
           </h1>
           <button
-            className="w-full sm:w-auto bg-[#16829E] text-white px-4 py-2 rounded-lg flex items-center justify-center gap-2 hover:bg-[#126a7e] transition-colors text-sm sm:text-base"
             onClick={() => router.push("/admin/usuarios/novo")}
+            className="w-full bg-[#16829E] text-white px-4 py-2 rounded-lg flex items-center justify-center gap-2 hover:bg-[#126a7e] transition-colors text-sm"
+          >
+            <FaPlus className="w-4 h-4" />
+            Novo Usuário
+          </button>
+        </div>
+
+        {/* Desktop: Layout flexível */}
+        <div className="hidden sm:flex justify-between items-center">
+          <h1 className="text-2xl font-bold text-[#16829E]">
+            Gerenciar Usuários
+          </h1>
+          <button
+            onClick={() => router.push("/admin/usuarios/novo")}
+            className="bg-[#16829E] text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-[#126a7e] transition-colors text-base"
           >
             <FaPlus className="w-4 h-4" />
             Novo Usuário

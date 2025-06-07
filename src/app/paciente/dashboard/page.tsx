@@ -1,16 +1,13 @@
 "use client";
 
-import { useSession } from "next-auth/react";
 import MainLayout from "@/components/MainLayout";
 
-export default function DashboardPaciente() {
-  const { data: session } = useSession();
-
+export default function PacienteDashboard() {
   return (
     <MainLayout>
       <div className="space-y-4 sm:space-y-6">
-        <h1 className="text-xl sm:text-2xl font-bold text-[#16829E]">
-          Bem-vindo, {session?.user?.name}
+        <h1 className="text-xl sm:text-2xl font-bold text-[#16829E] text-center sm:text-left">
+          Meu Dashboard
         </h1>
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3 sm:gap-4 md:gap-6">
           {/* Cards de resumo */}

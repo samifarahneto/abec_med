@@ -204,8 +204,8 @@ export default function MedicamentosPage() {
     <MainLayout>
       <div className="space-y-4 sm:space-y-6">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-3 sm:space-y-0">
-          <h1 className="text-xl sm:text-2xl font-bold text-[#16829E]">
-            Medicamentos
+          <h1 className="text-xl sm:text-2xl font-bold text-[#16829E] text-center sm:text-left">
+            Medicamentos Disponíveis
           </h1>
           <div className="relative w-full sm:w-auto">
             <input

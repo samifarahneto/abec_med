@@ -42,7 +42,9 @@ export default function OilsPage() {
   return (
     <MainLayout>
       <div className="space-y-4 sm:space-y-6">
-        <h1 className="text-xl sm:text-2xl font-bold text-[#16829E]">Óleos</h1>
+        <h1 className="text-xl sm:text-2xl font-bold text-[#16829E] text-center sm:text-left">
+          Óleos
+        </h1>
 
         {loading ? (
           <div className="text-center py-6 sm:py-8">

@@ -226,8 +226,8 @@ export default function Checkout() {
     return (
       <div className="max-w-4xl mx-auto p-3 sm:p-4">
         <div className="flex items-center mb-4 sm:mb-6">
-          <h1 className="text-xl sm:text-2xl font-bold text-[#16829E]">
-            Checkout
+          <h1 className="text-xl sm:text-2xl font-bold text-[#16829E] text-center sm:text-left">
+            Finalizar Pedido
           </h1>
         </div>
         <div className="bg-white rounded-lg shadow-md p-4 sm:p-6 text-center">

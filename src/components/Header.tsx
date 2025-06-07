@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useSession, signOut } from "next-auth/react";
@@ -163,6 +163,26 @@ export default function Header() {
     },
   });
   const { quantidadeProdutos } = useCarrinho();
+
+  // Definir estado inicial da sidebar baseado no tamanho da tela
+  useEffect(() => {
+    const handleResize = () => {
+      // Em mobile (< 640px), sidebar sempre fechada
+      // Em desktop (>= 640px), pode manter aberta
+      if (window.innerWidth < 640) {
+        setIsSidebarExpanded(false);
+      }
+    };
+
+    // Verificar tamanho inicial
+    handleResize();
+
+    // Adicionar listener para mudanças de tamanho
+    window.addEventListener("resize", handleResize);
+
+    // Cleanup
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   const isActive = (path: string) => pathname === path;
 
@@ -373,7 +393,7 @@ export default function Header() {
       {/* Sidebar abaixo do Header */}
       <aside
         className={`fixed top-16 left-0 bottom-0 bg-white shadow-lg z-40 transition-all duration-300 overflow-hidden
-          ${isSidebarExpanded ? "w-64 sm:w-72" : "w-12 sm:w-16"}`}
+          ${isSidebarExpanded ? "w-64 sm:w-72" : "w-0 sm:w-12 lg:w-16"}`}
       >
         <div className="flex flex-col h-full">
           {/* Links de Navegação */}
@@ -396,6 +416,12 @@ export default function Header() {
                         !isSidebarExpanded ? "justify-center" : ""
                       }`}
                       title={!isSidebarExpanded ? link.label : ""}
+                      onClick={() => {
+                        // Fechar sidebar em mobile após clicar em um link
+                        if (window.innerWidth < 640) {
+                          setIsSidebarExpanded(false);
+                        }
+                      }}
                     >
                       {link.icon && (
                         <span
@@ -430,9 +456,9 @@ export default function Header() {
                       )}
                     </Link>
 
-                    {/* Tooltip para modo mini */}
+                    {/* Tooltip para modo mini (apenas desktop) */}
                     {!isSidebarExpanded && (
-                      <div className="absolute left-full top-0 ml-2 px-2 py-1 bg-gray-800 text-white text-xs sm:text-sm rounded opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 whitespace-nowrap z-50">
+                      <div className="hidden sm:block absolute left-full top-0 ml-2 px-2 py-1 bg-gray-800 text-white text-xs sm:text-sm rounded opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 whitespace-nowrap z-50">
                         {link.label}
                         <div className="absolute top-1/2 left-0 transform -translate-y-1/2 -translate-x-full border-4 border-transparent border-r-gray-800"></div>
                       </div>
@@ -450,6 +476,12 @@ export default function Header() {
                                   ? "text-[#16829E] bg-blue-50"
                                   : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
                               } flex items-center px-2 sm:px-3 py-2 text-xs sm:text-sm transition-colors duration-200`}
+                              onClick={() => {
+                                // Fechar sidebar em mobile após clicar em um submenu
+                                if (window.innerWidth < 640) {
+                                  setIsSidebarExpanded(false);
+                                }
+                              }}
                             >
                               {subitem.icon && (
                                 <span className="mr-2 flex-shrink-0">
@@ -470,10 +502,18 @@ export default function Header() {
         </div>
       </aside>
 
+      {/* Overlay para mobile quando sidebar está aberta */}
+      {isSidebarExpanded && (
+        <div
+          className="fixed inset-0 bg-black bg-opacity-50 z-30 sm:hidden"
+          onClick={() => setIsSidebarExpanded(false)}
+        />
+      )}
+
       {/* Conteúdo Principal */}
       <main
         className={`transition-all duration-300 pt-16
-          ${isSidebarExpanded ? "ml-64 sm:ml-72" : "ml-12 sm:ml-16"}`}
+          ${isSidebarExpanded ? "sm:ml-64 lg:ml-72" : "sm:ml-12 lg:ml-16"}`}
       >
         {/* Aqui será renderizado o conteúdo da página */}
       </main>

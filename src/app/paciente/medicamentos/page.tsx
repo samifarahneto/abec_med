@@ -87,8 +87,8 @@ export default function MedicamentosPaciente() {
     <MainLayout>
       <div className="space-y-4 sm:space-y-6">
         <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center space-y-2 sm:space-y-0">
-          <h1 className="text-xl sm:text-2xl font-bold text-[#16829E]">
-            Medicamentos Disponíveis
+          <h1 className="text-xl sm:text-2xl font-bold text-[#16829E] text-center sm:text-left">
+            Catálogo de Medicamentos
           </h1>
 
           <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-4">
