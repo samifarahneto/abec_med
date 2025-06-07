@@ -5,6 +5,7 @@ import { FaSearch, FaEdit, FaTrash, FaPlus } from "react-icons/fa";
 import { useRouter } from "next/navigation";
 import ModalEditAdmin from "@/components/ModalEditAdmin";
 import MainLayout from "@/components/MainLayout";
+import { FormInput } from "@/components/ui";
 
 interface Usuario {
   id: string;
@@ -154,10 +155,10 @@ export default function GerenciarUsuarios() {
 
         {/* Barra de Pesquisa */}
         <div className="relative">
-          <input
+          <FormInput
             type="text"
             placeholder="Buscar usuários..."
-            className="w-full px-4 py-2 sm:py-3 pl-10 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#16829E] text-sm sm:text-base"
+            variant="search"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
@@ -344,7 +345,7 @@ export default function GerenciarUsuarios() {
                       name: e.target.value,
                     })
                   }
-                  className="block w-full rounded-md border-gray-300 shadow-sm focus:border-[#16829E] focus:ring-[#16829E] text-sm sm:text-base text-gray-700 px-3 py-2 sm:py-3"
+                  className="block w-full rounded-md border-gray-300 shadow-sm focus:border-[#16829E] focus:ring-[#16829E] text-sm sm:text-base text-gray-900 px-3 py-2 sm:py-3"
                 />
               </div>
 
@@ -361,7 +362,7 @@ export default function GerenciarUsuarios() {
                       email: e.target.value,
                     })
                   }
-                  className="block w-full rounded-md border-gray-300 shadow-sm focus:border-[#16829E] focus:ring-[#16829E] text-sm sm:text-base text-gray-700 px-3 py-2 sm:py-3"
+                  className="block w-full rounded-md border-gray-300 shadow-sm focus:border-[#16829E] focus:ring-[#16829E] text-sm sm:text-base text-gray-900 px-3 py-2 sm:py-3"
                 />
               </div>
 
@@ -377,7 +378,7 @@ export default function GerenciarUsuarios() {
                       role: e.target.value,
                     })
                   }
-                  className="block w-full rounded-md border-gray-300 shadow-sm focus:border-[#16829E] focus:ring-[#16829E] text-sm sm:text-base text-gray-700 px-3 py-2 sm:py-3"
+                  className="block w-full rounded-md border-gray-300 shadow-sm focus:border-[#16829E] focus:ring-[#16829E] text-sm sm:text-base text-gray-900 px-3 py-2 sm:py-3"
                 >
                   <option value="admin">Administrador</option>
                   <option value="doctor">Médico</option>
@@ -398,7 +399,7 @@ export default function GerenciarUsuarios() {
                       active: e.target.value === "true",
                     })
                   }
-                  className="block w-full rounded-md border-gray-300 shadow-sm focus:border-[#16829E] focus:ring-[#16829E] text-sm sm:text-base text-gray-700 px-3 py-2 sm:py-3"
+                  className="block w-full rounded-md border-gray-300 shadow-sm focus:border-[#16829E] focus:ring-[#16829E] text-sm sm:text-base text-gray-900 px-3 py-2 sm:py-3"
                 >
                   <option value="true">Ativo</option>
                   <option value="false">Inativo</option>

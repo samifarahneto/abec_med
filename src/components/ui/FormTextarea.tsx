@@ -1,16 +1,26 @@
+"use client";
+
 import React from "react";
 
-interface TextareaProps
+interface FormTextareaProps
   extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {
   label?: string;
   error?: string;
   helperText?: string;
 }
 
-const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
-  ({ label, error, helperText, className = "", ...props }, ref) => {
+const FormTextarea = React.forwardRef<HTMLTextAreaElement, FormTextareaProps>(
+  ({ label, error, helperText, className = "", style, ...props }, ref) => {
+    // Estilos inline para garantir que o texto seja sempre visível
+    const textareaStyle = {
+      color: "#111827", // gray-900 em hex para garantir visibilidade
+      backgroundColor: "#ffffff", // fundo branco
+      ...style,
+    };
+
     const baseClasses =
-      "w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[#16829E] focus:border-[#16829E] text-gray-900 resize-vertical";
+      "w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[#16829E] focus:border-[#16829E] resize-vertical";
+
     const errorClasses = error
       ? "border-red-500 focus:ring-red-500 focus:border-red-500"
       : "";
@@ -26,6 +36,7 @@ const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
 
         <textarea
           ref={ref}
+          style={textareaStyle}
           className={`${baseClasses} ${errorClasses} ${className}`}
           {...props}
         />
@@ -40,6 +51,6 @@ const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
   }
 );
 
-Textarea.displayName = "Textarea";
+FormTextarea.displayName = "FormTextarea";
 
-export default Textarea;
+export default FormTextarea;

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { FaTimes } from "react-icons/fa";
+import { FormInput, FormSelect, FormTextarea } from "@/components/ui";
 
 interface Produto {
   id: number;
@@ -76,109 +77,71 @@ export default function ModalEditarProduto({
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Nome
-              </label>
-              <input
-                type="text"
-                name="nome"
-                value={formData.nome}
-                onChange={handleChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#16829E] text-gray-700"
-                required
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Tipo
-              </label>
-              <select
-                name="tipo"
-                value={formData.tipo}
-                onChange={handleChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#16829E] text-gray-700"
-                required
-              >
-                <option value="Flor">Flor</option>
-                <option value="Óleo">Óleo</option>
-                <option value="Concentrado">Concentrado</option>
-                <option value="Comestíveis">Comestíveis</option>
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Strain Type
-              </label>
-              <input
-                type="text"
-                name="strain_type"
-                value={formData.strain_type || ""}
-                onChange={handleChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#16829E] text-gray-700"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Canabinóide
-              </label>
-              <input
-                type="text"
-                name="canabinoide"
-                value={formData.canabinoide}
-                onChange={handleChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#16829E] text-gray-700"
-                required
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Quantidade
-              </label>
-              <input
-                type="number"
-                name="quantidade"
-                value={formData.quantidade}
-                onChange={handleChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#16829E] text-gray-700"
-                required
-                min="0"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Preço
-              </label>
-              <input
-                type="number"
-                name="preco"
-                value={formData.preco}
-                onChange={handleChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#16829E] text-gray-700"
-                required
-                min="0"
-                step="0.01"
-              />
-            </div>
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Descrição
-            </label>
-            <textarea
-              name="descricao"
-              value={formData.descricao}
+            <FormInput
+              label="Nome"
+              name="nome"
+              value={formData.nome}
               onChange={handleChange}
-              rows={4}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#16829E] text-gray-700"
+              required
+            />
+
+            <FormSelect
+              label="Tipo"
+              name="tipo"
+              value={formData.tipo}
+              onChange={handleChange}
+              required
+            >
+              <option value="Flor">Flor</option>
+              <option value="Óleo">Óleo</option>
+              <option value="Concentrado">Concentrado</option>
+              <option value="Comestíveis">Comestíveis</option>
+            </FormSelect>
+
+            <FormInput
+              label="Strain Type"
+              name="strain_type"
+              value={formData.strain_type || ""}
+              onChange={handleChange}
+            />
+
+            <FormInput
+              label="Canabinóide"
+              name="canabinoide"
+              value={formData.canabinoide}
+              onChange={handleChange}
+              required
+            />
+
+            <FormInput
+              label="Quantidade"
+              type="number"
+              name="quantidade"
+              value={formData.quantidade}
+              onChange={handleChange}
+              min="0"
+              required
+            />
+
+            <FormInput
+              label="Preço"
+              type="number"
+              name="preco"
+              value={formData.preco}
+              onChange={handleChange}
+              min="0"
+              step="0.01"
+              required
             />
           </div>
+
+          <FormTextarea
+            label="Descrição"
+            name="descricao"
+            value={formData.descricao}
+            onChange={handleChange}
+            rows={4}
+          />
 
           <div className="flex justify-end space-x-4">
             <button

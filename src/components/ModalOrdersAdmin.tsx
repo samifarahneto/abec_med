@@ -7,6 +7,7 @@ import {
   FaTruck,
 } from "react-icons/fa";
 import { useState } from "react";
+import { FormInput } from "@/components/ui";
 
 interface Order {
   id: string;
@@ -360,22 +361,13 @@ export default function ModalOrdersAdmin({
             </div>
 
             <div className="space-y-4">
-              <div>
-                <label
-                  htmlFor="trackingCode"
-                  className="block text-sm font-medium text-gray-700 mb-1"
-                >
-                  Código de Rastreio
-                </label>
-                <input
-                  type="text"
-                  id="trackingCode"
-                  placeholder="Código de rastreamento..."
-                  value={trackingCode}
-                  onChange={(e) => setTrackingCode(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#16829E] focus:border-transparent text-gray-700"
-                />
-              </div>
+              <FormInput
+                label="Código de Rastreio"
+                type="text"
+                placeholder="Código de rastreamento..."
+                value={trackingCode}
+                onChange={(e) => setTrackingCode(e.target.value)}
+              />
 
               <div className="flex justify-end gap-2">
                 <button

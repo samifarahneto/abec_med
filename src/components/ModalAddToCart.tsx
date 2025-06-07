@@ -228,7 +228,7 @@ export default function ModalAddToCart({
                       step="5"
                       value={quantidade}
                       onChange={(e) => setQuantidade(Number(e.target.value))}
-                      className="w-12 sm:w-16 text-center font-semibold text-base sm:text-lg text-gray-700 focus:outline-none"
+                      className="w-12 sm:w-16 text-center font-semibold text-base sm:text-lg text-gray-900 focus:outline-none"
                     />
                     <button
                       onClick={incrementarQuantidade}

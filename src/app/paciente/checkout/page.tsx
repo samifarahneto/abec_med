@@ -14,6 +14,7 @@ import {
   FaTimesCircle,
 } from "react-icons/fa";
 import Image from "next/image";
+import { FormInput } from "@/components/ui";
 
 interface Endereco {
   cep: string;
@@ -400,103 +401,68 @@ export default function Checkout() {
             </h2>
             <form onSubmit={handleSubmitEndereco} className="space-y-4">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">
-                    CEP
-                  </label>
-                  <input
-                    type="text"
-                    value={endereco.cep}
-                    onChange={(e) =>
-                      setEndereco({ ...endereco, cep: e.target.value })
-                    }
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#16829E] focus:ring-[#16829E] text-gray-700 py-2 sm:py-3 text-sm sm:text-base"
-                    required
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">
-                    Rua
-                  </label>
-                  <input
-                    type="text"
-                    value={endereco.rua}
-                    onChange={(e) =>
-                      setEndereco({ ...endereco, rua: e.target.value })
-                    }
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#16829E] focus:ring-[#16829E] text-gray-700 py-2 sm:py-3 text-sm sm:text-base"
-                    required
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">
-                    Número
-                  </label>
-                  <input
-                    type="text"
-                    value={endereco.numero}
-                    onChange={(e) =>
-                      setEndereco({ ...endereco, numero: e.target.value })
-                    }
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#16829E] focus:ring-[#16829E] text-gray-700 py-2 sm:py-3 text-sm sm:text-base"
-                    required
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">
-                    Complemento
-                  </label>
-                  <input
-                    type="text"
-                    value={endereco.complemento}
-                    onChange={(e) =>
-                      setEndereco({ ...endereco, complemento: e.target.value })
-                    }
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#16829E] focus:ring-[#16829E] text-gray-700 py-2 sm:py-3 text-sm sm:text-base"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">
-                    Bairro
-                  </label>
-                  <input
-                    type="text"
-                    value={endereco.bairro}
-                    onChange={(e) =>
-                      setEndereco({ ...endereco, bairro: e.target.value })
-                    }
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#16829E] focus:ring-[#16829E] text-gray-700 py-2 sm:py-3 text-sm sm:text-base"
-                    required
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">
-                    Cidade
-                  </label>
-                  <input
-                    type="text"
-                    value={endereco.cidade}
-                    onChange={(e) =>
-                      setEndereco({ ...endereco, cidade: e.target.value })
-                    }
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#16829E] focus:ring-[#16829E] text-gray-700 py-2 sm:py-3 text-sm sm:text-base"
-                    required
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">
-                    Estado
-                  </label>
-                  <input
-                    type="text"
-                    value={endereco.estado}
-                    onChange={(e) =>
-                      setEndereco({ ...endereco, estado: e.target.value })
-                    }
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#16829E] focus:ring-[#16829E] text-gray-700 py-2 sm:py-3 text-sm sm:text-base"
-                    required
-                  />
-                </div>
+                <FormInput
+                  label="CEP"
+                  type="text"
+                  value={endereco.cep}
+                  onChange={(e) =>
+                    setEndereco({ ...endereco, cep: e.target.value })
+                  }
+                  required
+                />
+                <FormInput
+                  label="Rua"
+                  type="text"
+                  value={endereco.rua}
+                  onChange={(e) =>
+                    setEndereco({ ...endereco, rua: e.target.value })
+                  }
+                  required
+                />
+                <FormInput
+                  label="Número"
+                  type="text"
+                  value={endereco.numero}
+                  onChange={(e) =>
+                    setEndereco({ ...endereco, numero: e.target.value })
+                  }
+                  required
+                />
+                <FormInput
+                  label="Complemento"
+                  type="text"
+                  value={endereco.complemento}
+                  onChange={(e) =>
+                    setEndereco({ ...endereco, complemento: e.target.value })
+                  }
+                />
+                <FormInput
+                  label="Bairro"
+                  type="text"
+                  value={endereco.bairro}
+                  onChange={(e) =>
+                    setEndereco({ ...endereco, bairro: e.target.value })
+                  }
+                  required
+                />
+                <FormInput
+                  label="Cidade"
+                  type="text"
+                  value={endereco.cidade}
+                  onChange={(e) =>
+                    setEndereco({ ...endereco, cidade: e.target.value })
+                  }
+                  required
+                />
+                <FormInput
+                  label="Estado"
+                  type="text"
+                  value={endereco.estado}
+                  onChange={(e) =>
+                    setEndereco({ ...endereco, estado: e.target.value })
+                  }
+                  required
+                />
               </div>
             </form>
           </div>
@@ -512,79 +478,59 @@ export default function Checkout() {
               </div>
             )}
             <form onSubmit={handleSubmitPagamento} className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  Número do Cartão
-                </label>
-                <input
-                  type="text"
-                  value={pagamento.numeroCartao}
-                  onChange={(e) => {
-                    const value = e.target.value.replace(/\D/g, "");
-                    setPagamento({
-                      ...pagamento,
-                      numeroCartao: value,
-                    });
-                  }}
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#16829E] focus:ring-[#16829E] text-gray-700 py-2 sm:py-3 text-sm sm:text-base"
-                  required
-                  maxLength={16}
-                  placeholder="Digite apenas números"
-                />
-              </div>
+              <FormInput
+                label="Número do Cartão"
+                type="text"
+                value={pagamento.numeroCartao}
+                onChange={(e) => {
+                  const value = e.target.value.replace(/\D/g, "");
+                  setPagamento({
+                    ...pagamento,
+                    numeroCartao: value,
+                  });
+                }}
+                required
+                maxLength={16}
+                placeholder="Digite apenas números"
+              />
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">
-                    Validade
-                  </label>
-                  <input
-                    type="text"
-                    value={pagamento.validade}
-                    onChange={(e) =>
-                      setPagamento({
-                        ...pagamento,
-                        validade: e.target.value,
-                      })
-                    }
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#16829E] focus:ring-[#16829E] text-gray-700 py-2 sm:py-3 text-sm sm:text-base"
-                    required
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">
-                    CVV
-                  </label>
-                  <input
-                    type="text"
-                    value={pagamento.cvv}
-                    onChange={(e) =>
-                      setPagamento({
-                        ...pagamento,
-                        cvv: e.target.value,
-                      })
-                    }
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#16829E] focus:ring-[#16829E] text-gray-700 py-2 sm:py-3 text-sm sm:text-base"
-                    required
-                  />
-                </div>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  Nome no Cartão
-                </label>
-                <input
+                <FormInput
+                  label="Validade"
                   type="text"
-                  value={pagamento.nomeTitular}
+                  value={pagamento.validade}
                   onChange={(e) =>
                     setPagamento({
                       ...pagamento,
-                      nomeTitular: e.target.value,
+                      validade: e.target.value,
                     })
                   }
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#16829E] focus:ring-[#16829E] text-gray-700 py-2 sm:py-3 text-sm sm:text-base"
+                  required
+                />
+                <FormInput
+                  label="CVV"
+                  type="text"
+                  value={pagamento.cvv}
+                  onChange={(e) =>
+                    setPagamento({
+                      ...pagamento,
+                      cvv: e.target.value,
+                    })
+                  }
                   required
                 />
               </div>
+              <FormInput
+                label="Nome no Cartão"
+                type="text"
+                value={pagamento.nomeTitular}
+                onChange={(e) =>
+                  setPagamento({
+                    ...pagamento,
+                    nomeTitular: e.target.value,
+                  })
+                }
+                required
+              />
               <div className="mt-6">
                 <button
                   type="submit"

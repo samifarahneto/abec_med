@@ -1,3 +1,5 @@
+"use client";
+
 import React from "react";
 
 interface SelectOption {
@@ -5,7 +7,8 @@ interface SelectOption {
   label: string;
 }
 
-interface SelectProps extends React.SelectHTMLAttributes<HTMLSelectElement> {
+interface FormSelectProps
+  extends React.SelectHTMLAttributes<HTMLSelectElement> {
   label?: string;
   error?: string;
   helperText?: string;
@@ -13,7 +16,7 @@ interface SelectProps extends React.SelectHTMLAttributes<HTMLSelectElement> {
   placeholder?: string;
 }
 
-const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
+const FormSelect = React.forwardRef<HTMLSelectElement, FormSelectProps>(
   (
     {
       label,
@@ -22,13 +25,22 @@ const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
       options = [],
       placeholder,
       className = "",
+      style,
       children,
       ...props
     },
     ref
   ) => {
+    // Estilos inline para garantir que o texto seja sempre visível
+    const selectStyle = {
+      color: "#111827", // gray-900 em hex para garantir visibilidade
+      backgroundColor: "#ffffff", // fundo branco
+      ...style,
+    };
+
     const baseClasses =
-      "w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[#16829E] focus:border-[#16829E] text-gray-900";
+      "w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[#16829E] focus:border-[#16829E]";
+
     const errorClasses = error
       ? "border-red-500 focus:ring-red-500 focus:border-red-500"
       : "";
@@ -44,6 +56,7 @@ const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
 
         <select
           ref={ref}
+          style={selectStyle}
           className={`${baseClasses} ${errorClasses} ${className}`}
           {...props}
         >
@@ -55,7 +68,11 @@ const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
 
           {options.length > 0
             ? options.map((option) => (
-                <option key={option.value} value={option.value}>
+                <option
+                  key={option.value}
+                  value={option.value}
+                  style={selectStyle}
+                >
                   {option.label}
                 </option>
               ))
@@ -72,6 +89,6 @@ const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
   }
 );
 
-Select.displayName = "Select";
+FormSelect.displayName = "FormSelect";
 
-export default Select;
+export default FormSelect;

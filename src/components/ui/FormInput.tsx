@@ -1,6 +1,8 @@
+"use client";
+
 import React from "react";
 
-interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
+interface FormInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   label?: string;
   error?: string;
   helperText?: string;
@@ -8,7 +10,7 @@ interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   variant?: "default" | "search";
 }
 
-const Input = React.forwardRef<HTMLInputElement, InputProps>(
+const FormInput = React.forwardRef<HTMLInputElement, FormInputProps>(
   (
     {
       label,
@@ -17,14 +19,22 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
       icon,
       variant = "default",
       className = "",
+      style,
       ...props
     },
     ref
   ) => {
+    // Estilos inline para garantir que o texto seja sempre visível
+    const inputStyle = {
+      color: "#111827", // gray-900 em hex para garantir visibilidade
+      backgroundColor: "#ffffff", // fundo branco
+      ...style,
+    };
+
     const baseClasses =
       variant === "search"
-        ? "w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#16829E] focus:border-transparent text-gray-900"
-        : "w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[#16829E] focus:border-[#16829E] text-gray-900";
+        ? "w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#16829E] focus:border-transparent"
+        : "w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[#16829E] focus:border-[#16829E]";
 
     const errorClasses = error
       ? "border-red-500 focus:ring-red-500 focus:border-red-500"
@@ -46,6 +56,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
 
           <input
             ref={ref}
+            style={inputStyle}
             className={`${baseClasses} ${errorClasses} ${className}`}
             {...props}
           />
@@ -61,6 +72,6 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
   }
 );
 
-Input.displayName = "Input";
+FormInput.displayName = "FormInput";
 
-export default Input;
+export default FormInput;
