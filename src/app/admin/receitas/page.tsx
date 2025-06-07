@@ -280,7 +280,7 @@ export default function ReceitasPage() {
 
         <div className="bg-white rounded-lg shadow-md p-4 sm:p-6">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 sm:mb-6 space-y-3 sm:space-y-0">
-            <div className="relative w-full sm:w-64">
+            <div className="relative w-full sm:w-80">
               <Input
                 variant="search"
                 type="text"
