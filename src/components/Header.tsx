@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useSession, signOut } from "next-auth/react";
@@ -19,6 +19,8 @@ import {
   FaSignOutAlt,
   FaUserCircle,
   FaBox,
+  FaBars,
+  FaCog,
 } from "react-icons/fa";
 import { useCarrinho } from "@/contexts/CarrinhoContext";
 
@@ -56,11 +58,6 @@ const profileLinks: Record<string, LinkItem[]> = {
       href: "/admin/receitas",
       label: "Receitas",
       icon: <FaFileMedical className="w-5 h-5" />,
-    },
-    {
-      href: "/admin/perfil",
-      label: "Perfil",
-      icon: <FaUserCircle className="w-5 h-5" />,
     },
   ],
   doctor: [
@@ -157,7 +154,8 @@ const unauthenticatedLinks: LinkItem[] = [
 
 export default function Header() {
   const pathname = usePathname();
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isSidebarExpanded, setIsSidebarExpanded] = useState(false);
+  const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const { data: session, status } = useSession({
     required: false,
     onUnauthenticated() {
@@ -166,12 +164,13 @@ export default function Header() {
   });
   const { quantidadeProdutos } = useCarrinho();
 
-  // Fecha o menu quando a rota muda
-  useEffect(() => {
-    setIsMenuOpen(false);
-  }, [pathname]);
-
   const isActive = (path: string) => pathname === path;
+
+  // Verifica se é uma rota pública
+  const isPublicRoute = () => {
+    const publicRoutes = ["/", "/login", "/registrar", "/register"];
+    return publicRoutes.includes(pathname) || !session?.user;
+  };
 
   // Se estiver carregando, mostra um header neutro
   if (status === "loading") {
@@ -179,12 +178,9 @@ export default function Header() {
       <header className="fixed top-0 left-0 right-0 bg-white shadow-md z-50">
         <nav className="w-full md:px-[150px]">
           <div className="flex justify-between h-16">
-            {/* Menu Button */}
             <div className="flex items-center">
               <div className="w-6" />
             </div>
-
-            {/* Logo */}
             <div className="flex items-center">
               <Link href="/">
                 <Image
@@ -197,8 +193,6 @@ export default function Header() {
                 />
               </Link>
             </div>
-
-            {/* Espaço reservado para alinhamento */}
             <div className="w-6" />
           </div>
         </nav>
@@ -206,8 +200,8 @@ export default function Header() {
     );
   }
 
-  // Se o usuário não estiver autenticado, mostra o header padrão
-  if (!session?.user) {
+  // Se for rota pública ou usuário não autenticado, mostra o header padrão
+  if (isPublicRoute()) {
     return (
       <header className="fixed top-0 left-0 right-0 bg-white shadow-md z-50">
         <nav className="w-full md:px-[150px]">
@@ -225,16 +219,11 @@ export default function Header() {
               </Link>
             </div>
 
-            {/* Menu Mobile */}
+            {/* Menu Mobile para rotas públicas */}
             <div className="flex items-center sm:hidden">
-              <button
-                onClick={() => setIsMenuOpen(!isMenuOpen)}
-                className="p-2 rounded-md text-gray-500 hover:text-[#16829E] hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-[#16829E]"
-              >
-                <span className="sr-only">Abrir menu principal</span>
+              <button className="p-2 rounded-md text-gray-500 hover:text-[#16829E] hover:bg-gray-100">
                 <svg
                   className="h-6 w-6"
-                  xmlns="http://www.w3.org/2000/svg"
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -249,7 +238,7 @@ export default function Header() {
               </button>
             </div>
 
-            {/* Menu Desktop */}
+            {/* Menu Desktop para rotas públicas */}
             <div className="hidden sm:flex sm:items-center sm:space-x-8">
               {unauthenticatedLinks.map((link) => (
                 <Link
@@ -267,70 +256,31 @@ export default function Header() {
             </div>
           </div>
         </nav>
-
-        {/* Menu Mobile Aberto */}
-        {isMenuOpen && (
-          <div className="sm:hidden">
-            <div className="space-y-1">
-              {unauthenticatedLinks.map((link) => (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  className={`${
-                    isActive(link.href)
-                      ? "bg-[#16829E] text-white"
-                      : "text-gray-500 hover:bg-gray-50 hover:text-[#16829E]"
-                  } block px-3 py-2 text-base font-medium`}
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  {link.label}
-                </Link>
-              ))}
-            </div>
-          </div>
-        )}
       </header>
     );
   }
 
-  // Se o usuário estiver autenticado, retorna o layout com header e sidebar controlável
+  // Para usuários autenticados - Layout com Header fixo e Sidebar abaixo
   const role = session?.user?.role as keyof typeof profileLinks;
   const links = profileLinks[role] || [];
+  const sidebarWidth = isSidebarExpanded ? "w-64" : "w-16";
 
   return (
     <div className="relative">
       {/* Header Fixo */}
       <header className="fixed top-0 left-0 right-0 bg-white shadow-md z-50">
-        <nav className="w-full md:px-[150px]">
+        <nav className="w-full px-6">
           <div className="flex justify-between h-16">
-            {/* Menu Button */}
-            <div className="flex items-center w-12">
+            {/* Menu Button à esquerda */}
+            <div className="flex items-center">
               <button
-                onClick={() => setIsMenuOpen(!isMenuOpen)}
-                className={`p-2 rounded-md text-gray-500 hover:text-[#16829E] hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-[#16829E] ${
-                  isMenuOpen ? "hidden" : "block"
-                }`}
+                onClick={() => setIsSidebarExpanded(!isSidebarExpanded)}
+                className="p-2 rounded-md text-gray-500 hover:text-[#16829E] hover:bg-gray-100 mr-4"
               >
-                <span className="sr-only">Abrir menu</span>
-                <svg
-                  className="h-6 w-6"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M4 6h16M4 12h16M4 18h16"
-                  />
-                </svg>
+                <FaBars className="w-5 h-5" />
               </button>
-            </div>
 
-            {/* Logo */}
-            <div className="flex items-center justify-center flex-1">
+              {/* Logo */}
               <Link href="/">
                 <Image
                   src="/images/logo.png"
@@ -343,8 +293,9 @@ export default function Header() {
               </Link>
             </div>
 
-            {/* Carrinho de Compras (apenas para pacientes) */}
-            <div className="flex items-center w-12">
+            {/* Área direita: Carrinho + Saudação + Menu do usuário */}
+            <div className="flex items-center space-x-4">
+              {/* Carrinho de Compras (apenas para pacientes) */}
               {role === "patient" && (
                 <Link
                   href="/paciente/checkout"
@@ -358,149 +309,169 @@ export default function Header() {
                   )}
                 </Link>
               )}
+
+              {/* Saudação + Menu do usuário */}
+              <div className="flex items-center space-x-3">
+                <span className="text-sm text-gray-700 hidden sm:inline">
+                  Olá, {session?.user?.name}
+                </span>
+
+                {/* Menu dropdown do usuário */}
+                <div className="relative">
+                  <button
+                    onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
+                    className="flex items-center justify-center w-8 h-8 bg-gray-100 hover:bg-gray-200 rounded-full transition-colors duration-200"
+                  >
+                    <FaCog className="w-4 h-4 text-gray-600" />
+                  </button>
+
+                  {/* Dropdown Menu */}
+                  {isUserMenuOpen && (
+                    <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50 border">
+                      <Link
+                        href={`/${
+                          role === "admin"
+                            ? "admin"
+                            : role === "doctor"
+                            ? "medic"
+                            : role === "reception"
+                            ? "acolhimento"
+                            : "paciente"
+                        }/perfil`}
+                        className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                        onClick={() => setIsUserMenuOpen(false)}
+                      >
+                        <FaUserCircle className="w-4 h-4 mr-2" />
+                        Perfil
+                      </Link>
+                      <button
+                        onClick={() => {
+                          setIsUserMenuOpen(false);
+                          signOut({ callbackUrl: "/" });
+                        }}
+                        className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                      >
+                        <FaSignOutAlt className="w-4 h-4 mr-2" />
+                        Sair
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </div>
             </div>
           </div>
         </nav>
+
+        {/* Overlay para fechar o menu quando clicar fora */}
+        {isUserMenuOpen && (
+          <div
+            className="fixed inset-0 z-40"
+            onClick={() => setIsUserMenuOpen(false)}
+          />
+        )}
       </header>
 
-      {/* Sidebar */}
+      {/* Sidebar abaixo do Header */}
       <aside
-        className={`fixed top-0 left-0 bottom-0 z-50 w-64 bg-white shadow-md transform transition-transform duration-300 ease-in-out ${
-          isMenuOpen ? "translate-x-0" : "-translate-x-full"
-        }`}
+        className={`fixed top-16 left-0 bottom-0 bg-white shadow-lg z-40 transition-all duration-300 ${sidebarWidth} overflow-hidden`}
       >
         <div className="flex flex-col h-full">
-          <div className="flex-1 flex flex-col">
-            {/* Cabeçalho do Sidebar com botão de fechar */}
-            <div className="p-4 border-b flex justify-between items-center">
-              <Image
-                src="/images/icon.png"
-                alt="ABEC Med"
-                width={40}
-                height={40}
-                priority
-              />
-              <button
-                onClick={() => setIsMenuOpen(false)}
-                className="p-2 rounded-md text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200"
-              >
-                <span className="sr-only">Fechar menu</span>
-                <svg
-                  className="h-6 w-6"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M6 18L18 6M6 6l12 12"
-                  />
-                </svg>
-              </button>
-            </div>
-
-            {/* Informações do Usuário */}
-            <div className="p-4 border-b">
-              <div className="flex flex-col items-center space-y-2">
-                <span className="text-lg font-medium text-gray-800">
-                  {session.user.name}
-                </span>
-                <span className="text-xs bg-gray-100 text-gray-600 px-3 py-1 rounded-full">
-                  {session.user.role}
-                </span>
-              </div>
-            </div>
-
-            {/* Links de Navegação */}
-            <nav className="flex-1 p-4 overflow-y-auto">
-              <ul className="space-y-1">
-                {links.map((link) => (
-                  <li key={link.href}>
-                    <div className="relative">
-                      <Link
-                        href={link.href}
-                        className={`${
-                          isActive(link.href)
-                            ? "text-[#16829E] font-medium"
-                            : "text-gray-600 hover:text-gray-900"
-                        } flex items-center px-4 py-2.5 text-sm transition-colors duration-200`}
-                        onClick={() => setIsMenuOpen(false)}
-                      >
-                        {link.icon && <span className="mr-3">{link.icon}</span>}
-                        {link.label}
-                        {link.submenu && (
-                          <svg
-                            className="ml-auto h-4 w-4"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M19 9l-7 7-7-7"
-                            />
-                          </svg>
-                        )}
-                      </Link>
-                      {link.submenu && (
-                        <ul className="ml-4 mt-1 space-y-1">
-                          {link.submenu.map((subitem) => (
-                            <li key={subitem.href}>
-                              <Link
-                                href={subitem.href}
-                                className={`${
-                                  isActive(subitem.href)
-                                    ? "text-[#16829E] font-medium"
-                                    : "text-gray-600 hover:text-gray-900"
-                                } flex items-center px-4 py-2 text-sm transition-colors duration-200`}
-                                onClick={() => setIsMenuOpen(false)}
-                              >
-                                {subitem.icon && (
-                                  <span className="mr-3">{subitem.icon}</span>
-                                )}
-                                {subitem.label}
-                              </Link>
-                            </li>
-                          ))}
-                        </ul>
+          {/* Links de Navegação */}
+          <nav
+            className={`flex-1 py-4 min-h-0 ${
+              isSidebarExpanded ? "overflow-y-auto" : "overflow-hidden"
+            }`}
+          >
+            <ul className="space-y-1">
+              {links.map((link) => (
+                <li key={link.href}>
+                  <div className="relative group">
+                    <Link
+                      href={link.href}
+                      className={`${
+                        isActive(link.href)
+                          ? "text-[#16829E] bg-blue-50"
+                          : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
+                      } flex items-center px-4 py-3 text-sm transition-colors duration-200 ${
+                        !isSidebarExpanded ? "justify-center" : ""
+                      }`}
+                      title={!isSidebarExpanded ? link.label : ""}
+                    >
+                      {link.icon && (
+                        <span
+                          className={`${
+                            isSidebarExpanded ? "mr-3" : ""
+                          } flex-shrink-0`}
+                        >
+                          {link.icon}
+                        </span>
                       )}
-                    </div>
-                  </li>
-                ))}
-              </ul>
-            </nav>
-          </div>
+                      {isSidebarExpanded && (
+                        <>
+                          <span className="truncate">{link.label}</span>
+                          {link.submenu && (
+                            <svg
+                              className="ml-auto h-4 w-4 flex-shrink-0"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M19 9l-7 7-7-7"
+                              />
+                            </svg>
+                          )}
+                        </>
+                      )}
+                    </Link>
 
-          {/* Botão Sair fixo no final */}
-          <div className="p-4 border-t mt-auto">
-            <button
-              onClick={() => signOut({ callbackUrl: "/" })}
-              className="w-full flex items-center justify-center px-4 py-2 text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors duration-200"
-            >
-              <FaSignOutAlt className="h-5 w-5 mr-2" />
-              Sair
-            </button>
-          </div>
+                    {/* Tooltip para modo mini */}
+                    {!isSidebarExpanded && (
+                      <div className="absolute left-full top-0 ml-2 px-2 py-1 bg-gray-800 text-white text-sm rounded opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 whitespace-nowrap z-50">
+                        {link.label}
+                        <div className="absolute top-1/2 left-0 transform -translate-y-1/2 -translate-x-full border-4 border-transparent border-r-gray-800"></div>
+                      </div>
+                    )}
+
+                    {/* Submenu */}
+                    {link.submenu && isSidebarExpanded && (
+                      <ul className="ml-4 mt-1 space-y-1 border-l border-gray-200 pl-4">
+                        {link.submenu.map((subitem) => (
+                          <li key={subitem.href}>
+                            <Link
+                              href={subitem.href}
+                              className={`${
+                                isActive(subitem.href)
+                                  ? "text-[#16829E] bg-blue-50"
+                                  : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
+                              } flex items-center px-3 py-2 text-sm transition-colors duration-200`}
+                            >
+                              {subitem.icon && (
+                                <span className="mr-2 flex-shrink-0">
+                                  {subitem.icon}
+                                </span>
+                              )}
+                              <span className="truncate">{subitem.label}</span>
+                            </Link>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </nav>
         </div>
       </aside>
 
-      {/* Overlay para fechar o menu */}
-      {isMenuOpen && (
-        <div
-          className="fixed inset-0 bg-black bg-opacity-50 z-40"
-          onClick={() => setIsMenuOpen(false)}
-        />
-      )}
-
       {/* Conteúdo Principal */}
       <main
-        className={`pt-16 transition-all duration-300 ${
-          isMenuOpen ? "md:pl-64" : ""
+        className={`transition-all duration-300 pt-16 ${
+          isSidebarExpanded ? "ml-64" : "ml-16"
         }`}
       >
         {/* Aqui será renderizado o conteúdo da página */}
