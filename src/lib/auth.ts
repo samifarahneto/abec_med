@@ -30,10 +30,10 @@ export const authOptions: NextAuthOptions = {
           }
 
           return {
-            id: user._id,
+            id: user.id,
             email: user.email,
             name: user.name,
-            role: user.role as "paciente" | "medico" | "admin",
+            role: user.role as "admin" | "patient" | "doctor" | "reception",
           };
         } catch (error) {
           console.error("Erro na autenticação:", error);
@@ -53,13 +53,19 @@ export const authOptions: NextAuthOptions = {
       if (user) {
         token.id = user.id;
         token.role = user.role;
+        return token;
       }
       return token;
     },
     async session({ session, token }) {
       if (token && session.user) {
         session.user.id = token.id as string;
-        session.user.role = token.role as "paciente" | "medico" | "admin";
+        session.user.role = token.role as
+          | "admin"
+          | "patient"
+          | "doctor"
+          | "reception";
+        return session;
       }
       return session;
     },

@@ -328,23 +328,23 @@ export const useExternalAuth = () => {
 
 // Função helper para mapear roles da AbecMed
 function mapAbecMedRole(externalRole?: string): string {
-  if (!externalRole) return "paciente";
+  if (!externalRole) return "patient";
 
   const roleMap: { [key: string]: string } = {
     admin: "admin",
     administrator: "admin",
     super_admin: "admin",
-    medico: "medico",
-    doctor: "medico",
-    physician: "medico",
-    paciente: "paciente",
-    patient: "paciente",
-    user: "paciente",
+    medico: "doctor",
+    doctor: "doctor",
+    physician: "doctor",
+    paciente: "patient",
+    patient: "patient",
+    user: "patient",
     recepcao: "reception",
     receptionist: "reception",
     reception: "reception",
     acolhimento: "reception",
   };
 
-  return roleMap[externalRole.toLowerCase()] || "paciente";
+  return roleMap[externalRole.toLowerCase()] || "patient";
 }

@@ -143,14 +143,14 @@ async function loginWithExternalApi(email: string, password: string) {
       // Mapear roles da API externa para roles locais
       const roleMapping: { [key: string]: string } = {
         ADMIN: "admin",
-        DOCTOR: "medico",
-        MEDICO: "medico",
+        DOCTOR: "doctor",
+        MEDICO: "doctor",
         RECEPTION: "reception",
-        PATIENT: "paciente",
-        PACIENTE: "paciente",
+        PATIENT: "patient",
+        PACIENTE: "patient",
       };
 
-      const mappedRole = roleMapping[apiUser.role.toUpperCase()] || "paciente";
+      const mappedRole = roleMapping[apiUser.role.toUpperCase()] || "patient";
       console.log(
         "🎭 [API Externa] Role mapeado:",
         `${apiUser.role} → ${mappedRole}`
