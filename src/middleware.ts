@@ -70,22 +70,20 @@ export default withAuth(
       authorized: ({ token, req }) => {
         const { pathname } = req.nextUrl;
 
-        // Rotas públicas que não precisam de autenticação
-        const publicRoutes = [
-          "/login",
-          "/api/auth",
-          "/api/test-env",
-          "/api/debug",
-          "/api/test-vars",
-          "/api/produtos",
-          "/unauthorized",
-        ];
-        const isPublicRoute = publicRoutes.some((route) =>
-          pathname.startsWith(route)
-        );
-
-        if (isPublicRoute) {
-          return true; // Permitir acesso a rotas públicas
+        // Rotas públicas que NÃO precisam de autenticação
+        if (
+          pathname === "/" ||
+          pathname === "/login" ||
+          pathname === "/registrar" ||
+          pathname === "/register" ||
+          pathname.startsWith("/api/auth") ||
+          pathname.startsWith("/api/test-env") ||
+          pathname.startsWith("/api/debug") ||
+          pathname.startsWith("/api/test-vars") ||
+          pathname.startsWith("/api/produtos") ||
+          pathname === "/unauthorized"
+        ) {
+          return true; // Sempre permitir acesso a rotas públicas
         }
 
         // Para rotas protegidas, exigir token
@@ -97,7 +95,10 @@ export default withAuth(
 
 export const config = {
   matcher: [
-    // Proteger todas as rotas exceto as públicas
-    "/((?!api/auth|api/debug|api/test-env|api/test-vars|api/produtos|login|_next/static|_next/image|favicon.ico|public).*)",
+    // Proteger apenas rotas específicas que precisam de autenticação
+    "/admin/:path*",
+    "/medic/:path*",
+    "/acolhimento/:path*",
+    "/paciente/:path*",
   ],
 };

@@ -34,7 +34,7 @@ export default function RootLayout({
         <AuthProvider>
           <CarrinhoProvider>
             <Header />
-            <main className="min-h-screen bg-gray-50">{children}</main>
+            <main className="min-h-screen bg-gray-50 pt-16">{children}</main>
           </CarrinhoProvider>
         </AuthProvider>
       </body>
