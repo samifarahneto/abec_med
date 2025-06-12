@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useSession, signOut } from "next-auth/react";
@@ -23,6 +23,7 @@ import {
   FaCog,
 } from "react-icons/fa";
 import { useCarrinho } from "@/contexts/CarrinhoContext";
+import { useLayout } from "@/components/LayoutWrapper";
 
 interface LinkItem {
   href: string;
@@ -154,7 +155,6 @@ const unauthenticatedLinks: LinkItem[] = [
 
 export default function Header() {
   const pathname = usePathname();
-  const [isSidebarExpanded, setIsSidebarExpanded] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { data: session, status } = useSession({
@@ -165,25 +165,8 @@ export default function Header() {
   });
   const { quantidadeProdutos } = useCarrinho();
 
-  // Definir estado inicial da sidebar baseado no tamanho da tela
-  useEffect(() => {
-    const handleResize = () => {
-      // Em mobile (< 640px), sidebar sempre fechada
-      // Em desktop (>= 640px), pode manter aberta
-      if (window.innerWidth < 640) {
-        setIsSidebarExpanded(false);
-      }
-    };
-
-    // Verificar tamanho inicial
-    handleResize();
-
-    // Adicionar listener para mudanças de tamanho
-    window.addEventListener("resize", handleResize);
-
-    // Cleanup
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
+  // Usar o contexto do layout para o estado do sidebar
+  const { isSidebarExpanded, setIsSidebarExpanded } = useLayout();
 
   const isActive = (path: string) => pathname === path;
 
@@ -547,14 +530,6 @@ export default function Header() {
           onClick={() => setIsSidebarExpanded(false)}
         />
       )}
-
-      {/* Conteúdo Principal */}
-      <main
-        className={`transition-all duration-300 pt-16
-          ${isSidebarExpanded ? "sm:ml-64 lg:ml-72" : "sm:ml-12 lg:ml-16"}`}
-      >
-        {/* Aqui será renderizado o conteúdo da página */}
-      </main>
     </div>
   );
 }

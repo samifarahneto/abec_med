@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import Header from "@/components/Header";
+import LayoutWrapper from "@/components/LayoutWrapper";
 import AuthProvider from "@/providers/AuthProvider";
 import { CarrinhoProvider } from "@/contexts/CarrinhoContext";
 
@@ -33,8 +33,7 @@ export default function RootLayout({
       <body className={inter.className} suppressHydrationWarning>
         <AuthProvider>
           <CarrinhoProvider>
-            <Header />
-            <main className="min-h-screen bg-gray-50 pt-16">{children}</main>
+            <LayoutWrapper>{children}</LayoutWrapper>
           </CarrinhoProvider>
         </AuthProvider>
       </body>

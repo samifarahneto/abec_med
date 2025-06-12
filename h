@@ -1,0 +1,1 @@
+[33m41858d8[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m)[m Corrige redirecionamentos e links do header público - middleware protege apenas rotas específicas, rota raiz livre, menu mobile funcional
