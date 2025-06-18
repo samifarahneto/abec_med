@@ -11,7 +11,7 @@ import {
   FaEye,
 } from "react-icons/fa";
 import MainLayout from "@/components/MainLayout";
-import { Input, Table } from "@/components/ui";
+import { Input, Table, Button } from "@/components/ui";
 
 interface Paciente extends Record<string, unknown> {
   id: string;
@@ -171,8 +171,8 @@ export default function PacientesPage() {
       key: "name" as keyof Paciente,
       header: "Nome",
       render: (paciente: Paciente) => (
-        <div className="text-left">
-          <div className="font-semibold text-gray-900 text-sm">
+        <div className="text-center">
+          <div className="text-gray-900 text-sm font-medium">
             {String(paciente.name)}
           </div>
         </div>
@@ -182,7 +182,7 @@ export default function PacientesPage() {
       key: "cpf" as keyof Paciente,
       header: "CPF",
       render: (paciente: Paciente) => (
-        <span className="font-mono text-gray-700 text-sm">
+        <span className="text-gray-900 text-sm font-medium">
           {String(paciente.cpf)}
         </span>
       ),
@@ -191,7 +191,7 @@ export default function PacientesPage() {
       key: "date_of_birth" as keyof Paciente,
       header: "Data Nascimento",
       render: (paciente: Paciente) => (
-        <span className="text-gray-700 text-sm">
+        <span className="text-gray-900 text-sm font-medium">
           {formatDate(String(paciente.date_of_birth))}
         </span>
       ),
@@ -234,7 +234,7 @@ export default function PacientesPage() {
             <h1 className="text-2xl font-bold text-gray-900">
               Gerenciar Pacientes
             </h1>
-            <p className="text-gray-600 mt-1">
+            <p className="text-gray-600 text-sm font-medium mt-1">
               Visualize e gerencie todos os pacientes cadastrados no sistema
             </p>
           </div>
@@ -251,13 +251,15 @@ export default function PacientesPage() {
               />
               <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
             </div>
-            <button
+            <Button
               onClick={() => router.push("/admin/pacientes/novo")}
-              className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-lg shadow-sm text-white bg-[#16829E] hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#16829E] transition-all duration-300 whitespace-nowrap"
+              icon={<FaPlus />}
+              variant="primary"
+              size="md"
+              className="whitespace-nowrap"
             >
-              <FaPlus className="w-4 h-4 mr-2" />
               Novo Paciente
-            </button>
+            </Button>
           </div>
         </div>
 
@@ -278,7 +280,7 @@ export default function PacientesPage() {
                 </div>
                 <div className="ml-3">
                   <p className="text-sm font-medium text-gray-600">Total</p>
-                  <p className="text-xl font-semibold text-gray-900">
+                  <p className="text-xl font-bold text-gray-900">
                     {pacientes.length}
                   </p>
                 </div>
@@ -291,7 +293,7 @@ export default function PacientesPage() {
                 </div>
                 <div className="ml-3">
                   <p className="text-sm font-medium text-gray-600">Ativos</p>
-                  <p className="text-xl font-semibold text-gray-900">
+                  <p className="text-xl font-bold text-gray-900">
                     {pacientes.filter((p) => p.status === "ativo").length}
                   </p>
                 </div>
@@ -304,7 +306,7 @@ export default function PacientesPage() {
                 </div>
                 <div className="ml-3">
                   <p className="text-sm font-medium text-gray-600">Inativos</p>
-                  <p className="text-xl font-semibold text-gray-900">
+                  <p className="text-xl font-bold text-gray-900">
                     {pacientes.filter((p) => p.status === "inativo").length}
                   </p>
                 </div>
@@ -317,7 +319,7 @@ export default function PacientesPage() {
                 </div>
                 <div className="ml-3">
                   <p className="text-sm font-medium text-gray-600">Suspensos</p>
-                  <p className="text-xl font-semibold text-gray-900">
+                  <p className="text-xl font-bold text-gray-900">
                     {pacientes.filter((p) => p.status === "suspenso").length}
                   </p>
                 </div>
@@ -341,7 +343,7 @@ export default function PacientesPage() {
                     <FaUser className="w-5 h-5 text-white" />
                   </div>
                   <div>
-                    <h3 className="font-semibold text-gray-900 text-sm">
+                    <h3 className="text-gray-900 text-sm font-medium">
                       {String(paciente.name)}
                     </h3>
                   </div>
@@ -353,20 +355,26 @@ export default function PacientesPage() {
 
               <div className="grid grid-cols-2 gap-2 text-sm">
                 <div>
-                  <span className="text-gray-500 text-xs">CPF:</span>
-                  <p className="font-mono text-gray-700 text-sm">
+                  <span className="text-gray-500 text-xs font-medium">
+                    CPF:
+                  </span>
+                  <p className="text-gray-900 text-sm font-medium">
                     {String(paciente.cpf)}
                   </p>
                 </div>
                 <div>
-                  <span className="text-gray-500 text-xs">Telefone:</span>
-                  <p className="font-mono text-gray-700 text-sm">
+                  <span className="text-gray-500 text-xs font-medium">
+                    Telefone:
+                  </span>
+                  <p className="text-gray-900 text-sm font-medium">
                     {String(paciente.phone)}
                   </p>
                 </div>
                 <div>
-                  <span className="text-gray-500 text-xs">Nascimento:</span>
-                  <p className="text-gray-700 text-sm">
+                  <span className="text-gray-500 text-xs font-medium">
+                    Nascimento:
+                  </span>
+                  <p className="text-gray-900 text-sm font-medium">
                     {formatDate(String(paciente.date_of_birth))}
                   </p>
                 </div>
@@ -374,8 +382,10 @@ export default function PacientesPage() {
 
               {paciente.observations && (
                 <div>
-                  <span className="text-gray-500 text-xs">Observações:</span>
-                  <p className="text-gray-700 text-sm">
+                  <span className="text-gray-500 text-xs font-medium">
+                    Observações:
+                  </span>
+                  <p className="text-gray-900 text-sm font-medium">
                     {String(paciente.observations)}
                   </p>
                 </div>
@@ -383,20 +393,14 @@ export default function PacientesPage() {
 
               <div className="flex justify-end space-x-2 pt-2 border-t">
                 {actions.map((action, index) => (
-                  <button
+                  <Button
                     key={index}
                     onClick={() => action.onClick(paciente)}
-                    className={`p-2 rounded-lg transition-colors ${
-                      action.variant === "primary"
-                        ? "text-[#16829E] hover:bg-blue-50"
-                        : action.variant === "danger"
-                        ? "text-red-600 hover:bg-red-50"
-                        : "text-gray-600 hover:bg-gray-50"
-                    }`}
+                    variant={action.variant}
+                    size="sm"
+                    icon={action.icon}
                     title={action.label}
-                  >
-                    {action.icon}
-                  </button>
+                  />
                 ))}
               </div>
             </div>
