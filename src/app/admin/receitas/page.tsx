@@ -8,7 +8,7 @@ import type {
   TextMarkedContent,
 } from "pdfjs-dist/types/src/display/api";
 import MainLayout from "@/components/MainLayout";
-import { Input } from "@/components/ui";
+import { Input, Table } from "@/components/ui";
 
 // Configuração do worker do PDF.js
 pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
@@ -39,6 +39,7 @@ interface Receita {
   status: "pendente" | "aprovada" | "rejeitada";
   observacoes: string;
   arquivo: string;
+  [key: string]: unknown;
 }
 
 interface ExtractedData {
@@ -292,138 +293,144 @@ export default function ReceitasPage() {
             </div>
           </div>
 
-          {/* Desktop Table */}
-          <div className="hidden lg:block overflow-x-auto rounded-lg border border-gray-200">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
-                <tr>
-                  <th className="px-4 sm:px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider bg-gray-100">
-                    Paciente
-                  </th>
-                  <th className="px-4 sm:px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider bg-gray-100">
-                    Médico
-                  </th>
-                  <th className="px-4 sm:px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider bg-gray-100">
-                    Data Emissão
-                  </th>
-                  <th className="px-4 sm:px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider bg-gray-100">
-                    Status
-                  </th>
-                  <th className="px-4 sm:px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider bg-gray-100">
-                    Ações
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
-                {filteredReceitas.map((receita) => (
-                  <tr
-                    key={receita.id}
-                    className="hover:bg-gray-50 transition-colors duration-150"
+          {/* Tabela Moderna */}
+          <Table<Receita>
+            data={filteredReceitas}
+            loading={loading}
+            emptyMessage="Nenhuma receita encontrada"
+            columns={[
+              {
+                key: "paciente",
+                header: "Paciente",
+                render: (receita: Receita) => (
+                  <div className="text-center">
+                    <div className="text-sm font-medium text-gray-900">
+                      {receita.paciente.nome}
+                    </div>
+                    <div className="text-xs text-gray-500">
+                      {receita.paciente.cpf}
+                    </div>
+                  </div>
+                ),
+                mobileLabel: "Paciente",
+              },
+              {
+                key: "medico",
+                header: "Médico",
+                render: (receita: Receita) => (
+                  <div className="text-center">
+                    <div className="text-sm font-medium text-gray-900">
+                      {receita.medico.nome}
+                    </div>
+                    <div className="text-xs text-gray-500">
+                      CRM: {receita.medico.crm}
+                    </div>
+                  </div>
+                ),
+                mobileLabel: "Médico",
+              },
+              {
+                key: "dataEmissao",
+                header: "Data Emissão",
+                render: (receita: Receita) => (
+                  <div className="text-center">
+                    <div className="text-sm text-gray-700">
+                      {new Date(receita.dataEmissao).toLocaleDateString()}
+                    </div>
+                    <div className="text-xs text-gray-500">
+                      Válido até:{" "}
+                      {new Date(receita.dataValidade).toLocaleDateString()}
+                    </div>
+                  </div>
+                ),
+                mobileLabel: "Data Emissão",
+              },
+              {
+                key: "status",
+                header: "Status",
+                render: (receita: Receita) => (
+                  <span
+                    className={`inline-flex items-center px-3 py-1 text-xs font-semibold rounded-lg border ${
+                      receita.status === "aprovada"
+                        ? "bg-green-100 text-green-800 border-green-200"
+                        : receita.status === "rejeitada"
+                        ? "bg-red-100 text-red-800 border-red-200"
+                        : "bg-yellow-100 text-yellow-800 border-yellow-200"
+                    }`}
                   >
-                    <td className="px-4 sm:px-6 py-4 whitespace-nowrap text-center">
-                      <div className="text-sm font-medium text-black">
-                        {receita.paciente.nome}
-                      </div>
-                      <div className="text-sm text-gray-700">
-                        {receita.paciente.cpf}
-                      </div>
-                    </td>
-                    <td className="px-4 sm:px-6 py-4 whitespace-nowrap text-center">
-                      <div className="text-sm font-medium text-black">
-                        {receita.medico.nome}
-                      </div>
-                      <div className="text-sm text-gray-700">
-                        CRM: {receita.medico.crm}
-                      </div>
-                    </td>
-                    <td className="px-4 sm:px-6 py-4 whitespace-nowrap text-center">
-                      <div className="text-sm text-gray-700">
-                        {new Date(receita.dataEmissao).toLocaleDateString()}
-                      </div>
-                      <div className="text-sm text-gray-700">
-                        Válido até:{" "}
-                        {new Date(receita.dataValidade).toLocaleDateString()}
-                      </div>
-                    </td>
-                    <td className="px-4 sm:px-6 py-4 whitespace-nowrap text-center">
-                      <span
-                        className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                          receita.status === "aprovada"
-                            ? "bg-green-100 text-green-800"
-                            : receita.status === "rejeitada"
-                            ? "bg-red-100 text-red-800"
-                            : "bg-yellow-100 text-yellow-800"
-                        }`}
-                      >
-                        {receita.status.charAt(0).toUpperCase() +
-                          receita.status.slice(1)}
-                      </span>
-                    </td>
-                    <td className="px-4 sm:px-6 py-4 whitespace-nowrap text-center">
-                      <div className="flex justify-center space-x-2">
-                        <button
-                          className="inline-flex items-center px-2.5 py-1.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 hover:bg-blue-200 transition-colors duration-200"
-                          onClick={() => handleViewReceita(receita)}
-                          title="Visualizar receita"
-                        >
-                          <FaEye className="mr-1" />
-                        </button>
-                        <button
-                          className="inline-flex items-center px-2.5 py-1.5 rounded-full text-xs font-medium bg-green-100 text-green-800 hover:bg-green-200 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-                          onClick={() => handleValidateClick(receita)}
-                          disabled={receita.status === "aprovada"}
-                          title="Validar receita"
-                        >
-                          <FaCheck className="mr-1" />
-                        </button>
-                        <button
-                          className="inline-flex items-center px-2.5 py-1.5 rounded-full text-xs font-medium bg-red-100 text-red-800 hover:bg-red-200 transition-colors duration-200"
-                          onClick={() => handleDelete(receita.id)}
-                          title="Excluir receita"
-                        >
-                          <FaTrash className="mr-1" />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-
-          {/* Mobile Cards */}
-          <div className="lg:hidden space-y-4">
-            {filteredReceitas.map((receita) => (
-              <div
-                key={receita.id}
-                className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm"
-              >
-                <div className="flex justify-between items-start mb-3">
+                    <div
+                      className={`w-2 h-2 rounded-full mr-2 ${
+                        receita.status === "aprovada"
+                          ? "bg-green-500 animate-pulse"
+                          : receita.status === "rejeitada"
+                          ? "bg-red-500"
+                          : "bg-yellow-500 animate-pulse"
+                      }`}
+                    ></div>
+                    {receita.status.charAt(0).toUpperCase() +
+                      receita.status.slice(1)}
+                  </span>
+                ),
+                mobileLabel: "Status",
+              },
+            ]}
+            actions={[
+              {
+                label: "Visualizar",
+                icon: <FaEye className="w-4 h-4" />,
+                onClick: handleViewReceita,
+                variant: "secondary",
+              },
+              {
+                label: "Validar",
+                icon: <FaCheck className="w-4 h-4" />,
+                onClick: handleValidateClick,
+                variant: "primary",
+              },
+              {
+                label: "Excluir",
+                icon: <FaTrash className="w-4 h-4" />,
+                onClick: (receita: Receita) => handleDelete(receita.id),
+                variant: "danger",
+              },
+            ]}
+            mobileCardRender={(receita: Receita) => (
+              <>
+                <div className="flex justify-between items-start mb-4">
                   <div className="flex-1 min-w-0">
-                    <h3 className="text-sm font-medium text-gray-900 truncate">
+                    <h3 className="text-base font-semibold text-gray-900 truncate">
                       {receita.paciente.nome}
                     </h3>
-                    <p className="text-xs text-gray-500">
+                    <p className="text-sm text-gray-500 truncate mt-1">
                       {receita.paciente.cpf}
                     </p>
                   </div>
                   <span
-                    className={`px-2 py-1 text-xs font-semibold rounded-full ml-2 flex-shrink-0 ${
+                    className={`inline-flex items-center px-3 py-1 text-xs font-semibold rounded-lg border ml-3 ${
                       receita.status === "aprovada"
-                        ? "bg-green-100 text-green-800"
+                        ? "bg-green-100 text-green-800 border-green-200"
                         : receita.status === "rejeitada"
-                        ? "bg-red-100 text-red-800"
-                        : "bg-yellow-100 text-yellow-800"
+                        ? "bg-red-100 text-red-800 border-red-200"
+                        : "bg-yellow-100 text-yellow-800 border-yellow-200"
                     }`}
                   >
+                    <div
+                      className={`w-2 h-2 rounded-full mr-2 ${
+                        receita.status === "aprovada"
+                          ? "bg-green-500 animate-pulse"
+                          : receita.status === "rejeitada"
+                          ? "bg-red-500"
+                          : "bg-yellow-500 animate-pulse"
+                      }`}
+                    ></div>
                     {receita.status.charAt(0).toUpperCase() +
                       receita.status.slice(1)}
                   </span>
                 </div>
 
-                <div className="space-y-2 mb-3">
+                <div className="space-y-3 mb-4">
                   <div>
-                    <p className="text-xs text-gray-500">Médico</p>
+                    <p className="text-xs font-medium text-gray-500">Médico</p>
                     <p className="text-sm text-gray-900">
                       {receita.medico.nome}
                     </p>
@@ -432,39 +439,21 @@ export default function ReceitasPage() {
                     </p>
                   </div>
                   <div>
-                    <p className="text-xs text-gray-500">Data de Emissão</p>
+                    <p className="text-xs font-medium text-gray-500">
+                      Data de Emissão
+                    </p>
                     <p className="text-sm text-gray-900">
                       {new Date(receita.dataEmissao).toLocaleDateString()}
                     </p>
+                    <p className="text-xs text-gray-500">
+                      Válido até:{" "}
+                      {new Date(receita.dataValidade).toLocaleDateString()}
+                    </p>
                   </div>
                 </div>
-
-                <div className="flex space-x-2">
-                  <button
-                    className="flex-1 inline-flex items-center justify-center px-3 py-2 text-xs font-medium bg-blue-100 text-blue-800 hover:bg-blue-200 transition-colors duration-200 rounded-md"
-                    onClick={() => handleViewReceita(receita)}
-                  >
-                    <FaEye className="mr-1" />
-                    Ver
-                  </button>
-                  <button
-                    className="flex-1 inline-flex items-center justify-center px-3 py-2 text-xs font-medium bg-green-100 text-green-800 hover:bg-green-200 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed rounded-md"
-                    onClick={() => handleValidateClick(receita)}
-                    disabled={receita.status === "aprovada"}
-                  >
-                    <FaCheck className="mr-1" />
-                    Validar
-                  </button>
-                  <button
-                    className="flex-shrink-0 inline-flex items-center justify-center px-3 py-2 text-xs font-medium bg-red-100 text-red-800 hover:bg-red-200 transition-colors duration-200 rounded-md"
-                    onClick={() => handleDelete(receita.id)}
-                  >
-                    <FaTrash />
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
+              </>
+            )}
+          />
 
           {/* Modal */}
           {isModalOpen && selectedReceita && (

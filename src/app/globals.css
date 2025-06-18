@@ -125,4 +125,24 @@ body {
   .placeholder-visible::placeholder {
     @apply text-gray-400 opacity-100 !important;
   }
+
+  /* Estilos específicos para consistência de altura dos componentes de formulário */
+  .form-input-height {
+    height: 42px !important;
+    min-height: 42px !important;
+  }
+
+  /* Garantir altura consistente para inputs de data */
+  input[type="date"] {
+    height: 42px !important;
+    min-height: 42px !important;
+    padding: 0.625rem 0.75rem; /* py-2.5 px-3 */
+  }
+
+  /* Garantir altura consistente para selects */
+  select {
+    height: 42px !important;
+    min-height: 42px !important;
+    padding: 0.625rem 0.75rem; /* py-2.5 px-3 */
+  }
 }

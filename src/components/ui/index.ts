@@ -4,4 +4,6 @@ export { default as Textarea } from "./Textarea";
 export { default as FormInput } from "./FormInput";
 export { default as FormSelect } from "./FormSelect";
 export { default as FormTextarea } from "./FormTextarea";
+export { default as FormAutocomplete } from "./FormAutocomplete";
 export { default as FormLayout } from "./form-layout";
+export { default as Table } from "./Table";

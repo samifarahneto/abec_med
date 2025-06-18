@@ -39,7 +39,7 @@ const FormSelect = React.forwardRef<HTMLSelectElement, FormSelectProps>(
     };
 
     const baseClasses =
-      "w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[#16829E] focus:border-[#16829E]";
+      "w-full px-3 py-2.5 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[#16829E] focus:border-[#16829E] h-[42px]";
 
     const errorClasses = error
       ? "border-red-500 focus:ring-red-500 focus:border-red-500"

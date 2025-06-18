@@ -33,8 +33,10 @@ const FormInput = React.forwardRef<HTMLInputElement, FormInputProps>(
 
     const baseClasses =
       variant === "search"
-        ? "w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#16829E] focus:border-transparent"
-        : "w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[#16829E] focus:border-[#16829E]";
+        ? "w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#16829E] focus:border-transparent h-[42px]"
+        : `w-full px-3 py-2.5 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[#16829E] focus:border-[#16829E] h-[42px] ${
+            props.type === "date" ? "date-input" : ""
+          }`;
 
     const errorClasses = error
       ? "border-red-500 focus:ring-red-500 focus:border-red-500"
@@ -56,7 +58,10 @@ const FormInput = React.forwardRef<HTMLInputElement, FormInputProps>(
 
           <input
             ref={ref}
-            style={inputStyle}
+            style={{
+              ...inputStyle,
+              ...(props.type === "date" && { lineHeight: "42px" }),
+            }}
             className={`${baseClasses} ${errorClasses} ${className}`}
             {...props}
           />

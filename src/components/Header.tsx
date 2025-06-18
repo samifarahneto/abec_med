@@ -36,29 +36,44 @@ interface LinkItem {
 const profileLinks: Record<string, LinkItem[]> = {
   admin: [
     {
-      href: "/admin/dashboard",
+      href: "/admin",
       label: "Dashboard",
       icon: <FaHome className="w-5 h-5" />,
     },
     {
-      href: "/admin/usuarios",
-      label: "Usuários",
+      href: "/admin/pacientes",
+      label: "Pacientes",
       icon: <FaUsers className="w-5 h-5" />,
     },
     {
-      href: "/admin/estoque",
-      label: "Estoque",
-      icon: <FaBox className="w-5 h-5" />,
+      href: "/admin/medicos",
+      label: "Médicos",
+      icon: <FaUserCircle className="w-5 h-5" />,
     },
     {
-      href: "/admin/pedidos",
-      label: "Pedidos",
-      icon: <FaShoppingCart className="w-5 h-5" />,
+      href: "/admin/acolhimento",
+      label: "Acolhimento",
+      icon: <FaCalendarAlt className="w-5 h-5" />,
+    },
+    {
+      href: "/admin/administradores",
+      label: "Administradores",
+      icon: <FaCog className="w-5 h-5" />,
     },
     {
       href: "/admin/receitas",
       label: "Receitas",
       icon: <FaFileMedical className="w-5 h-5" />,
+    },
+    {
+      href: "/admin/produto",
+      label: "Produto",
+      icon: <FaPills className="w-5 h-5" />,
+    },
+    {
+      href: "/admin/tipo-produto",
+      label: "Tipo de produto",
+      icon: <FaBox className="w-5 h-5" />,
     },
   ],
   doctor: [
