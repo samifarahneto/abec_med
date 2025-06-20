@@ -4,11 +4,11 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "next dev --turbopack",
+    "dev": "next dev",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "clean": "next clean",
+    "clean": "npx next clean",
     "migrate-users": "NODE_OPTIONS='--loader ts-node/esm' node src/scripts/migrate-users.ts"
   },
   "dependencies": {
