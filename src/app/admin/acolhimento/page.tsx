@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import {
   FaUserCheck,
   FaClock,
@@ -31,6 +32,7 @@ interface Acolhimento extends Record<string, unknown> {
 }
 
 export default function AcolhimentoPage() {
+  const router = useRouter();
   const [atendimentos, setAtendimentos] = useState<Acolhimento[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [loading, setLoading] = useState(true);
@@ -259,15 +261,13 @@ export default function AcolhimentoPage() {
               <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
             </div>
             <Button
-              onClick={() => {
-                /* Funcionalidade para agendar novo atendimento */
-              }}
+              onClick={() => router.push("/admin/acolhimento/novo")}
               icon={<FaPlus />}
               variant="primary"
               size="md"
               className="whitespace-nowrap"
             >
-              Cadastrar Colaborador
+              Novo Acolhimento
             </Button>
           </div>
         </div>
