@@ -19,13 +19,14 @@ import {
 
 interface Administrador {
   id: string;
-  nome: string;
+  name: string;
+  cpf: string;
+  date_of_birth: string;
+  gender: string;
   email: string;
-  cargo: string;
-  telefone: string;
-  nivel_acesso: "master" | "admin";
-  status: "ativo" | "inativo";
-  observacoes: string;
+  phone: string;
+  observations: string;
+  nivel: "Master" | "Admin";
   address_id: string;
   companies_id: string;
 }
@@ -46,13 +47,14 @@ export default function CadastrarAdministradorPage() {
 
   const [administrador, setAdministrador] = useState<Administrador>({
     id: "",
-    nome: "",
+    name: "",
+    cpf: "",
+    date_of_birth: "",
+    gender: "",
     email: "",
-    cargo: "",
-    telefone: "",
-    nivel_acesso: "admin",
-    status: "ativo",
-    observacoes: "",
+    phone: "",
+    observations: "",
+    nivel: "Admin",
     address_id: "",
     companies_id: "",
   });
@@ -94,14 +96,17 @@ export default function CadastrarAdministradorPage() {
       setError(null);
 
       // Validações básicas
-      if (!administrador.nome.trim()) {
+      if (!administrador.name.trim()) {
         throw new Error("Nome é obrigatório");
+      }
+      if (!administrador.cpf.trim()) {
+        throw new Error("CPF é obrigatório");
+      }
+      if (!administrador.date_of_birth) {
+        throw new Error("Data de nascimento é obrigatória");
       }
       if (!administrador.email.trim()) {
         throw new Error("Email é obrigatório");
-      }
-      if (!administrador.cargo.trim()) {
-        throw new Error("Cargo é obrigatório");
       }
 
       // Mock de salvamento - substituir por chamada real da API
@@ -158,16 +163,36 @@ export default function CadastrarAdministradorPage() {
               Informações Pessoais
             </h2>
             <div className="space-y-4">
-              {/* Primeira linha: Nome, Email, Cargo */}
+              {/* Primeira linha: Nome, CPF, Data de Nascimento */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <FormInput
                   label="Nome Completo"
                   type="text"
-                  value={administrador.nome}
-                  onChange={(e) => handleChange("nome", e.target.value)}
+                  value={administrador.name}
+                  onChange={(e) => handleChange("name", e.target.value)}
                   placeholder="Digite o nome completo"
                   required
                 />
+                <FormInput
+                  label="CPF"
+                  type="text"
+                  value={administrador.cpf}
+                  onChange={(e) => handleChange("cpf", e.target.value)}
+                  placeholder="000.000.000-00"
+                  required
+                />
+                <FormInput
+                  label="Data de Nascimento"
+                  type="date"
+                  value={administrador.date_of_birth}
+                  onChange={(e) =>
+                    handleChange("date_of_birth", e.target.value)
+                  }
+                  required
+                />
+              </div>
+              {/* Segunda linha: Email, Telefone, Gênero, Nível */}
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                 <FormInput
                   label="Email"
                   type="email"
@@ -177,51 +202,35 @@ export default function CadastrarAdministradorPage() {
                   required
                 />
                 <FormInput
-                  label="Cargo"
-                  type="text"
-                  value={administrador.cargo}
-                  onChange={(e) => handleChange("cargo", e.target.value)}
-                  placeholder="Digite o cargo"
-                  required
-                />
-              </div>
-              {/* Segunda linha: Telefone, Nível de Acesso, Status */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <FormInput
                   label="Telefone"
                   type="tel"
-                  value={administrador.telefone}
-                  onChange={(e) => handleChange("telefone", e.target.value)}
+                  value={administrador.phone}
+                  onChange={(e) => handleChange("phone", e.target.value)}
                   placeholder="(00) 00000-0000"
                 />
                 <FormSelect
-                  label="Nível de Acesso"
-                  value={administrador.nivel_acesso}
-                  onChange={(e) =>
-                    handleChange(
-                      "nivel_acesso",
-                      e.target.value as "master" | "admin"
-                    )
-                  }
+                  label="Gênero"
+                  value={administrador.gender}
+                  onChange={(e) => handleChange("gender", e.target.value)}
                   required
+                  placeholder="Selecione..."
                   options={[
-                    { value: "admin", label: "Admin" },
-                    { value: "master", label: "Master" },
+                    { value: "Masculino", label: "Masculino" },
+                    { value: "Feminino", label: "Feminino" },
+                    { value: "Outro", label: "Outro" },
                   ]}
                 />
                 <FormSelect
-                  label="Status"
-                  value={administrador.status}
+                  label="Nível"
+                  value={administrador.nivel}
                   onChange={(e) =>
-                    handleChange(
-                      "status",
-                      e.target.value as "ativo" | "inativo"
-                    )
+                    handleChange("nivel", e.target.value as "Master" | "Admin")
                   }
                   required
+                  placeholder="Selecione..."
                   options={[
-                    { value: "ativo", label: "Ativo" },
-                    { value: "inativo", label: "Inativo" },
+                    { value: "Admin", label: "Admin" },
+                    { value: "Master", label: "Master" },
                   ]}
                 />
               </div>
@@ -229,8 +238,8 @@ export default function CadastrarAdministradorPage() {
               <div>
                 <FormTextarea
                   label="Observações"
-                  value={administrador.observacoes}
-                  onChange={(e) => handleChange("observacoes", e.target.value)}
+                  value={administrador.observations}
+                  onChange={(e) => handleChange("observations", e.target.value)}
                   rows={3}
                   placeholder="Observações sobre o administrador..."
                 />
