@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import {
   FaArrowLeft,
   FaSave,
-  FaUserCheck,
+  FaUserShield,
   FaMapMarkerAlt,
 } from "react-icons/fa";
 import MainLayout from "@/components/MainLayout";
@@ -17,16 +17,15 @@ import {
   Button,
 } from "@/components/ui";
 
-interface Acolhimento {
+interface Administrador {
   id: string;
-  name: string;
-  cpf: string;
-  date_of_birth: string;
-  gender: string;
+  nome: string;
   email: string;
-  phone: string;
-  observations: string;
   cargo: string;
+  telefone: string;
+  nivel_acesso: "master" | "admin";
+  status: "ativo" | "inativo";
+  observacoes: string;
   address_id: string;
   companies_id: string;
 }
@@ -42,19 +41,18 @@ interface Address {
   complement?: string;
 }
 
-export default function CadastrarAcolhimentoPage() {
+export default function CadastrarAdministradorPage() {
   const router = useRouter();
 
-  const [acolhimento, setAcolhimento] = useState<Acolhimento>({
+  const [administrador, setAdministrador] = useState<Administrador>({
     id: "",
-    name: "",
-    cpf: "",
-    date_of_birth: "",
-    gender: "",
+    nome: "",
     email: "",
-    phone: "",
-    observations: "",
-    cargo: "Atendente",
+    cargo: "",
+    telefone: "",
+    nivel_acesso: "admin",
+    status: "ativo",
+    observacoes: "",
     address_id: "",
     companies_id: "",
   });
@@ -73,8 +71,11 @@ export default function CadastrarAcolhimentoPage() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const handleChange = (field: keyof Acolhimento, value: string | string[]) => {
-    setAcolhimento((prev) => ({
+  const handleChange = (
+    field: keyof Administrador,
+    value: string | string[]
+  ) => {
+    setAdministrador((prev) => ({
       ...prev,
       [field]: value,
     }));
@@ -93,30 +94,29 @@ export default function CadastrarAcolhimentoPage() {
       setError(null);
 
       // Validações básicas
-      if (!acolhimento.name.trim()) {
+      if (!administrador.nome.trim()) {
         throw new Error("Nome é obrigatório");
       }
-      if (!acolhimento.cpf.trim()) {
-        throw new Error("CPF é obrigatório");
-      }
-      if (!acolhimento.date_of_birth) {
-        throw new Error("Data de nascimento é obrigatória");
-      }
-      if (!acolhimento.email.trim()) {
+      if (!administrador.email.trim()) {
         throw new Error("Email é obrigatório");
+      }
+      if (!administrador.cargo.trim()) {
+        throw new Error("Cargo é obrigatório");
       }
 
       // Mock de salvamento - substituir por chamada real da API
-      console.log("Cadastrando acolhimento:", { acolhimento, address });
+      console.log("Cadastrando administrador:", { administrador, address });
 
       // Simular delay
       await new Promise((resolve) => setTimeout(resolve, 1500));
 
-      // Redirect back to acolhimento list
-      router.push("/admin/acolhimento");
+      // Redirect back to administradores list
+      router.push("/admin/administradores");
     } catch (error: unknown) {
       setError(
-        error instanceof Error ? error.message : "Erro ao cadastrar acolhimento"
+        error instanceof Error
+          ? error.message
+          : "Erro ao cadastrar administrador"
       );
     } finally {
       setSaving(false);
@@ -137,7 +137,7 @@ export default function CadastrarAcolhimentoPage() {
             </button>
             <div>
               <h1 className="text-2xl font-bold text-gray-900">
-                Cadastrar Acolhimento
+                Cadastrar Administrador
               </h1>
             </div>
           </div>
@@ -154,76 +154,74 @@ export default function CadastrarAcolhimentoPage() {
         <div className="space-y-6 h-full">
           <div className="bg-white rounded-lg shadow-sm border p-6 h-full flex flex-col">
             <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-              <FaUserCheck className="w-5 h-5 mr-2 text-[#16829E]" />
+              <FaUserShield className="w-5 h-5 mr-2 text-[#16829E]" />
               Informações Pessoais
             </h2>
             <div className="space-y-4">
-              {/* Primeira linha: Nome, CPF, Data de Nascimento */}
+              {/* Primeira linha: Nome, Email, Cargo */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <FormInput
                   label="Nome Completo"
                   type="text"
-                  value={acolhimento.name}
-                  onChange={(e) => handleChange("name", e.target.value)}
+                  value={administrador.nome}
+                  onChange={(e) => handleChange("nome", e.target.value)}
                   placeholder="Digite o nome completo"
                   required
                 />
                 <FormInput
-                  label="CPF"
-                  type="text"
-                  value={acolhimento.cpf}
-                  onChange={(e) => handleChange("cpf", e.target.value)}
-                  placeholder="000.000.000-00"
-                  required
-                />
-                <FormInput
-                  label="Data de Nascimento"
-                  type="date"
-                  value={acolhimento.date_of_birth}
-                  onChange={(e) =>
-                    handleChange("date_of_birth", e.target.value)
-                  }
-                  required
-                />
-              </div>
-              {/* Segunda linha: Email, Telefone, Gênero, Cargo */}
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                <FormInput
                   label="Email"
                   type="email"
-                  value={acolhimento.email}
+                  value={administrador.email}
                   onChange={(e) => handleChange("email", e.target.value)}
                   placeholder="email@exemplo.com"
                   required
                 />
                 <FormInput
+                  label="Cargo"
+                  type="text"
+                  value={administrador.cargo}
+                  onChange={(e) => handleChange("cargo", e.target.value)}
+                  placeholder="Digite o cargo"
+                  required
+                />
+              </div>
+              {/* Segunda linha: Telefone, Nível de Acesso, Status */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <FormInput
                   label="Telefone"
                   type="tel"
-                  value={acolhimento.phone}
-                  onChange={(e) => handleChange("phone", e.target.value)}
+                  value={administrador.telefone}
+                  onChange={(e) => handleChange("telefone", e.target.value)}
                   placeholder="(00) 00000-0000"
                 />
                 <FormSelect
-                  label="Gênero"
-                  value={acolhimento.gender}
-                  onChange={(e) => handleChange("gender", e.target.value)}
+                  label="Nível de Acesso"
+                  value={administrador.nivel_acesso}
+                  onChange={(e) =>
+                    handleChange(
+                      "nivel_acesso",
+                      e.target.value as "master" | "admin"
+                    )
+                  }
                   required
-                  placeholder="Selecione..."
                   options={[
-                    { value: "Masculino", label: "Masculino" },
-                    { value: "Feminino", label: "Feminino" },
-                    { value: "Outro", label: "Outro" },
+                    { value: "admin", label: "Admin" },
+                    { value: "master", label: "Master" },
                   ]}
                 />
                 <FormSelect
-                  label="Cargo"
-                  value={acolhimento.cargo}
-                  onChange={(e) => handleChange("cargo", e.target.value)}
+                  label="Status"
+                  value={administrador.status}
+                  onChange={(e) =>
+                    handleChange(
+                      "status",
+                      e.target.value as "ativo" | "inativo"
+                    )
+                  }
                   required
                   options={[
-                    { value: "Atendente", label: "Atendente" },
-                    { value: "Administrativo", label: "Administrativo" },
-                    { value: "Logistica", label: "Logística" },
+                    { value: "ativo", label: "Ativo" },
+                    { value: "inativo", label: "Inativo" },
                   ]}
                 />
               </div>
@@ -231,10 +229,10 @@ export default function CadastrarAcolhimentoPage() {
               <div>
                 <FormTextarea
                   label="Observações"
-                  value={acolhimento.observations}
-                  onChange={(e) => handleChange("observations", e.target.value)}
+                  value={administrador.observacoes}
+                  onChange={(e) => handleChange("observacoes", e.target.value)}
                   rows={3}
-                  placeholder="Observações sobre a pessoa..."
+                  placeholder="Observações sobre o administrador..."
                 />
               </div>
             </div>
@@ -363,10 +361,10 @@ export default function CadastrarAcolhimentoPage() {
             icon={<FaSave />}
             loading={saving}
           >
-            {saving ? "Cadastrando..." : "Cadastrar Acolhimento"}
+            {saving ? "Cadastrando..." : "Cadastrar Administrador"}
           </Button>
           <Button
-            onClick={() => router.push("/admin/acolhimento")}
+            onClick={() => router.push("/admin/administradores")}
             disabled={saving}
             variant="secondary"
             size="md"

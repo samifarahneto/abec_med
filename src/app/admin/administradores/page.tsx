@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import {
   FaUserShield,
   FaCog,
@@ -27,6 +28,7 @@ interface Administrador extends Record<string, unknown> {
 }
 
 export default function AdministradoresPage() {
+  const router = useRouter();
   const [administradores, setAdministradores] = useState<Administrador[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [loading, setLoading] = useState(true);
@@ -219,15 +221,13 @@ export default function AdministradoresPage() {
               <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
             </div>
             <Button
-              onClick={() => {
-                /* Funcionalidade para cadastrar novo administrador */
-              }}
+              onClick={() => router.push("/admin/administradores/novo")}
               icon={<FaPlus />}
               variant="primary"
               size="md"
               className="whitespace-nowrap"
             >
-              Cadastrar Administrador
+              Novo Administrador
             </Button>
           </div>
         </div>
