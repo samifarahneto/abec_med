@@ -38,7 +38,7 @@ export default function LayoutWrapper({ children }: LayoutWrapperProps) {
   // Função para verificar se é rota pública
   const isPublicRoute = () => {
     const publicRoutes = ["/", "/login", "/registrar", "/register"];
-    return publicRoutes.includes(pathname) || !session?.user;
+    return publicRoutes.includes(pathname);
   };
 
   // Definir estado inicial da sidebar baseado no tamanho da tela
@@ -62,7 +62,8 @@ export default function LayoutWrapper({ children }: LayoutWrapperProps) {
   }, []);
 
   // Determinar se deve aplicar margem da sidebar
-  const shouldApplySidebarMargin = !isPublicRoute() && status !== "loading";
+  const shouldApplySidebarMargin =
+    !isPublicRoute() && status === "authenticated" && session?.user;
 
   return (
     <LayoutContext.Provider value={{ isSidebarExpanded, setIsSidebarExpanded }}>

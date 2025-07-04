@@ -3,7 +3,6 @@ import { auth } from "../../../../../auth";
 
 const API_BASE_URL = "https://abecmed-api.22aczq.easypanel.host";
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export async function GET(request: NextRequest) {
   try {
     // Verificar se o usuário está autenticado
@@ -25,8 +24,29 @@ export async function GET(request: NextRequest) {
     console.log("🔍 Proxy: Buscando pacientes via servidor...");
     console.log(`🔑 Proxy: Token: ${accessToken.substring(0, 20)}...`);
 
+    // Pegar os parâmetros de query da requisição
+    const url = new URL(request.url);
+    const searchParams = url.searchParams;
+
+    // Construir a URL da API externa com os parâmetros
+    const apiUrl = new URL(`${API_BASE_URL}/patients`);
+
+    // Adicionar os parâmetros de query se existirem
+    if (searchParams.has("cpf"))
+      apiUrl.searchParams.set("cpf", searchParams.get("cpf")!);
+    if (searchParams.has("name"))
+      apiUrl.searchParams.set("name", searchParams.get("name")!);
+    if (searchParams.has("phone"))
+      apiUrl.searchParams.set("phone", searchParams.get("phone")!);
+    if (searchParams.has("email"))
+      apiUrl.searchParams.set("email", searchParams.get("email")!);
+    if (searchParams.has("status"))
+      apiUrl.searchParams.set("status", searchParams.get("status")!);
+
+    console.log(`📡 Proxy: URL da API externa: ${apiUrl.toString()}`);
+
     // Fazer a requisição para a API externa
-    const response = await fetch(`${API_BASE_URL}/patients`, {
+    const response = await fetch(apiUrl.toString(), {
       method: "GET",
       headers: {
         "Content-Type": "application/json",

@@ -7,5 +7,14 @@ export default function AuthProvider({
 }: {
   children: React.ReactNode;
 }) {
-  return <SessionProvider>{children}</SessionProvider>;
+  return (
+    <SessionProvider
+      // Configurações otimizadas para reduzir hidratação
+      refetchInterval={5 * 60} // 5 minutos
+      refetchOnWindowFocus={false}
+      refetchWhenOffline={false}
+    >
+      {children}
+    </SessionProvider>
+  );
 }

@@ -91,11 +91,11 @@ export function Table<T extends Record<string, unknown>>({
     <>
       {/* Desktop Table */}
       <div
-        className={`hidden lg:block bg-white rounded-2xl shadow-xl shadow-gray-200/50 overflow-hidden border border-gray-100/50 backdrop-blur-sm ${className}`}
+        className={`hidden lg:block bg-white shadow-xl shadow-gray-200/50 overflow-hidden border border-gray-100/50 backdrop-blur-sm ${className}`}
       >
         <div className="overflow-x-auto">
           <table className="min-w-full table-fixed">
-            <thead className="bg-gradient-to-r from-gray-100 via-slate-100 to-gray-100 border-b-2 border-gray-300/60">
+            <thead className="bg-[#F1F1F1] border-b-2 border-gray-300/60">
               <tr className="backdrop-blur-sm">
                 {columns.map((column) => (
                   <th
@@ -184,7 +184,7 @@ export function Table<T extends Record<string, unknown>>({
                                 e.stopPropagation();
                                 action.onClick(item);
                               }}
-                              className={`relative p-3 rounded-xl transition-all duration-300 transform hover:scale-110 hover:-translate-y-1 active:scale-95 shadow-lg hover:shadow-xl ${getActionVariantClasses(
+                              className={`relative p-2 rounded-lg transition-all duration-200 transform hover:scale-105 active:scale-95 shadow-sm hover:shadow-md ${getActionVariantClasses(
                                 action.variant
                               )} ${action.className || ""}`}
                               title={action.label}
@@ -274,17 +274,17 @@ export function Table<T extends Record<string, unknown>>({
                               e.stopPropagation();
                               action.onClick(item);
                             }}
-                            className={`relative p-4 rounded-2xl transition-all duration-300 transform hover:scale-110 hover:-translate-y-1 active:scale-95 shadow-lg hover:shadow-2xl ${getActionVariantClasses(
+                            className={`relative p-3 rounded-lg transition-all duration-200 transform hover:scale-105 active:scale-95 shadow-sm hover:shadow-md ${getActionVariantClasses(
                               action.variant
                             )} ${
                               action.className || ""
                             } backdrop-blur-sm group/button`}
                             title={action.label}
                           >
-                            <div className="relative z-10 transform group-hover/button:scale-110 transition-transform duration-200">
+                            <div className="relative z-10 transform group-hover/button:scale-105 transition-transform duration-200">
                               {action.icon}
                             </div>
-                            <div className="absolute inset-0 bg-gradient-to-r from-white/30 to-transparent rounded-2xl opacity-0 group-hover/button:opacity-100 transition-opacity duration-300"></div>
+                            <div className="absolute inset-0 bg-gradient-to-r from-white/30 to-transparent rounded-lg opacity-0 group-hover/button:opacity-100 transition-opacity duration-200"></div>
                           </button>
                         ))}
                       </div>

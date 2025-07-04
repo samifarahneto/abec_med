@@ -36,7 +36,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       danger:
         "bg-red-400 hover:bg-red-500 text-white border-transparent focus:ring-red-400",
       success:
-        "bg-green-400 hover:bg-green-500 text-white border-transparent focus:ring-green-400",
+        "bg-green-600 hover:bg-green-700 text-white border-transparent focus:ring-green-600",
       outline:
         "bg-white hover:bg-gray-100 text-[#1F9CBE] border-[#1F9CBE] hover:border-[#16829E] focus:ring-[#1F9CBE]",
     };
@@ -85,7 +85,9 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       >
         {loading && (
           <svg
-            className={`animate-spin ${iconSize} ${children ? "mr-2" : ""}`}
+            className={`animate-spin ${iconSize} ${
+              children ? "mr-2" : ""
+            } flex items-center justify-center`}
             fill="none"
             viewBox="0 0 24 24"
           >
@@ -106,7 +108,11 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         )}
 
         {!loading && icon && iconPosition === "left" && (
-          <span className={`${iconSize} ${children ? "mr-2" : ""}`}>
+          <span
+            className={`${iconSize} ${
+              children ? "mr-2" : ""
+            } flex items-center justify-center`}
+          >
             {icon}
           </span>
         )}
@@ -114,7 +120,11 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         {children}
 
         {!loading && icon && iconPosition === "right" && (
-          <span className={`${iconSize} ${children ? "ml-2" : ""}`}>
+          <span
+            className={`${iconSize} ${
+              children ? "ml-2" : ""
+            } flex items-center justify-center`}
+          >
             {icon}
           </span>
         )}
