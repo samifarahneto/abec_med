@@ -1,15 +1,14 @@
 # ABEC Med - Clínica Médica
 
-Sistema de gestão para clínica médica desenvolvido com Next.js, TypeScript e MongoDB.
+Sistema de gestão para clínica médica desenvolvido com Next.js, TypeScript e **API Externa ABEC Med**.
 
 ## 🚀 Tecnologias Utilizadas
 
 - **Next.js 14** - Framework React para renderização do lado do servidor
 - **TypeScript** - Superset JavaScript com tipagem estática
 - **Tailwind CSS** - Framework CSS utilitário
-- **MongoDB** - Banco de dados NoSQL
-- **NextAuth.js** - Autenticação e autorização
-- **bcryptjs** - Criptografia de senhas
+- **NextAuth.js v5** - Autenticação e autorização
+- **API Externa ABEC Med** - Sistema de autenticação e dados
 
 ## 📁 Estrutura do Projeto
 
@@ -17,27 +16,21 @@ Sistema de gestão para clínica médica desenvolvido com Next.js, TypeScript e 
 src/
 ├── app/
 │   ├── api/
-│   │   ├── auth/
-│   │   │   └── [...nextauth]/
-│   │   │       └── route.ts
-│   │   ├── register/
-│   │   │   └── route.ts
-│   │   ├── setup/
-│   │   │   └── route.ts
-│   │   ├── test-connection/
-│   │   │   └── route.ts
-│   │   └── users/
-│   │       └── route.ts
+│   │   └── auth/
+│   │       └── [...nextauth]/
+│   │           └── route.ts
+│   ├── admin/
+│   ├── medic/
+│   ├── paciente/
 │   ├── login/
-│   │   └── page.tsx
-│   ├── registrar/
 │   │   └── page.tsx
 │   ├── layout.tsx
 │   └── page.tsx
 ├── components/
-│   └── Header.tsx
-├── lib/
-│   └── mongodb.ts
+│   ├── Header.tsx
+│   └── ui/
+├── config/
+│   └── api.ts
 ├── providers/
 │   └── AuthProvider.tsx
 └── types/
@@ -66,103 +59,190 @@ src/
 
 ## 🔐 Autenticação e Perfis
 
+### Integração com API Externa
+
+O sistema usa **exclusivamente** a API externa ABEC Med:
+
+- **Endpoint**: `https://abecmed-api.22aczq.easypanel.host/auth/login`
+- **Autenticação JWT** via NextAuth.js v5
+- **Sem banco de dados local** - Todos os dados vêm da API
+
 ### Perfis de Usuário
 
 1. **Administrador (admin)**
 
-   - Dashboard
+   - Dashboard administrativo
    - Gerenciamento de usuários
    - Configurações do sistema
 
 2. **Médico (doctor)**
 
-   - Consultas
-   - Pacientes
-   - Agenda
+   - Consultas e pacientes
+   - Agenda médica
 
 3. **Acolhimento (reception)**
 
    - Agendamentos
-   - Pacientes
-   - Relatórios
+   - Atendimento ao paciente
 
 4. **Paciente (patient)**
-   - Minhas consultas
-   - Meus exames
-   - Meu perfil
-
-### Rotas de API
-
-- **POST /api/register** - Registro de novos usuários
-- **POST /api/setup** - Criação do usuário administrador inicial
-- **GET /api/test-connection** - Teste de conexão com MongoDB
-- **GET/POST /api/auth/[...nextauth]** - Autenticação via NextAuth.js
+   - Dashboard pessoal
+   - Consultas e exames
 
 ## 🛠️ Configuração do Ambiente
 
-1. **Variáveis de Ambiente**
+### 1. Variáveis de Ambiente **OBRIGATÓRIAS**
 
-   ```env
-   MONGODB_URI=mongodb+srv://<username>:<password>@<cluster>.mongodb.net/<database>?retryWrites=true&w=majority
-   NEXTAUTH_SECRET=sua_chave_secreta_aqui
-   NEXTAUTH_URL=http://localhost:3000
-   ```
+Crie o arquivo `.env.local` na raiz do projeto:
 
-2. **Instalação de Dependências**
+```env
+# API Externa ABEC Med
+NEXT_PUBLIC_API_BASE_URL=https://abecmed-api.22aczq.easypanel.host
 
-   ```bash
-   npm install
-   ```
+# NextAuth.js v5
+NEXTAUTH_URL=http://localhost:3000
+NEXTAUTH_SECRET=sua-chave-secreta-super-forte-aqui
+```
 
-3. **Execução do Projeto**
-   ```bash
-   npm run dev
-   ```
+### 2. Instalação e Execução
+
+```bash
+# Instalar dependências
+npm install
+
+# Executar em desenvolvimento
+npm run dev
+
+# Build para produção
+npm run build
+
+# Iniciar em produção
+npm start
+```
+
+## 🌐 API Externa
+
+### Configuração
+
+A API está configurada em `src/config/api.ts`:
+
+```typescript
+export const API_CONFIG = {
+  BASE_URL:
+    process.env.NEXT_PUBLIC_API_BASE_URL ||
+    "https://abecmed-api.22aczq.easypanel.host",
+  ENDPOINTS: {
+    LOGIN: "/auth/login",
+    LOGOUT: "/auth/logout",
+    PROFILE: "/auth/me",
+    // ... outros endpoints
+  },
+};
+```
+
+### Autenticação
+
+```typescript
+// Login via API externa
+POST https://abecmed-api.22aczq.easypanel.host/auth/login
+{
+  "email": "usuario@exemplo.com",
+  "password": "senha123"
+}
+```
 
 ## 📱 Responsividade
 
-O projeto segue uma abordagem mobile-first, com breakpoints definidos para diferentes tamanhos de tela:
+O projeto segue uma abordagem mobile-first:
 
-- Layout adaptativo para mobile, tablet e desktop
-- Menu hamburguer para dispositivos móveis
-- Design responsivo em todos os componentes
+- Layout adaptativo para todos os dispositivos
+- Menu responsivo com drawer mobile
+- Design moderno e acessível
 
-## ⚙️ Configurações Especiais
+## ⚙️ Funcionalidades
 
-### Tailwind CSS
+### ✅ Implementado
 
-- Configuração personalizada em `tailwind.config.js`
-- Plugins para forms e typography
-- Cores e breakpoints customizados
+- [x] Autenticação via API externa
+- [x] Sistema de rotas protegidas
+- [x] Header responsivo com perfis
+- [x] Middleware de autenticação
+- [x] Redirecionamento por role
+- [x] Configuração de variáveis de ambiente
 
-### Next.js
+### 🚧 Em Desenvolvimento
 
-- App Router
-- Server Components
-- API Routes
-- Middleware para proteção de rotas
+- [ ] Dashboard para cada perfil
+- [ ] CRUD de pacientes via API
+- [ ] Sistema de agendamento
+- [ ] Gestão de consultas
+- [ ] Relatórios e estatísticas
+
+## 🔧 Configurações Especiais
+
+### NextAuth.js v5
+
+- **Estratégia**: JWT com cookies seguros
+- **Providers**: Credentials (API externa)
+- **Callbacks** personalizados para roles
+- **Páginas** customizadas de login
+
+### Middleware
+
+Proteção automática de rotas baseada em roles:
+
+```typescript
+// middleware.ts
+export const config = {
+  matcher: ["/admin/:path*", "/medic/:path*", "/paciente/:path*"],
+};
+```
+
+## 🚀 Deploy
+
+### Variáveis de Produção
+
+```env
+NEXT_PUBLIC_API_BASE_URL=https://abecmed-api.22aczq.easypanel.host
+NEXTAUTH_URL=https://seu-dominio.com
+NEXTAUTH_SECRET=chave-super-segura-para-producao
+```
+
+### Vercel / Netlify
+
+1. Configure as variáveis de ambiente
+2. Conecte o repositório
+3. Deploy automático
 
 ## 🤝 Contribuição
 
-1. Faça um fork do projeto
-2. Crie uma branch para sua feature (`git checkout -b feature/AmazingFeature`)
-3. Commit suas mudanças (`git commit -m 'Add some AmazingFeature'`)
-4. Push para a branch (`git push origin feature/AmazingFeature`)
+1. Fork o projeto
+2. Crie uma branch (`git checkout -b feature/nova-feature`)
+3. Commit suas mudanças (`git commit -m 'Adiciona nova feature'`)
+4. Push para a branch (`git push origin feature/nova-feature`)
 5. Abra um Pull Request
 
 ## 📋 Próximos Passos
 
-- [x] Configuração inicial do projeto
-- [x] Sistema de autenticação
-- [x] Header responsivo com diferentes perfis
-- [ ] Dashboard para cada perfil
-- [ ] CRUD de pacientes
-- [ ] Sistema de agendamento
-- [ ] Gestão de consultas
-- [ ] Relatórios e estatísticas
-- [ ] Sistema de notificações
-- [ ] Integração com prontuário eletrônico
+- [ ] Implementar dashboards específicos por role
+- [ ] Integração completa com todos os endpoints da API
+- [ ] Sistema de notificações em tempo real
+- [ ] Módulo de telemedicina
+- [ ] App mobile React Native
+
+## 🆘 Suporte
+
+Para problemas relacionados à:
+
+- **API Externa**: Contate a equipe ABEC Med
+- **Frontend**: Abra uma issue neste repositório
+- **Configuração**: Verifique a documentação em `/docs`
 
 ## 📝 Licença
 
 Este projeto está sob a licença MIT. Veja o arquivo [LICENSE](LICENSE) para mais detalhes.
+
+---
+
+**🔗 API Externa:** `https://abecmed-api.22aczq.easypanel.host`
+**📚 Documentação:** `/docs/API_EXTERNA_INTEGRATION.md`

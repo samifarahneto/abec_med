@@ -16,18 +16,18 @@ O sistema ABEC Med agora usa **EXCLUSIVAMENTE** a API externa do AbecMed para au
 Adicione no seu arquivo `.env.local`:
 
 ```env
-BASE_URL=https://abecmed-api-hrgcn.ondigitalocean.app
+NEXT_PUBLIC_API_BASE_URL=https://abecmed-api.22aczq.easypanel.host
 NEXTAUTH_URL=http://localhost:3000
 NEXTAUTH_SECRET=your-secret-key-change-in-production
 ```
 
-**⚠️ IMPORTANTE:** Sem `BASE_URL` configurada, o sistema não funcionará.
+**⚠️ IMPORTANTE:** Sem `NEXT_PUBLIC_API_BASE_URL` configurada, o sistema não funcionará.
 
 ## 🔄 Fluxo de Autenticação
 
 ### Login Direto na API Externa
 
-**Endpoint:** `${BASE_URL}/api/auth/login`
+**Endpoint:** `${NEXT_PUBLIC_API_BASE_URL}/auth/login`
 **Método:** POST
 **Body:**
 
@@ -80,7 +80,7 @@ NEXTAUTH_SECRET=your-secret-key-change-in-production
 
 ### Se API Externa Não Estiver Configurada
 
-Se `BASE_URL` não estiver configurada, o sistema retornará:
+Se `NEXT_PUBLIC_API_BASE_URL` não estiver configurada, o sistema retornará:
 
 ```
 "Configuração da API externa não encontrada. Contate o administrador."
@@ -111,13 +111,13 @@ Se `BASE_URL` não estiver configurada, o sistema retornará:
 
 ### 1. Verificar Configuração
 
-Acesse: `http://localhost:3000/api/test-env`
+Verifique as configurações no arquivo `.env.local`
 
 **Esperado:**
 
 ```json
 {
-  "BASE_URL": "https://abecmed-api-hrgcn.ondigitalocean.app",
+  "NEXT_PUBLIC_API_BASE_URL": "https://abecmed-api.22aczq.easypanel.host",
   "NEXTAUTH_URL": "http://localhost:3000",
   "NEXTAUTH_SECRET": "Configurada"
 }
@@ -131,8 +131,8 @@ Acesse: `http://localhost:3000/api/test-env`
 
 ```
 🔍 [API Externa] Iniciando autenticação...
-🔍 [API Externa] BASE_URL: https://abecmed-api-hrgcn.ondigitalocean.app
-🌐 [API Externa] Endpoint: https://abecmed-api-hrgcn.ondigitalocean.app/api/auth/login
+🔍 [API Externa] NEXT_PUBLIC_API_BASE_URL: https://abecmed-api.22aczq.easypanel.host
+🌐 [API Externa] Endpoint: https://abecmed-api.22aczq.easypanel.host/auth/login
 📡 [API Externa] Status da resposta: 200
 ✅ [API Externa] Resposta recebida: {...}
 🎯 [API Externa] Usuário autenticado com sucesso: {...}
@@ -182,7 +182,7 @@ Email: usuario@exemplo.com
 
 ### "Configuração da API externa não encontrada"
 
-**Causa**: BASE_URL não configurada
+**Causa**: NEXT_PUBLIC_API_BASE_URL não configurada
 **Solução**: Verificar arquivo `.env.local`
 
 ### "Email ou senha incorretos"
@@ -197,4 +197,4 @@ Email: usuario@exemplo.com
 
 ---
 
-**Status:** ✅ Sistema simplificado usando APENAS API externa
+**Status:** ✅ Sistema atualizado para nova API: `https://abecmed-api.22aczq.easypanel.host`

@@ -11,18 +11,6 @@ const compat = new FlatCompat({
 
 const eslintConfig = [
   ...compat.extends("next/core-web-vitals", "next/typescript"),
-  {
-    ignores: ["**/pdf.worker.js"],
-  },
-  {
-    files: ["**/pdf.worker.js"],
-    rules: {
-      "@typescript-eslint/no-unused-vars": "off",
-      "@typescript-eslint/no-this-alias": "off",
-      "@typescript-eslint/no-unused-expressions": "off",
-      "@next/next/no-assign-module-variable": "off",
-    },
-  },
 ];
 
 export default eslintConfig;

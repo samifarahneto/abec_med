@@ -9,20 +9,11 @@ import {
   FaHome,
   FaUsers,
   FaCalendarAlt,
-  FaFileMedical,
-  FaShoppingCart,
-  FaPills,
-  FaOilCan,
-  FaFlask,
-  FaLeaf,
-  FaCookie,
   FaSignOutAlt,
   FaUserCircle,
-  FaBox,
   FaBars,
   FaCog,
 } from "react-icons/fa";
-import { useCarrinho } from "@/contexts/CarrinhoContext";
 import { useLayout } from "@/components/LayoutWrapper";
 
 interface LinkItem {
@@ -60,21 +51,6 @@ const profileLinks: Record<string, LinkItem[]> = {
       label: "Administradores",
       icon: <FaCog className="w-5 h-5" />,
     },
-    {
-      href: "/admin/receitas",
-      label: "Receitas",
-      icon: <FaFileMedical className="w-5 h-5" />,
-    },
-    {
-      href: "/admin/produto",
-      label: "Produto",
-      icon: <FaPills className="w-5 h-5" />,
-    },
-    {
-      href: "/admin/tipo-produto",
-      label: "Tipo de produto",
-      icon: <FaBox className="w-5 h-5" />,
-    },
   ],
   doctor: [
     {
@@ -87,32 +63,12 @@ const profileLinks: Record<string, LinkItem[]> = {
       label: "Pacientes",
       icon: <FaUsers className="w-5 h-5" />,
     },
-    {
-      href: "/medic/pedidos",
-      label: "Pedidos",
-      icon: <FaShoppingCart className="w-5 h-5" />,
-    },
-    {
-      href: "/medic/medicamentos",
-      label: "Medicamentos",
-      icon: <FaPills className="w-5 h-5" />,
-    },
   ],
   reception: [
     {
-      href: "/acolhimento/agendamentos",
-      label: "Agendamentos",
+      href: "/admin/acolhimento",
+      label: "Acolhimento",
       icon: <FaCalendarAlt className="w-5 h-5" />,
-    },
-    {
-      href: "/acolhimento/pacientes",
-      label: "Pacientes",
-      icon: <FaUsers className="w-5 h-5" />,
-    },
-    {
-      href: "/acolhimento/relatorios",
-      label: "Relatórios",
-      icon: <FaFileMedical className="w-5 h-5" />,
     },
   ],
   patient: [
@@ -120,43 +76,6 @@ const profileLinks: Record<string, LinkItem[]> = {
       href: "/paciente/dashboard",
       label: "Dashboard",
       icon: <FaHome className="w-5 h-5" />,
-    },
-    {
-      href: "/paciente/receitas",
-      label: "Receitas",
-      icon: <FaFileMedical className="w-5 h-5" />,
-    },
-    {
-      href: "/paciente/pedidos",
-      label: "Pedidos",
-      icon: <FaShoppingCart className="w-5 h-5" />,
-    },
-    {
-      href: "/paciente/medicamentos",
-      label: "Medicamentos",
-      icon: <FaPills className="w-5 h-5" />,
-      submenu: [
-        {
-          href: "/paciente/medicamentos/flowers",
-          label: "Flores",
-          icon: <FaLeaf className="w-4 h-4" />,
-        },
-        {
-          href: "/paciente/medicamentos/oils",
-          label: "Óleos",
-          icon: <FaOilCan className="w-4 h-4" />,
-        },
-        {
-          href: "/paciente/medicamentos/extracts",
-          label: "Concentrados",
-          icon: <FaFlask className="w-4 h-4" />,
-        },
-        {
-          href: "/paciente/medicamentos/eatables",
-          label: "Comestíveis",
-          icon: <FaCookie className="w-4 h-4" />,
-        },
-      ],
     },
   ],
 };
@@ -178,7 +97,6 @@ export default function Header() {
       // O usuário não está autenticado
     },
   });
-  const { quantidadeProdutos } = useCarrinho();
 
   // Usar o contexto do layout para o estado do sidebar
   const { isSidebarExpanded, setIsSidebarExpanded } = useLayout();
@@ -348,23 +266,8 @@ export default function Header() {
               </Link>
             </div>
 
-            {/* Área direita: Carrinho + Saudação + Menu do usuário */}
+            {/* Área direita: Saudação + Menu do usuário */}
             <div className="flex items-center space-x-2 sm:space-x-4">
-              {/* Carrinho de Compras (apenas para pacientes) */}
-              {role === "patient" && (
-                <Link
-                  href="/paciente/checkout"
-                  className="relative text-gray-600 hover:text-[#16829E] p-2"
-                >
-                  <FaShoppingCart className="w-5 h-5 sm:w-6 sm:h-6" />
-                  {quantidadeProdutos > 0 && (
-                    <span className="absolute -top-1 -right-1 bg-[#16829E] text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
-                      {quantidadeProdutos}
-                    </span>
-                  )}
-                </Link>
-              )}
-
               {/* Saudação + Menu do usuário */}
               <div className="flex items-center space-x-2 sm:space-x-3">
                 <span className="text-sm text-gray-700 hidden md:inline truncate max-w-[100px] lg:max-w-none">

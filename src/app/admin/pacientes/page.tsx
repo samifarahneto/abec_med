@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import {
   FaUser,
@@ -12,6 +12,30 @@ import {
 } from "react-icons/fa";
 import MainLayout from "@/components/MainLayout";
 import { Input, Table, Button } from "@/components/ui";
+import { useAuthSession } from "@/hooks/useAuthSession";
+
+// Interface para dados da API externa
+interface ApiPacienteData {
+  id: number | string;
+  identifier?: string;
+  name: string;
+  dateOfBirth: string;
+  cpf: string;
+  gender: string;
+  phone: string;
+  observations?: string;
+  status: "ACTIVE" | "INACTIVE" | "SUSPENDED";
+  email: string;
+  street?: string;
+  number?: string;
+  complement?: string;
+  neighborhood?: string;
+  cityId?: number;
+  stateId?: number;
+  zipCode?: string;
+  companyId?: number;
+  doctorId?: number;
+}
 
 interface Paciente extends Record<string, unknown> {
   id: string;
@@ -23,90 +47,145 @@ interface Paciente extends Record<string, unknown> {
   phone: string;
   observations: string;
   status: "ativo" | "inativo" | "suspenso";
+  email: string;
+  street: string;
+  number: string;
+  complement: string;
+  neighborhood: string;
+  city_id: number;
+  state_id: number;
+  zip_code: string;
+  company_id: number;
+  doctor_id: number;
 }
+
+// Função para mapear dados da API para o formato da interface
+const mapApiDataToPaciente = (apiData: ApiPacienteData): Paciente => {
+  console.log("🔄 Mapeando dados da API:", apiData);
+
+  const mapped = {
+    id: apiData.id?.toString() || "",
+    identifier: apiData.identifier || `PAC${apiData.id}`,
+    name: apiData.name || "",
+    date_of_birth: apiData.dateOfBirth || "",
+    cpf: apiData.cpf || "",
+    gender: apiData.gender || "",
+    phone: apiData.phone || "",
+    observations: apiData.observations || "",
+    status: (apiData.status === "ACTIVE"
+      ? "ativo"
+      : apiData.status === "INACTIVE"
+      ? "inativo"
+      : "suspenso") as "ativo" | "inativo" | "suspenso",
+    email: apiData.email || "",
+    street: apiData.street || "",
+    number: apiData.number || "",
+    complement: apiData.complement || "",
+    neighborhood: apiData.neighborhood || "",
+    city_id: apiData.cityId || 0,
+    state_id: apiData.stateId || 0,
+    zip_code: apiData.zipCode || "",
+    company_id: apiData.companyId || 0,
+    doctor_id: apiData.doctorId || 0,
+  };
+
+  console.log("✅ Dados mapeados:", mapped);
+  return mapped;
+};
 
 export default function PacientesPage() {
   const router = useRouter();
+  const { user, isAuthenticated } = useAuthSession();
   const [pacientes, setPacientes] = useState<Paciente[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    fetchPacientes();
-  }, []);
-
-  const fetchPacientes = async () => {
+  const fetchPacientes = useCallback(async () => {
     try {
       setLoading(true);
-      // Simulando dados enquanto não há API real
-      const mockPacientes: Paciente[] = [
-        {
-          id: "1",
-          identifier: "PAC001",
-          name: "Maria Silva Santos",
-          cpf: "123.456.789-00",
-          date_of_birth: "1985-03-15",
-          gender: "Feminino",
-          phone: "(11) 99999-9999",
-          observations: "Paciente regular, sem alergias conhecidas",
-          status: "ativo",
-        },
-        {
-          id: "2",
-          identifier: "PAC002",
-          name: "João Pedro Oliveira",
-          cpf: "987.654.321-00",
-          date_of_birth: "1990-07-22",
-          gender: "Masculino",
-          phone: "(11) 88888-8888",
-          observations: "Hipertensão controlada",
-          status: "ativo",
-        },
-        {
-          id: "3",
-          identifier: "PAC003",
-          name: "Ana Carolina Ferreira",
-          cpf: "456.789.123-00",
-          date_of_birth: "1978-12-03",
-          gender: "Feminino",
-          phone: "(11) 77777-7777",
-          observations: "Diabética tipo 2",
-          status: "inativo",
-        },
-        {
-          id: "4",
-          identifier: "PAC004",
-          name: "Roberto Lima Souza",
-          cpf: "789.123.456-00",
-          date_of_birth: "1965-05-18",
-          gender: "Masculino",
-          phone: "(11) 66666-6666",
-          observations: "Cardiopata, acompanhamento especial",
-          status: "suspenso",
-        },
-      ];
+      setError(null);
 
-      // Simular delay de API
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      setPacientes(mockPacientes);
+      if (!user?.accessToken) {
+        console.log("❌ Token de acesso não encontrado");
+        setError("Token de acesso não encontrado. Faça login novamente.");
+        return;
+      }
+
+      console.log("🚀 Buscando pacientes via proxy...");
+      console.log(`🔑 Token: ${user.accessToken?.substring(0, 20)}...`);
+
+      // Usar o proxy da API do Next.js para evitar problemas de CORS
+      const response = await fetch("/api/proxy/patients", {
+        method: "GET",
+      });
+
+      console.log(`📡 Status da resposta: ${response.status}`);
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log(`📊 Dados recebidos:`, data);
+
+        // Verificar se a resposta é um array de pacientes
+        if (Array.isArray(data) && data.length > 0) {
+          console.log(`✅ ${data.length} pacientes encontrados`);
+
+          // Mapear dados para o formato esperado
+          const pacientesMapeados = data.map(mapApiDataToPaciente);
+          setPacientes(pacientesMapeados);
+
+          console.log(
+            `✅ Pacientes carregados com sucesso:`,
+            pacientesMapeados
+          );
+        } else {
+          console.log("❌ Resposta não contém dados de pacientes:", data);
+          setError("Nenhum paciente encontrado.");
+        }
+      } else {
+        console.log(`❌ Erro na resposta: ${response.status}`);
+        const errorText = await response.text();
+        console.log(`❌ Erro detalhado:`, errorText);
+        setError(`Erro ao buscar pacientes (${response.status}): ${errorText}`);
+      }
     } catch (error) {
-      setError("Erro ao carregar pacientes");
-      console.error("Erro:", error);
+      console.error("❌ Erro ao carregar pacientes:", error);
+      setError(
+        "Erro ao carregar pacientes. Verifique sua conexão e tente novamente."
+      );
     } finally {
       setLoading(false);
     }
-  };
+  }, [user?.accessToken]);
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      fetchPacientes();
+    }
+  }, [isAuthenticated, fetchPacientes]);
 
   const handleDelete = async (id: string) => {
     if (!confirm("Tem certeza que deseja excluir este paciente?")) return;
 
     try {
-      // Aqui seria a chamada para a API real
-      setPacientes(pacientes.filter((p) => p.id !== id));
+      console.log(`🗑️ Deletando paciente ID: ${id}`);
+
+      const response = await fetch(`/api/proxy/patients?id=${id}`, {
+        method: "DELETE",
+      });
+
+      if (response.ok) {
+        console.log(`✅ Paciente deletado com sucesso`);
+        // Remover paciente da lista local
+        setPacientes(pacientes.filter((p) => p.id !== id));
+      } else {
+        const errorData = await response.json();
+        console.error(`❌ Erro ao deletar paciente:`, errorData);
+        setError(errorData.error || "Erro ao deletar paciente.");
+      }
     } catch (error) {
-      setError("Erro ao excluir paciente");
-      console.error("Erro:", error);
+      console.error("❌ Erro ao excluir paciente:", error);
+      setError("Erro ao excluir paciente. Tente novamente.");
     }
   };
 
@@ -120,7 +199,12 @@ export default function PacientesPage() {
   };
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString("pt-BR");
+    if (!dateString) return "";
+    try {
+      return new Date(dateString).toLocaleDateString("pt-BR");
+    } catch {
+      return dateString;
+    }
   };
 
   const getStatusBadge = (status: Paciente["status"]) => {
@@ -142,7 +226,7 @@ export default function PacientesPage() {
       },
     };
 
-    const config = statusConfig[status];
+    const config = statusConfig[status] || statusConfig.inativo;
 
     return (
       <span
@@ -163,7 +247,8 @@ export default function PacientesPage() {
         .toLowerCase()
         .includes(searchTerm.toLowerCase()) ||
       String(paciente.cpf).includes(searchTerm) ||
-      String(paciente.phone).includes(searchTerm)
+      String(paciente.phone).includes(searchTerm) ||
+      String(paciente.email).toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const columns = [
@@ -175,6 +260,7 @@ export default function PacientesPage() {
           <div className="text-gray-900 text-sm font-medium">
             {String(paciente.name)}
           </div>
+          <div className="text-gray-500 text-xs">{String(paciente.email)}</div>
         </div>
       ),
     },
@@ -193,6 +279,15 @@ export default function PacientesPage() {
       render: (paciente: Paciente) => (
         <span className="text-gray-900 text-sm font-medium">
           {formatDate(String(paciente.date_of_birth))}
+        </span>
+      ),
+    },
+    {
+      key: "phone" as keyof Paciente,
+      header: "Telefone",
+      render: (paciente: Paciente) => (
+        <span className="text-gray-900 text-sm font-medium">
+          {String(paciente.phone)}
         </span>
       ),
     },
@@ -225,6 +320,24 @@ export default function PacientesPage() {
     },
   ];
 
+  // Verificar se o usuário está autenticado
+  if (!isAuthenticated) {
+    return (
+      <MainLayout>
+        <div className="flex items-center justify-center min-h-64">
+          <div className="text-center">
+            <p className="text-gray-600 mb-4">
+              Você precisa estar logado para acessar esta página.
+            </p>
+            <Button onClick={() => router.push("/login")} variant="primary">
+              Fazer Login
+            </Button>
+          </div>
+        </div>
+      </MainLayout>
+    );
+  }
+
   return (
     <MainLayout>
       <div className="space-y-6">
@@ -244,7 +357,7 @@ export default function PacientesPage() {
             <div className="relative flex-1">
               <Input
                 type="text"
-                placeholder="Buscar por nome, identificador, CPF ou telefone..."
+                placeholder="Buscar por nome, identificador, CPF, telefone ou email..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="pl-10"
@@ -267,6 +380,15 @@ export default function PacientesPage() {
         {error && (
           <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
             {error}
+            <button
+              onClick={() => {
+                setError(null);
+                fetchPacientes();
+              }}
+              className="ml-2 underline hover:no-underline"
+            >
+              Tentar novamente
+            </button>
           </div>
         )}
 
@@ -346,6 +468,9 @@ export default function PacientesPage() {
                     <h3 className="text-gray-900 text-sm font-medium">
                       {String(paciente.name)}
                     </h3>
+                    <p className="text-gray-500 text-xs">
+                      {String(paciente.email)}
+                    </p>
                   </div>
                 </div>
                 {getStatusBadge(

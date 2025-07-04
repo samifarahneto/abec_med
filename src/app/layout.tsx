@@ -3,7 +3,6 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import LayoutWrapper from "@/components/LayoutWrapper";
 import AuthProvider from "@/providers/AuthProvider";
-import { CarrinhoProvider } from "@/contexts/CarrinhoContext";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -16,7 +15,10 @@ export const metadata: Metadata = {
 if (process.env.NODE_ENV === "development") {
   const originalError = console.error;
   console.error = (...args) => {
-    if (args[0]?.includes("Warning: A tree hydrated but some attributes")) {
+    if (
+      typeof args[0] === "string" &&
+      args[0].includes("Warning: A tree hydrated but some attributes")
+    ) {
       return;
     }
     originalError.call(console, ...args);
@@ -32,9 +34,7 @@ export default function RootLayout({
     <html lang="pt-BR" suppressHydrationWarning>
       <body className={inter.className} suppressHydrationWarning>
         <AuthProvider>
-          <CarrinhoProvider>
-            <LayoutWrapper>{children}</LayoutWrapper>
-          </CarrinhoProvider>
+          <LayoutWrapper>{children}</LayoutWrapper>
         </AuthProvider>
       </body>
     </html>
