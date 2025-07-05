@@ -93,6 +93,31 @@ const mapApiDataToPaciente = (apiData: ApiPacienteData): Paciente => {
   return mapped;
 };
 
+// Função utilitária para formatar CPF
+function formatCpf(cpf: string) {
+  if (!cpf) return "";
+  const digits = cpf.replace(/\D/g, "");
+  if (digits.length === 11) {
+    return `${digits.slice(0, 3)}.${digits.slice(3, 6)}.${digits.slice(
+      6,
+      9
+    )}-${digits.slice(9)}`;
+  }
+  return cpf;
+}
+
+// Função utilitária para formatar telefone
+function formatPhone(phone: string) {
+  if (!phone) return "";
+  const digits = phone.replace(/\D/g, "");
+  if (digits.length === 11) {
+    return `(${digits.slice(0, 2)})${digits.slice(2, 7)}-${digits.slice(7)}`;
+  } else if (digits.length === 10) {
+    return `(${digits.slice(0, 2)})${digits.slice(2, 6)}-${digits.slice(6)}`;
+  }
+  return phone;
+}
+
 export default function PacientesPage() {
   const router = useRouter();
   const { user, isAuthenticated } = useAuthSession();
@@ -491,7 +516,9 @@ export default function PacientesPage() {
                 key: "cpf",
                 header: "CPF",
                 render: (paciente) => (
-                  <span className="text-sm text-gray-700">{paciente.cpf}</span>
+                  <span className="text-sm text-gray-700">
+                    {formatCpf(paciente.cpf)}
+                  </span>
                 ),
               },
               {
@@ -508,7 +535,7 @@ export default function PacientesPage() {
                 header: "Telefone",
                 render: (paciente) => (
                   <span className="text-sm text-gray-700">
-                    {paciente.phone}
+                    {formatPhone(paciente.phone)}
                   </span>
                 ),
               },

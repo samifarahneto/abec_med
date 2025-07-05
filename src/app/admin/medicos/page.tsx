@@ -23,7 +23,7 @@ interface ApiMedicoData {
   documentDoctorUf: string;
   phone: string;
   email: string;
-  status: "ACTIVE" | "INACTIVE";
+  status: "ACTIVE" | "INACTIVE" | "PENDING";
   created_at: string;
 }
 
@@ -60,6 +60,22 @@ const mapApiDataToMedico = (apiData: ApiMedicoData): Medico => {
   console.log("✅ Dados mapeados:", mapped);
   return mapped;
 };
+
+// Função utilitária para formatar telefone
+function formatPhone(phone: string) {
+  if (!phone) return "";
+  // Remove tudo que não for dígito
+  const digits = phone.replace(/\D/g, "");
+  if (digits.length === 11) {
+    // Formato celular: (XX)XXXXX-XXXX
+    return `(${digits.slice(0, 2)})${digits.slice(2, 7)}-${digits.slice(7)}`;
+  } else if (digits.length === 10) {
+    // Formato fixo: (XX)XXXX-XXXX
+    return `(${digits.slice(0, 2)})${digits.slice(2, 6)}-${digits.slice(6)}`;
+  }
+  // Retorna o valor original se não bater com os padrões
+  return phone;
+}
 
 export default function MedicosPage() {
   const router = useRouter();
@@ -108,8 +124,13 @@ export default function MedicosPage() {
         if (filters?.cpf) params.append("cpf", filters.cpf);
         if (filters?.name) params.append("name", filters.name);
         if (filters?.phone) params.append("phone", filters.phone);
-        if (filters?.documentDoctorType)
+        if (filters?.documentDoctorType) {
+          console.log(
+            "🔍 Adicionando documentDoctorType:",
+            filters.documentDoctorType
+          );
           params.append("documentDoctorType", filters.documentDoctorType);
+        }
         if (filters?.documentDoctorNumber)
           params.append("documentDoctorNumber", filters.documentDoctorNumber);
         if (filters?.email) params.append("email", filters.email);
@@ -120,6 +141,8 @@ export default function MedicosPage() {
               ? "ACTIVE"
               : filters.status === "inativo"
               ? "INACTIVE"
+              : filters.status === "pendente"
+              ? "PENDING"
               : "";
           if (apiStatus) params.append("status", apiStatus);
         }
@@ -128,6 +151,7 @@ export default function MedicosPage() {
           params.toString() ? `?${params.toString()}` : ""
         }`;
         console.log(`📡 URL da requisição: ${url}`);
+        console.log(`📡 Parâmetros enviados:`, params.toString());
 
         // Usar o proxy da API do Next.js para evitar problemas de CORS
         const response = await fetch(url, {
@@ -145,10 +169,44 @@ export default function MedicosPage() {
             console.log(`✅ ${data.length} médicos encontrados`);
 
             // Mapear dados para o formato esperado
-            const medicosMapeados = data.map(mapApiDataToMedico);
+            let medicosMapeados = data.map(mapApiDataToMedico);
+
+            // Aplicar filtro local se necessário (quando a API externa não filtra)
+            if (filters?.documentDoctorType) {
+              const medicosFiltrados = medicosMapeados.filter(
+                (medico) =>
+                  medico.documentDoctorType === filters.documentDoctorType
+              );
+              console.log(
+                `🔍 Filtro local aplicado: ${filters.documentDoctorType}`
+              );
+              console.log(
+                `🔍 Médicos antes do filtro: ${medicosMapeados.length}`
+              );
+              console.log(`🔍 Médicos após filtro: ${medicosFiltrados.length}`);
+              medicosMapeados = medicosFiltrados;
+            }
+
             setMedicos(medicosMapeados);
 
             console.log(`✅ Médicos carregados com sucesso:`, medicosMapeados);
+
+            // Log adicional para verificar os tipos de documento
+            console.log(
+              "🔍 Tipos de documento encontrados:",
+              medicosMapeados.map((m) => m.documentDoctorType)
+            );
+
+            // Verificar se o filtro está funcionando
+            if (filters?.documentDoctorType) {
+              const filteredByType = medicosMapeados.filter(
+                (m) => m.documentDoctorType === filters.documentDoctorType
+              );
+              console.log(
+                `🔍 Médicos filtrados por tipo ${filters.documentDoctorType}:`,
+                filteredByType.length
+              );
+            }
           } else {
             console.log("❌ Resposta não contém dados de médicos:", data);
             setMedicos([]);
@@ -227,14 +285,21 @@ export default function MedicosPage() {
     if (filterCpf.trim()) filters.cpf = filterCpf.trim();
     if (filterName.trim()) filters.name = filterName.trim();
     if (filterPhone.trim()) filters.phone = filterPhone.trim();
-    if (filterDocumentDoctorType.trim())
+    if (filterDocumentDoctorType.trim()) {
+      console.log(
+        "🔍 Adicionando filtro documentDoctorType:",
+        filterDocumentDoctorType.trim()
+      );
       filters.documentDoctorType = filterDocumentDoctorType.trim();
+    }
     if (filterDocumentDoctorNumber.trim())
       filters.documentDoctorNumber = filterDocumentDoctorNumber.trim();
     if (filterEmail.trim()) filters.email = filterEmail.trim();
     if (filterStatus) filters.status = filterStatus;
 
     console.log("🔍 Filtros aplicados:", filters);
+    console.log("🔍 Tipo de documento selecionado:", filterDocumentDoctorType);
+    console.log("🔍 Estado atual do filtro:", filterDocumentDoctorType);
     fetchMedicos(filters);
   };
 
@@ -378,7 +443,14 @@ export default function MedicosPage() {
               <FormSelect
                 label="Tipo de Documento"
                 value={filterDocumentDoctorType}
-                onChange={(e) => setFilterDocumentDoctorType(e.target.value)}
+                onChange={(e) => {
+                  console.log(
+                    "🔍 Tipo de documento selecionado:",
+                    e.target.value
+                  );
+                  console.log("🔍 Valor anterior:", filterDocumentDoctorType);
+                  setFilterDocumentDoctorType(e.target.value);
+                }}
                 options={[
                   { value: "", label: "Todos os tipos" },
                   { value: "CRM", label: "CRM" },
@@ -411,6 +483,7 @@ export default function MedicosPage() {
                   { value: "", label: "Todos os status" },
                   { value: "ativo", label: "Ativo" },
                   { value: "inativo", label: "Inativo" },
+                  { value: "pendente", label: "Pendente" },
                 ]}
               />
             </div>
@@ -490,7 +563,9 @@ export default function MedicosPage() {
                 key: "phone",
                 header: "Telefone",
                 render: (medico) => (
-                  <span className="text-sm text-gray-700">{medico.phone}</span>
+                  <span className="text-sm text-gray-700">
+                    {formatPhone(medico.phone)}
+                  </span>
                 ),
               },
               {
