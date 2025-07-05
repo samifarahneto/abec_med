@@ -1,250 +1,436 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import {
-  FaUserMd,
-  FaStethoscope,
-  FaGraduationCap,
-  FaUserCheck,
-  FaPlus,
-  FaSearch,
-  FaEdit,
-  FaTrash,
-} from "react-icons/fa";
+import { useState, useEffect, useCallback } from "react";
+import { useRouter } from "next/navigation";
 import MainLayout from "@/components/MainLayout";
-import { Input, Table, Button } from "@/components/ui";
+import FormInput from "@/components/ui/FormInput";
+import FormSelect from "@/components/ui/FormSelect";
+import { Table } from "@/components/ui/Table";
+import ButtonComponent from "@/components/ui/Button";
+import { useAuthSession } from "@/hooks/useAuthSession";
+import AddIcon from "@mui/icons-material/Add";
+import SearchIcon from "@mui/icons-material/Search";
+import VisibilityIcon from "@mui/icons-material/Visibility";
+import EditIcon from "@mui/icons-material/Edit";
+import DeleteIcon from "@mui/icons-material/Delete";
+
+// Interface para dados da API externa
+interface ApiMedicoData {
+  id: number | string;
+  name: string;
+  documentDoctorType: string;
+  documentDoctorNumber: string;
+  documentDoctorUf: string;
+  phone: string;
+  email: string;
+  status: "ACTIVE" | "INACTIVE";
+  created_at: string;
+}
 
 interface Medico extends Record<string, unknown> {
   id: string;
-  nome: string;
-  crm: string;
-  especialidade: string;
-  telefone: string;
+  name: string;
+  documentDoctorType: string;
+  documentDoctorNumber: string;
+  documentDoctorUf: string;
+  phone: string;
   email: string;
-  permissoes: ("THC" | "CBD")[];
-  status: "ativo" | "inativo";
-  data_cadastro: string;
+  status: "ativo" | "inativo" | "pendente";
+  created_at: string;
 }
 
+// Função para mapear dados da API para o formato da interface
+const mapApiDataToMedico = (apiData: ApiMedicoData): Medico => {
+  console.log("🔄 Mapeando dados da API:", apiData);
+
+  const mapped = {
+    id: apiData.id?.toString() || "",
+    name: apiData.name || "",
+    documentDoctorType: apiData.documentDoctorType || "",
+    documentDoctorNumber: apiData.documentDoctorNumber || "",
+    documentDoctorUf: apiData.documentDoctorUf || "",
+    phone: apiData.phone || "",
+    email: apiData.email || "",
+    status: (apiData.status === "ACTIVE" ? "ativo" : "inativo") as
+      | "ativo"
+      | "inativo",
+    created_at: apiData.created_at || "",
+  };
+
+  console.log("✅ Dados mapeados:", mapped);
+  return mapped;
+};
+
 export default function MedicosPage() {
+  const router = useRouter();
+  const { user, isAuthenticated } = useAuthSession();
   const [medicos, setMedicos] = useState<Medico[]>([]);
-  const [searchTerm, setSearchTerm] = useState("");
+
+  // Estados dos filtros
+  const [filterCpf, setFilterCpf] = useState<string>("");
+  const [filterName, setFilterName] = useState<string>("");
+  const [filterPhone, setFilterPhone] = useState<string>("");
+  const [filterDocumentDoctorType, setFilterDocumentDoctorType] =
+    useState<string>("");
+  const [filterDocumentDoctorNumber, setFilterDocumentDoctorNumber] =
+    useState<string>("");
+  const [filterEmail, setFilterEmail] = useState<string>("");
+  const [filterStatus, setFilterStatus] = useState<string>("");
+
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  const fetchMedicos = useCallback(
+    async (filters?: {
+      cpf?: string;
+      name?: string;
+      phone?: string;
+      documentDoctorType?: string;
+      documentDoctorNumber?: string;
+      email?: string;
+      status?: string;
+    }) => {
+      try {
+        setLoading(true);
+        setError(null);
+
+        if (!user?.accessToken) {
+          console.log("❌ Token de acesso não encontrado");
+          setError("Token de acesso não encontrado. Faça login novamente.");
+          return;
+        }
+
+        console.log("🚀 Buscando médicos via proxy...");
+        console.log(`🔑 Token: ${user.accessToken?.substring(0, 20)}...`);
+
+        // Construir query parameters
+        const params = new URLSearchParams();
+        if (filters?.cpf) params.append("cpf", filters.cpf);
+        if (filters?.name) params.append("name", filters.name);
+        if (filters?.phone) params.append("phone", filters.phone);
+        if (filters?.documentDoctorType)
+          params.append("documentDoctorType", filters.documentDoctorType);
+        if (filters?.documentDoctorNumber)
+          params.append("documentDoctorNumber", filters.documentDoctorNumber);
+        if (filters?.email) params.append("email", filters.email);
+        if (filters?.status) {
+          // Converter status para formato da API
+          const apiStatus =
+            filters.status === "ativo"
+              ? "ACTIVE"
+              : filters.status === "inativo"
+              ? "INACTIVE"
+              : "";
+          if (apiStatus) params.append("status", apiStatus);
+        }
+
+        const url = `/api/proxy/doctors${
+          params.toString() ? `?${params.toString()}` : ""
+        }`;
+        console.log(`📡 URL da requisição: ${url}`);
+
+        // Usar o proxy da API do Next.js para evitar problemas de CORS
+        const response = await fetch(url, {
+          method: "GET",
+        });
+
+        console.log(`📡 Status da resposta: ${response.status}`);
+
+        if (response.ok) {
+          const data = await response.json();
+          console.log(`📊 Dados recebidos:`, data);
+
+          // Verificar se a resposta é um array de médicos
+          if (Array.isArray(data) && data.length > 0) {
+            console.log(`✅ ${data.length} médicos encontrados`);
+
+            // Mapear dados para o formato esperado
+            const medicosMapeados = data.map(mapApiDataToMedico);
+            setMedicos(medicosMapeados);
+
+            console.log(`✅ Médicos carregados com sucesso:`, medicosMapeados);
+          } else {
+            console.log("❌ Resposta não contém dados de médicos:", data);
+            setMedicos([]);
+          }
+        } else {
+          console.log(`❌ Erro na resposta: ${response.status}`);
+          const errorText = await response.text();
+          console.log(`❌ Erro detalhado:`, errorText);
+          setError(`Erro ao buscar médicos (${response.status}): ${errorText}`);
+        }
+      } catch (error) {
+        console.error("❌ Erro ao carregar médicos:", error);
+        setError(
+          "Erro ao carregar médicos. Verifique sua conexão e tente novamente."
+        );
+      } finally {
+        setLoading(false);
+      }
+    },
+    [user?.accessToken]
+  );
+
   useEffect(() => {
-    fetchMedicos();
-  }, []);
-
-  const fetchMedicos = async () => {
-    try {
-      setLoading(true);
-      // Simulando dados de médicos
-      const mockMedicos: Medico[] = [
-        {
-          id: "1",
-          nome: "Dr. João Carvalho",
-          crm: "CRM/SP 123456",
-          especialidade: "Neurologia",
-          telefone: "(11) 99999-1111",
-          email: "joao.carvalho@abecmed.com.br",
-          permissoes: ["THC", "CBD"],
-          status: "ativo",
-          data_cadastro: "2024-01-10",
-        },
-        {
-          id: "2",
-          nome: "Dra. Ana Santos",
-          crm: "CRM/SP 789012",
-          especialidade: "Cardiologia",
-          telefone: "(11) 99999-2222",
-          email: "ana.santos@abecmed.com.br",
-          permissoes: ["CBD"],
-          status: "ativo",
-          data_cadastro: "2024-01-12",
-        },
-        {
-          id: "3",
-          nome: "Dr. Carlos Silva",
-          crm: "CRM/SP 345678",
-          especialidade: "Psiquiatria",
-          telefone: "(11) 99999-3333",
-          email: "carlos.silva@abecmed.com.br",
-          permissoes: ["THC", "CBD"],
-          status: "ativo",
-          data_cadastro: "2024-01-15",
-        },
-        {
-          id: "4",
-          nome: "Dra. Marina Costa",
-          crm: "CRM/SP 901234",
-          especialidade: "Oncologia",
-          telefone: "(11) 99999-4444",
-          email: "marina.costa@abecmed.com.br",
-          permissoes: ["THC"],
-          status: "inativo",
-          data_cadastro: "2024-01-08",
-        },
-      ];
-
-      // Simular delay de API
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      setMedicos(mockMedicos);
-    } catch (error) {
-      setError("Erro ao carregar médicos");
-      console.error("Erro:", error);
-    } finally {
-      setLoading(false);
+    if (isAuthenticated) {
+      fetchMedicos();
     }
-  };
-
-  const getPermissoesBadges = (permissoes: Medico["permissoes"]) => {
-    const permissaoConfig = {
-      THC: {
-        color: "bg-purple-500",
-        text: "THC",
-        bgClass: "bg-purple-50 text-purple-700 border-purple-200",
-      },
-      CBD: {
-        color: "bg-green-500",
-        text: "CBD",
-        bgClass: "bg-green-50 text-green-700 border-green-200",
-      },
-    };
-
-    return (
-      <div className="flex flex-wrap gap-1 justify-center">
-        {permissoes.map((permissao) => {
-          const config = permissaoConfig[permissao];
-          return (
-            <span
-              key={permissao}
-              className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium border ${config.bgClass}`}
-            >
-              <span
-                className={`w-2 h-2 ${config.color} rounded-full mr-1`}
-              ></span>
-              {config.text}
-            </span>
-          );
-        })}
-      </div>
-    );
-  };
-
-  const handleEdit = (medico: Medico) => {
-    // Aqui seria redirecionado para página de edição do médico
-    console.log("Editar médico:", medico);
-  };
+  }, [isAuthenticated, fetchMedicos]);
 
   const handleDelete = async (id: string) => {
     if (!confirm("Tem certeza que deseja excluir este médico?")) return;
 
     try {
-      // Aqui seria a chamada para a API real
-      setMedicos(medicos.filter((m) => m.id !== id));
+      console.log(`🗑️ Deletando médico ID: ${id}`);
+
+      const response = await fetch(`/api/proxy/doctors?id=${id}`, {
+        method: "DELETE",
+      });
+
+      if (response.ok) {
+        console.log(`✅ Médico deletado com sucesso`);
+        // Remover médico da lista local
+        setMedicos(medicos.filter((m) => m.id !== id));
+      } else {
+        const errorData = await response.json();
+        console.error(`❌ Erro ao deletar médico:`, errorData);
+        setError(errorData.error || "Erro ao deletar médico.");
+      }
     } catch (error) {
-      setError("Erro ao excluir médico");
-      console.error("Erro:", error);
+      console.error("❌ Erro ao excluir médico:", error);
+      setError("Erro ao excluir médico. Tente novamente.");
     }
   };
 
-  const filteredMedicos = medicos.filter(
-    (medico) =>
-      String(medico.nome).toLowerCase().includes(searchTerm.toLowerCase()) ||
-      String(medico.crm).toLowerCase().includes(searchTerm.toLowerCase()) ||
-      String(medico.especialidade)
-        .toLowerCase()
-        .includes(searchTerm.toLowerCase()) ||
-      String(medico.email).toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const handleEdit = (medico: Medico) => {
+    router.push(`/admin/medicos/${medico.id}`);
+  };
 
-  const columns = [
-    {
-      key: "nome" as keyof Medico,
-      header: "Nome",
-      render: (medico: Medico) => (
-        <span className="text-gray-900 text-sm font-medium">
-          {String(medico.nome)}
-        </span>
-      ),
-    },
-    {
-      key: "crm" as keyof Medico,
-      header: "CRM",
-      render: (medico: Medico) => (
-        <span className="text-gray-900 text-sm font-medium">
-          {String(medico.crm)}
-        </span>
-      ),
-    },
-    {
-      key: "especialidade" as keyof Medico,
-      header: "Especialidade",
-      render: (medico: Medico) => (
-        <span className="text-gray-900 text-sm font-medium">
-          {String(medico.especialidade)}
-        </span>
-      ),
-    },
-    {
-      key: "permissoes" as keyof Medico,
-      header: "Permissões",
-      render: (medico: Medico) =>
-        getPermissoesBadges(medico.permissoes as ("THC" | "CBD")[]),
-    },
-  ];
+  const handleView = (medico: Medico) => {
+    // Aqui seria redirecionado para página de visualização
+    console.log("Visualizar médico:", medico);
+  };
 
-  const actions = [
-    {
-      label: "Editar",
-      icon: <FaEdit className="w-4 h-4" />,
-      onClick: handleEdit,
-      variant: "primary" as const,
-    },
-    {
-      label: "Excluir",
-      icon: <FaTrash className="w-4 h-4" />,
-      onClick: (medico: Medico) => handleDelete(medico.id),
-      variant: "danger" as const,
-    },
-  ];
+  // Função para executar pesquisa com filtros
+  const handleSearch = () => {
+    const filters: {
+      cpf?: string;
+      name?: string;
+      phone?: string;
+      documentDoctorType?: string;
+      documentDoctorNumber?: string;
+      email?: string;
+      status?: string;
+    } = {};
+
+    // Adicionar apenas filtros que não estão vazios
+    if (filterCpf.trim()) filters.cpf = filterCpf.trim();
+    if (filterName.trim()) filters.name = filterName.trim();
+    if (filterPhone.trim()) filters.phone = filterPhone.trim();
+    if (filterDocumentDoctorType.trim())
+      filters.documentDoctorType = filterDocumentDoctorType.trim();
+    if (filterDocumentDoctorNumber.trim())
+      filters.documentDoctorNumber = filterDocumentDoctorNumber.trim();
+    if (filterEmail.trim()) filters.email = filterEmail.trim();
+    if (filterStatus) filters.status = filterStatus;
+
+    console.log("🔍 Filtros aplicados:", filters);
+    fetchMedicos(filters);
+  };
+
+  // Função para limpar filtros
+  const handleClearFilters = () => {
+    setFilterCpf("");
+    setFilterName("");
+    setFilterPhone("");
+    setFilterDocumentDoctorType("");
+    setFilterDocumentDoctorNumber("");
+    setFilterEmail("");
+    setFilterStatus("");
+    fetchMedicos(); // Buscar todos os médicos
+  };
+
+  // Verificar se o usuário está autenticado
+  if (!isAuthenticated) {
+    return (
+      <MainLayout>
+        <div className="flex items-center justify-center min-h-64">
+          <div className="text-center">
+            <p className="text-gray-600 mb-4">
+              Você precisa estar logado para acessar esta página.
+            </p>
+            <ButtonComponent
+              onClick={() => router.push("/login")}
+              variant="primary"
+              size="md"
+            >
+              Fazer Login
+            </ButtonComponent>
+          </div>
+        </div>
+      </MainLayout>
+    );
+  }
 
   return (
     <MainLayout>
-      <div className="space-y-6">
-        {/* Header */}
-        <div className="flex flex-col gap-4">
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900">Médicos</h1>
-            <p className="text-gray-600 text-sm font-medium mt-1">
-              Gerencie os médicos cadastrados no sistema
-            </p>
-          </div>
+      <div className="space-y-6 bg-[#f5f7fa] min-h-screen p-2 md:p-6">
+        {/* Header Section */}
+        <div className="bg-white p-6 rounded-xl shadow-sm border flex flex-col gap-1">
+          <h1 className="text-2xl font-bold text-gray-900 mb-1">
+            Gerenciar Médicos
+          </h1>
+          <p className="text-gray-600 text-sm">
+            Visualize e gerencie todos os médicos cadastrados no sistema
+          </p>
+        </div>
 
-          {/* Search and Add Button */}
-          <div className="flex flex-col sm:flex-row gap-4">
-            <div className="relative flex-1">
-              <Input
-                type="text"
-                placeholder="Buscar por nome, CRM, especialidade ou email..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10"
-              />
-              <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+        {/* Stats Section */}
+        {!loading && (
+          <div className="bg-white p-6 rounded-xl shadow-sm border">
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
+              <h3 className="text-lg font-semibold text-gray-900 mb-2 md:mb-0">
+                Resumo dos Médicos
+              </h3>
+              <ButtonComponent
+                onClick={() => router.push("/admin/medicos/novo")}
+                variant="success"
+                size="md"
+                icon={<AddIcon fontSize="small" />}
+              >
+                Novo Médico
+              </ButtonComponent>
             </div>
-            <Button
-              onClick={() => {
-                /* Funcionalidade para cadastrar novo médico */
-              }}
-              icon={<FaPlus />}
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+              <div className="bg-[#f7fafc] p-6 rounded-xl border border-[#e2e8f0] text-center flex flex-col items-center">
+                <div className="w-3 h-3 bg-blue-600 rounded-full mb-2"></div>
+                <div className="text-2xl font-bold text-gray-900 mb-1">
+                  {medicos.length}
+                </div>
+                <div className="text-xs text-gray-600 uppercase tracking-wider">
+                  Total
+                </div>
+              </div>
+              <div className="bg-[#f7fafc] p-6 rounded-xl border border-[#e2e8f0] text-center flex flex-col items-center">
+                <div className="w-3 h-3 bg-green-600 rounded-full mb-2"></div>
+                <div className="text-2xl font-bold text-gray-900 mb-1">
+                  {medicos.filter((m) => m.status === "ativo").length}
+                </div>
+                <div className="text-xs text-gray-600 uppercase tracking-wider">
+                  Ativos
+                </div>
+              </div>
+              <div className="bg-[#f7fafc] p-6 rounded-xl border border-[#e2e8f0] text-center flex flex-col items-center">
+                <div className="w-3 h-3 bg-yellow-600 rounded-full mb-2"></div>
+                <div className="text-2xl font-bold text-gray-900 mb-1">
+                  {medicos.filter((m) => m.status === "inativo").length}
+                </div>
+                <div className="text-xs text-gray-600 uppercase tracking-wider">
+                  Inativos
+                </div>
+              </div>
+              <div className="bg-[#f7fafc] p-6 rounded-xl border border-[#e2e8f0] text-center flex flex-col items-center">
+                <div className="w-3 h-3 bg-orange-600 rounded-full mb-2"></div>
+                <div className="text-2xl font-bold text-gray-900 mb-1">
+                  {medicos.filter((m) => m.status === "pendente").length}
+                </div>
+                <div className="text-xs text-gray-600 uppercase tracking-wider">
+                  Pendentes
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Filters Section */}
+        <div className="bg-white p-6 rounded-xl shadow-sm border">
+          <div className="mb-4">
+            <h3 className="text-lg font-semibold text-gray-900">
+              Filtros de Pesquisa
+            </h3>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-5">
+            <div className="form-group">
+              <FormInput
+                label="CPF"
+                value={filterCpf}
+                onChange={(e) => setFilterCpf(e.target.value)}
+                placeholder="000.000.000-00"
+              />
+            </div>
+            <div className="form-group">
+              <FormInput
+                label="Nome"
+                value={filterName}
+                onChange={(e) => setFilterName(e.target.value)}
+                placeholder="Nome do médico"
+              />
+            </div>
+            <div className="form-group">
+              <FormInput
+                label="Telefone"
+                value={filterPhone}
+                onChange={(e) => setFilterPhone(e.target.value)}
+                placeholder="(00) 00000-0000"
+              />
+            </div>
+            <div className="form-group">
+              <FormSelect
+                label="Tipo de Documento"
+                value={filterDocumentDoctorType}
+                onChange={(e) => setFilterDocumentDoctorType(e.target.value)}
+                options={[
+                  { value: "", label: "Todos os tipos" },
+                  { value: "CRM", label: "CRM" },
+                  { value: "CRMV", label: "CRMV" },
+                ]}
+              />
+            </div>
+            <div className="form-group">
+              <FormInput
+                label="Número do Documento"
+                value={filterDocumentDoctorNumber}
+                onChange={(e) => setFilterDocumentDoctorNumber(e.target.value)}
+                placeholder="Número do documento"
+              />
+            </div>
+            <div className="form-group">
+              <FormInput
+                label="Email"
+                value={filterEmail}
+                onChange={(e) => setFilterEmail(e.target.value)}
+                placeholder="exemplo@email.com"
+              />
+            </div>
+            <div className="form-group">
+              <FormSelect
+                label="Status"
+                value={filterStatus}
+                onChange={(e) => setFilterStatus(e.target.value)}
+                options={[
+                  { value: "", label: "Todos os status" },
+                  { value: "ativo", label: "Ativo" },
+                  { value: "inativo", label: "Inativo" },
+                ]}
+              />
+            </div>
+          </div>
+          <div className="flex justify-end gap-3">
+            <ButtonComponent
+              onClick={handleSearch}
               variant="primary"
               size="md"
-              className="whitespace-nowrap"
+              icon={<SearchIcon fontSize="small" />}
             >
-              Cadastrar Médico
-            </Button>
+              Pesquisar
+            </ButtonComponent>
+            <ButtonComponent
+              onClick={handleClearFilters}
+              variant="secondary"
+              size="md"
+            >
+              Limpar Filtros
+            </ButtonComponent>
           </div>
         </div>
 
@@ -252,137 +438,101 @@ export default function MedicosPage() {
         {error && (
           <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
             {error}
+            <ButtonComponent
+              onClick={() => {
+                setError(null);
+                fetchMedicos();
+              }}
+              variant="outline"
+              size="sm"
+              className="ml-2"
+            >
+              Tentar novamente
+            </ButtonComponent>
           </div>
         )}
 
-        {/* Stats Cards */}
-        {!loading && (
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <div className="bg-white p-4 rounded-lg shadow-sm border">
-              <div className="flex items-center">
-                <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
-                  <FaUserMd className="w-4 h-4 text-blue-600" />
-                </div>
-                <div className="ml-3">
-                  <p className="text-sm font-medium text-gray-600">Total</p>
-                  <p className="text-xl font-bold text-gray-900">
-                    {medicos.length}
-                  </p>
-                </div>
-              </div>
-            </div>
-            <div className="bg-white p-4 rounded-lg shadow-sm border">
-              <div className="flex items-center">
-                <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
-                  <FaUserCheck className="w-4 h-4 text-green-600" />
-                </div>
-                <div className="ml-3">
-                  <p className="text-sm font-medium text-gray-600">Ativos</p>
-                  <p className="text-xl font-bold text-gray-900">
-                    {medicos.filter((m) => m.status === "ativo").length}
-                  </p>
-                </div>
-              </div>
-            </div>
-            <div className="bg-white p-4 rounded-lg shadow-sm border">
-              <div className="flex items-center">
-                <div className="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center">
-                  <FaStethoscope className="w-4 h-4 text-purple-600" />
-                </div>
-                <div className="ml-3">
-                  <p className="text-sm font-medium text-gray-600">Com THC</p>
-                  <p className="text-xl font-bold text-gray-900">
-                    {medicos.filter((m) => m.permissoes.includes("THC")).length}
-                  </p>
-                </div>
-              </div>
-            </div>
-            <div className="bg-white p-4 rounded-lg shadow-sm border">
-              <div className="flex items-center">
-                <div className="w-8 h-8 bg-emerald-100 rounded-lg flex items-center justify-center">
-                  <FaGraduationCap className="w-4 h-4 text-emerald-600" />
-                </div>
-                <div className="ml-3">
-                  <p className="text-sm font-medium text-gray-600">Com CBD</p>
-                  <p className="text-xl font-bold text-gray-900">
-                    {medicos.filter((m) => m.permissoes.includes("CBD")).length}
-                  </p>
-                </div>
-              </div>
-            </div>
+        {/* Table Section */}
+        <div className="bg-white rounded-xl shadow-sm border overflow-hidden">
+          <div className="px-6 py-5 border-b border-gray-200">
+            <h3 className="text-lg font-semibold text-gray-900">
+              Médicos Encontrados
+            </h3>
           </div>
-        )}
-
-        {/* Table */}
-        <Table
-          data={filteredMedicos}
-          columns={columns}
-          actions={actions}
-          loading={loading}
-          emptyMessage="Nenhum médico encontrado"
-          mobileCardRender={(medico: Medico) => (
-            <div className="bg-white rounded-lg p-4 shadow-sm border space-y-3">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-3">
-                  <div className="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center">
-                    <FaUserMd className="w-5 h-5 text-white" />
-                  </div>
+          <Table
+            data={medicos}
+            columns={[
+              {
+                key: "name",
+                header: "Nome",
+                render: (medico) => (
                   <div>
-                    <h3 className="text-gray-900 text-sm font-medium">
-                      {String(medico.nome)}
-                    </h3>
-                    <p className="text-gray-500 text-xs">
-                      {String(medico.crm)}
-                    </p>
+                    <div className="font-medium text-gray-900 text-sm">
+                      {medico.name}
+                    </div>
+                    <div className="text-xs text-gray-500">{medico.email}</div>
                   </div>
-                </div>
-                <div className="flex flex-col gap-1">
-                  {getPermissoesBadges(medico.permissoes as ("THC" | "CBD")[])}
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-2 text-sm">
-                <div>
-                  <span className="text-gray-500 text-xs font-medium">
-                    Especialidade:
+                ),
+              },
+              {
+                key: "documentDoctorNumber",
+                header: "Documento",
+                render: (medico) => (
+                  <div>
+                    <div className="text-sm text-gray-700">
+                      {medico.documentDoctorType}
+                      {medico.documentDoctorNumber}/{medico.documentDoctorUf}
+                    </div>
+                  </div>
+                ),
+              },
+              {
+                key: "phone",
+                header: "Telefone",
+                render: (medico) => (
+                  <span className="text-sm text-gray-700">{medico.phone}</span>
+                ),
+              },
+              {
+                key: "status",
+                header: "Status",
+                render: (medico) => (
+                  <span
+                    className={`px-4 py-1 rounded-2xl text-xs font-bold uppercase tracking-wide ${
+                      medico.status === "ativo"
+                        ? "bg-green-100 text-green-700"
+                        : "bg-yellow-100 text-yellow-700"
+                    }`}
+                  >
+                    {medico.status === "ativo" ? "ATIVO" : "INATIVO"}
                   </span>
-                  <p className="text-gray-900 text-sm font-medium">
-                    {String(medico.especialidade)}
-                  </p>
-                </div>
-                <div>
-                  <span className="text-gray-500 text-xs font-medium">
-                    Telefone:
-                  </span>
-                  <p className="text-gray-900 text-sm font-medium">
-                    {String(medico.telefone)}
-                  </p>
-                </div>
-                <div className="col-span-2">
-                  <span className="text-gray-500 text-xs font-medium">
-                    Email:
-                  </span>
-                  <p className="text-gray-900 text-sm font-medium">
-                    {String(medico.email)}
-                  </p>
-                </div>
-              </div>
-
-              <div className="flex justify-end space-x-2 pt-2 border-t">
-                {actions.map((action, index) => (
-                  <Button
-                    key={index}
-                    onClick={() => action.onClick(medico)}
-                    variant={action.variant}
-                    size="sm"
-                    icon={action.icon}
-                    title={action.label}
-                  />
-                ))}
-              </div>
-            </div>
-          )}
-        />
+                ),
+              },
+            ]}
+            actions={[
+              {
+                label: "Visualizar",
+                icon: <VisibilityIcon fontSize="small" />,
+                onClick: handleView,
+                variant: "primary",
+              },
+              {
+                label: "Editar",
+                icon: <EditIcon fontSize="small" />,
+                onClick: handleEdit,
+                variant: "secondary",
+              },
+              {
+                label: "Excluir",
+                icon: <DeleteIcon fontSize="small" />,
+                onClick: (medico) => handleDelete(medico.id),
+                variant: "danger",
+              },
+            ]}
+            emptyMessage="Nenhum médico encontrado"
+            loading={loading}
+          />
+        </div>
       </div>
     </MainLayout>
   );
