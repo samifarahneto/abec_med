@@ -6,6 +6,7 @@ import MainLayout from "@/components/MainLayout";
 import FormInput from "@/components/ui/FormInput";
 import FormSelect from "@/components/ui/FormSelect";
 import { Table } from "@/components/ui/Table";
+import { Pagination } from "@/components/ui/Pagination";
 import ButtonComponent from "@/components/ui/Button";
 import { useAuthSession } from "@/hooks/useAuthSession";
 import AddIcon from "@mui/icons-material/Add";
@@ -77,6 +78,38 @@ function formatPhone(phone: string) {
   return phone;
 }
 
+// Função para criar badges de status seguindo o padrão da página de administradores
+const getStatusBadge = (status: Medico["status"]) => {
+  const statusConfig = {
+    ativo: {
+      color: "bg-green-500",
+      text: "Ativo",
+      bgClass: "bg-green-50 text-green-700 border-green-200",
+    },
+    inativo: {
+      color: "bg-red-500",
+      text: "Inativo",
+      bgClass: "bg-red-50 text-red-700 border-red-200",
+    },
+    pendente: {
+      color: "bg-yellow-500",
+      text: "Pendente",
+      bgClass: "bg-yellow-50 text-yellow-700 border-yellow-200",
+    },
+  };
+
+  const config = statusConfig[status];
+
+  return (
+    <span
+      className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium border ${config.bgClass}`}
+    >
+      <span className={`w-2 h-2 ${config.color} rounded-full mr-1`}></span>
+      {config.text}
+    </span>
+  );
+};
+
 export default function MedicosPage() {
   const router = useRouter();
   const { user, isAuthenticated } = useAuthSession();
@@ -96,16 +129,26 @@ export default function MedicosPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  // Estados de paginação
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalItems, setTotalItems] = useState(0);
+
   const fetchMedicos = useCallback(
-    async (filters?: {
-      cpf?: string;
-      name?: string;
-      phone?: string;
-      documentDoctorType?: string;
-      documentDoctorNumber?: string;
-      email?: string;
-      status?: string;
-    }) => {
+    async (
+      filters?: {
+        cpf?: string;
+        name?: string;
+        phone?: string;
+        documentDoctorType?: string;
+        documentDoctorNumber?: string;
+        email?: string;
+        crm?: string;
+        specialty?: string;
+        status?: string;
+      },
+      page: number = 1,
+      perPage: number = 10
+    ) => {
       try {
         setLoading(true);
         setError(null);
@@ -147,6 +190,10 @@ export default function MedicosPage() {
           if (apiStatus) params.append("status", apiStatus);
         }
 
+        // Adicionar parâmetros de paginação
+        params.append("page", page.toString());
+        params.append("per_page", perPage.toString());
+
         const url = `/api/proxy/doctors${
           params.toString() ? `?${params.toString()}` : ""
         }`;
@@ -164,52 +211,69 @@ export default function MedicosPage() {
           const data = await response.json();
           console.log(`📊 Dados recebidos:`, data);
 
-          // Verificar se a resposta é um array de médicos
-          if (Array.isArray(data) && data.length > 0) {
-            console.log(`✅ ${data.length} médicos encontrados`);
+          // Verificar se a resposta é um array de médicos ou objeto com dados paginados
+          let medicosData: Medico[] = [];
+          let totalCount = 0;
 
-            // Mapear dados para o formato esperado
-            let medicosMapeados = data.map(mapApiDataToMedico);
-
-            // Aplicar filtro local se necessário (quando a API externa não filtra)
-            if (filters?.documentDoctorType) {
-              const medicosFiltrados = medicosMapeados.filter(
-                (medico) =>
-                  medico.documentDoctorType === filters.documentDoctorType
-              );
-              console.log(
-                `🔍 Filtro local aplicado: ${filters.documentDoctorType}`
-              );
-              console.log(
-                `🔍 Médicos antes do filtro: ${medicosMapeados.length}`
-              );
-              console.log(`🔍 Médicos após filtro: ${medicosFiltrados.length}`);
-              medicosMapeados = medicosFiltrados;
-            }
-
-            setMedicos(medicosMapeados);
-
-            console.log(`✅ Médicos carregados com sucesso:`, medicosMapeados);
-
-            // Log adicional para verificar os tipos de documento
-            console.log(
-              "🔍 Tipos de documento encontrados:",
-              medicosMapeados.map((m) => m.documentDoctorType)
-            );
-
-            // Verificar se o filtro está funcionando
-            if (filters?.documentDoctorType) {
-              const filteredByType = medicosMapeados.filter(
-                (m) => m.documentDoctorType === filters.documentDoctorType
-              );
-              console.log(
-                `🔍 Médicos filtrados por tipo ${filters.documentDoctorType}:`,
-                filteredByType.length
-              );
-            }
+          if (Array.isArray(data)) {
+            // Resposta direta como array
+            medicosData = data;
+            totalCount = data.length;
+          } else if (data && typeof data === "object" && "data" in data) {
+            // Resposta paginada com estrutura { data: [], total: number, page: number, etc }
+            medicosData = Array.isArray(data.data) ? data.data : [];
+            totalCount = data.total || data.total_count || medicosData.length;
           } else {
-            console.log("❌ Resposta não contém dados de médicos:", data);
+            console.log("❌ Formato de resposta não reconhecido:", data);
             setMedicos([]);
+            setTotalItems(0);
+            return;
+          }
+
+          console.log(`✅ ${medicosData.length} médicos encontrados`);
+
+          // Mapear dados para o formato esperado
+          let medicosMapeados = medicosData.map((item) =>
+            mapApiDataToMedico(item as unknown as ApiMedicoData)
+          );
+
+          // Aplicar filtro local se necessário (quando a API externa não filtra)
+          if (filters?.documentDoctorType) {
+            const medicosFiltrados = medicosMapeados.filter(
+              (medico) =>
+                medico.documentDoctorType === filters.documentDoctorType
+            );
+            console.log(
+              `🔍 Filtro local aplicado: ${filters.documentDoctorType}`
+            );
+            console.log(
+              `🔍 Médicos antes do filtro: ${medicosMapeados.length}`
+            );
+            console.log(`🔍 Médicos após filtro: ${medicosFiltrados.length}`);
+            medicosMapeados = medicosFiltrados;
+          }
+
+          setMedicos(medicosMapeados);
+          setTotalItems(totalCount);
+
+          console.log(`✅ Médicos carregados com sucesso:`, medicosMapeados);
+          console.log(`📊 Total de itens: ${totalCount}`);
+
+          // Log adicional para verificar os tipos de documento
+          console.log(
+            "🔍 Tipos de documento encontrados:",
+            medicosMapeados.map((m) => m.documentDoctorType)
+          );
+
+          // Verificar se o filtro está funcionando
+          if (filters?.documentDoctorType) {
+            const filteredByType = medicosMapeados.filter(
+              (m) => m.documentDoctorType === filters.documentDoctorType
+            );
+            console.log(
+              `🔍 Médicos filtrados por tipo ${filters.documentDoctorType}:`,
+              filteredByType.length
+            );
           }
         } else {
           console.log(`❌ Erro na resposta: ${response.status}`);
@@ -231,9 +295,9 @@ export default function MedicosPage() {
 
   useEffect(() => {
     if (isAuthenticated) {
-      fetchMedicos();
+      fetchMedicos({}, currentPage, 10);
     }
-  }, [isAuthenticated, fetchMedicos]);
+  }, [isAuthenticated, fetchMedicos, currentPage]);
 
   const handleDelete = async (id: string) => {
     if (!confirm("Tem certeza que deseja excluir este médico?")) return;
@@ -300,7 +364,24 @@ export default function MedicosPage() {
     console.log("🔍 Filtros aplicados:", filters);
     console.log("🔍 Tipo de documento selecionado:", filterDocumentDoctorType);
     console.log("🔍 Estado atual do filtro:", filterDocumentDoctorType);
-    fetchMedicos(filters);
+
+    // Resetar para primeira página ao fazer nova busca
+    setCurrentPage(1);
+    fetchMedicos(filters, 1, 10);
+  };
+
+  // Função para mudar de página
+  const handlePageChange = (page: number) => {
+    const filters = {
+      cpf: filterCpf.trim() || undefined,
+      name: filterName.trim() || undefined,
+      phone: filterPhone.trim() || undefined,
+      documentDoctorType: filterDocumentDoctorType.trim() || undefined,
+      documentDoctorNumber: filterDocumentDoctorNumber.trim() || undefined,
+      email: filterEmail.trim() || undefined,
+      status: filterStatus || undefined,
+    };
+    fetchMedicos(filters, page, 10);
   };
 
   // Função para limpar filtros
@@ -312,8 +393,14 @@ export default function MedicosPage() {
     setFilterDocumentDoctorNumber("");
     setFilterEmail("");
     setFilterStatus("");
-    fetchMedicos(); // Buscar todos os médicos
+    setCurrentPage(1); // Resetar para primeira página
+    fetchMedicos({}, 1, 10); // Buscar todos os médicos
   };
+
+  // Fatiar médicos para exibir apenas 10 por página
+  const startIndex = (currentPage - 1) * 10;
+  const endIndex = startIndex + 10;
+  const medicosPaginados = medicos.slice(startIndex, endIndex);
 
   // Verificar se o usuário está autenticado
   if (!isAuthenticated) {
@@ -339,7 +426,7 @@ export default function MedicosPage() {
 
   return (
     <MainLayout>
-      <div className="space-y-6 bg-[#f5f7fa] min-h-screen p-2 md:p-6">
+      <div className="space-y-6 bg-transparent min-h-screen p-2 md:p-6">
         {/* Header Section */}
         <div className="bg-white p-6 rounded-xl shadow-sm border flex flex-col gap-1">
           <h1 className="text-2xl font-bold text-gray-900 mb-1">
@@ -533,7 +620,7 @@ export default function MedicosPage() {
             </h3>
           </div>
           <Table
-            data={medicos}
+            data={medicosPaginados}
             columns={[
               {
                 key: "name",
@@ -571,17 +658,7 @@ export default function MedicosPage() {
               {
                 key: "status",
                 header: "Status",
-                render: (medico) => (
-                  <span
-                    className={`px-4 py-1 rounded-2xl text-xs font-bold uppercase tracking-wide ${
-                      medico.status === "ativo"
-                        ? "bg-green-100 text-green-700"
-                        : "bg-yellow-100 text-yellow-700"
-                    }`}
-                  >
-                    {medico.status === "ativo" ? "ATIVO" : "INATIVO"}
-                  </span>
-                ),
+                render: (medico) => getStatusBadge(medico.status),
               },
             ]}
             actions={[
@@ -607,6 +684,17 @@ export default function MedicosPage() {
             emptyMessage="Nenhum médico encontrado"
             loading={loading}
           />
+
+          {/* Componente de Paginação */}
+          {!loading && totalItems > 0 && (
+            <Pagination
+              currentPage={currentPage}
+              totalPages={Math.ceil(totalItems / 10)}
+              totalItems={totalItems}
+              itemsPerPage={10}
+              onPageChange={handlePageChange}
+            />
+          )}
         </div>
       </div>
     </MainLayout>

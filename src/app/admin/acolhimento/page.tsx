@@ -2,45 +2,95 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import {
-  FaUserCheck,
-  FaClock,
-  FaStethoscope,
-  FaCheckCircle,
-  FaPlus,
-  FaSearch,
-  FaEdit,
-  FaTrash,
-} from "react-icons/fa";
+import { FaPlus, FaSearch, FaEdit, FaTrash } from "react-icons/fa";
 import MainLayout from "@/components/MainLayout";
-import { Input, Table, Button } from "@/components/ui";
+import FormInput from "@/components/ui/FormInput";
+import FormSelect from "@/components/ui/FormSelect";
+import { Table } from "@/components/ui/Table";
+import { Pagination } from "@/components/ui/Pagination";
+import ButtonComponent from "@/components/ui/Button";
 
 interface Acolhimento extends Record<string, unknown> {
   id: string;
   paciente_id: string;
   paciente_nome: string;
   paciente_cpf: string;
+  telefone: string;
   medico_nome: string;
   tipo_consulta: string;
   hora_chegada: string;
   hora_agendada: string;
   prioridade: "baixa" | "media" | "alta" | "urgente";
-  status: "aguardando" | "triagem" | "em_atendimento" | "atendido" | "faltou";
+  status: "ACTIVE" | "INACTIVE";
   permissoes: ("THC" | "CBD")[];
   observacoes: string;
   data_atendimento: string;
 }
 
+// Função para criar badges de status seguindo o padrão das outras páginas
+const getStatusBadge = (status: Acolhimento["status"]) => {
+  const statusConfig = {
+    ACTIVE: {
+      color: "bg-green-500",
+      text: "Ativo",
+      bgClass: "bg-green-50 text-green-700 border-green-200",
+    },
+    INACTIVE: {
+      color: "bg-red-500",
+      text: "Inativo",
+      bgClass: "bg-red-50 text-red-700 border-red-200",
+    },
+  };
+
+  const config = statusConfig[status];
+
+  return (
+    <span
+      className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium border ${config.bgClass}`}
+    >
+      <span className={`w-2 h-2 ${config.color} rounded-full mr-1`}></span>
+      {config.text}
+    </span>
+  );
+};
+
+// Função para formatar CPF
+const formatCPF = (cpf: string) => {
+  // Remove caracteres não numéricos
+  const cleanCPF = cpf.replace(/\D/g, "");
+  // Aplica máscara
+  return cleanCPF.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, "$1.$2.$3-$4");
+};
+
 export default function AcolhimentoPage() {
   const router = useRouter();
   const [atendimentos, setAtendimentos] = useState<Acolhimento[]>([]);
-  const [searchTerm, setSearchTerm] = useState("");
+  const [filteredAtendimentos, setFilteredAtendimentos] = useState<
+    Acolhimento[]
+  >([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  // Estados dos filtros
+  const [filterCpf, setFilterCpf] = useState("");
+  const [filterName, setFilterName] = useState("");
+  const [filterPhone, setFilterPhone] = useState("");
+  const [filterEmail, setFilterEmail] = useState("");
+  const [filterStatus, setFilterStatus] = useState("");
+
+  // Estados de paginação
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalItems, setTotalItems] = useState(0);
 
   useEffect(() => {
     fetchAtendimentos();
   }, []);
+
+  // Inicializar dados filtrados quando os atendimentos são carregados
+  useEffect(() => {
+    setFilteredAtendimentos(atendimentos);
+    setTotalItems(atendimentos.length);
+  }, [atendimentos]);
 
   const fetchAtendimentos = async () => {
     try {
@@ -52,12 +102,13 @@ export default function AcolhimentoPage() {
           paciente_id: "PAC001",
           paciente_nome: "Maria Silva Santos",
           paciente_cpf: "123.456.789-00",
+          telefone: "(11) 99999-0001",
           medico_nome: "Dr. João Carvalho",
           tipo_consulta: "Consulta de Rotina",
           hora_chegada: "08:15",
           hora_agendada: "08:30",
           prioridade: "media",
-          status: "aguardando",
+          status: "ACTIVE",
           permissoes: ["THC", "CBD"],
           observacoes: "Primeira consulta, paciente nervosa",
           data_atendimento: "2024-01-15",
@@ -67,12 +118,13 @@ export default function AcolhimentoPage() {
           paciente_id: "PAC002",
           paciente_nome: "João Pedro Oliveira",
           paciente_cpf: "987.654.321-00",
+          telefone: "(11) 99999-0002",
           medico_nome: "Dra. Ana Santos",
           tipo_consulta: "Retorno",
           hora_chegada: "09:00",
           hora_agendada: "09:00",
           prioridade: "baixa",
-          status: "em_atendimento",
+          status: "ACTIVE",
           permissoes: ["CBD"],
           observacoes: "Paciente pontual, retorno de hipertensão",
           data_atendimento: "2024-01-15",
@@ -82,12 +134,13 @@ export default function AcolhimentoPage() {
           paciente_id: "PAC003",
           paciente_nome: "Ana Carolina Ferreira",
           paciente_cpf: "456.789.123-00",
+          telefone: "(11) 99999-0003",
           medico_nome: "Dr. Carlos Silva",
           tipo_consulta: "Consulta Especializada",
           hora_chegada: "10:45",
           hora_agendada: "11:00",
           prioridade: "alta",
-          status: "triagem",
+          status: "ACTIVE",
           permissoes: ["THC"],
           observacoes: "Dor no peito, verificar sinais vitais",
           data_atendimento: "2024-01-15",
@@ -97,12 +150,13 @@ export default function AcolhimentoPage() {
           paciente_id: "PAC004",
           paciente_nome: "Roberto Lima Souza",
           paciente_cpf: "789.123.456-00",
+          telefone: "(11) 99999-0004",
           medico_nome: "Dra. Marina Costa",
           tipo_consulta: "Emergência",
           hora_chegada: "07:30",
           hora_agendada: "08:00",
           prioridade: "urgente",
-          status: "atendido",
+          status: "INACTIVE",
           permissoes: ["THC", "CBD"],
           observacoes: "Atendimento de urgência concluído",
           data_atendimento: "2024-01-15",
@@ -112,6 +166,7 @@ export default function AcolhimentoPage() {
       // Simular delay de API
       await new Promise((resolve) => setTimeout(resolve, 1000));
       setAtendimentos(mockAtendimentos);
+      setTotalItems(mockAtendimentos.length);
     } catch (error) {
       setError("Erro ao carregar dados de acolhimento");
       console.error("Erro:", error);
@@ -120,87 +175,93 @@ export default function AcolhimentoPage() {
     }
   };
 
-  const getPermissoesBadges = (permissoes: Acolhimento["permissoes"]) => {
-    const permissaoConfig = {
-      THC: {
-        color: "bg-purple-500",
-        text: "THC",
-        bgClass: "bg-purple-50 text-purple-700 border-purple-200",
-      },
-      CBD: {
-        color: "bg-green-500",
-        text: "CBD",
-        bgClass: "bg-green-50 text-green-700 border-green-200",
-      },
-    };
+  // Função para executar pesquisa com filtros
+  const handleSearch = () => {
+    setCurrentPage(1); // Resetar para primeira página
 
-    return (
-      <div className="flex flex-wrap gap-1 justify-center">
-        {permissoes.map((permissao) => {
-          const config = permissaoConfig[permissao];
-          return (
-            <span
-              key={permissao}
-              className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium border ${config.bgClass}`}
-            >
-              <span
-                className={`w-2 h-2 ${config.color} rounded-full mr-1`}
-              ></span>
-              {config.text}
-            </span>
-          );
-        })}
-      </div>
+    const filtered = atendimentos.filter(
+      (atendimento) =>
+        (filterName === "" ||
+          String(atendimento.paciente_nome)
+            .toLowerCase()
+            .includes(filterName.toLowerCase())) &&
+        (filterCpf === "" ||
+          String(atendimento.paciente_cpf).includes(filterCpf)) &&
+        (filterPhone === "" ||
+          String(atendimento.telefone).includes(filterPhone)) &&
+        (filterEmail === "" ||
+          String(atendimento.email || "")
+            .toLowerCase()
+            .includes(filterEmail.toLowerCase())) &&
+        (filterStatus === "" || atendimento.status === filterStatus)
     );
+
+    setFilteredAtendimentos(filtered);
+    setTotalItems(filtered.length);
+
+    console.log("🔍 Filtros aplicados:", {
+      cpf: filterCpf,
+      name: filterName,
+      phone: filterPhone,
+      email: filterEmail,
+      status: filterStatus,
+    });
+    console.log(`✅ ${filtered.length} atendimentos encontrados`);
   };
 
-  const filteredAtendimentos = atendimentos.filter(
-    (atendimento) =>
-      String(atendimento.paciente_nome)
-        .toLowerCase()
-        .includes(searchTerm.toLowerCase()) ||
-      String(atendimento.paciente_id)
-        .toLowerCase()
-        .includes(searchTerm.toLowerCase()) ||
-      String(atendimento.paciente_cpf).includes(searchTerm) ||
-      String(atendimento.medico_nome)
-        .toLowerCase()
-        .includes(searchTerm.toLowerCase())
+  // Função para limpar filtros
+  const handleClearFilters = () => {
+    setFilterCpf("");
+    setFilterName("");
+    setFilterPhone("");
+    setFilterEmail("");
+    setFilterStatus("");
+    setCurrentPage(1); // Resetar para primeira página
+    setFilteredAtendimentos(atendimentos); // Mostrar todos os atendimentos
+    setTotalItems(atendimentos.length);
+  };
+
+  // Fatiar atendimentos filtrados para exibir apenas 10 por página
+  const startIndex = (currentPage - 1) * 10;
+  const endIndex = startIndex + 10;
+  const atendimentosPaginados = filteredAtendimentos.slice(
+    startIndex,
+    endIndex
   );
 
   const columns = [
     {
       key: "paciente_nome" as keyof Acolhimento,
-      header: "Paciente",
-      render: (atendimento: Acolhimento) => (
+      header: "Nome",
+      render: (atendimento: Record<string, unknown>) => (
         <span className="text-gray-900 text-sm font-medium">
-          {String(atendimento.paciente_nome)}
+          {(atendimento as Acolhimento).paciente_nome}
         </span>
       ),
     },
     {
-      key: "medico_nome" as keyof Acolhimento,
-      header: "Médico",
-      render: (atendimento: Acolhimento) => (
+      key: "paciente_cpf" as keyof Acolhimento,
+      header: "CPF",
+      render: (atendimento: Record<string, unknown>) => (
         <span className="text-gray-900 text-sm font-medium">
-          {String(atendimento.medico_nome)}
+          {formatCPF((atendimento as Acolhimento).paciente_cpf)}
         </span>
       ),
     },
     {
-      key: "hora_agendada" as keyof Acolhimento,
-      header: "Horário",
-      render: (atendimento: Acolhimento) => (
+      key: "telefone" as keyof Acolhimento,
+      header: "Telefone",
+      render: (atendimento: Record<string, unknown>) => (
         <span className="text-gray-900 text-sm font-medium">
-          {String(atendimento.hora_agendada)}
+          {(atendimento as Acolhimento).telefone || "-"}
         </span>
       ),
     },
     {
-      key: "permissoes" as keyof Acolhimento,
-      header: "Permissões",
-      render: (atendimento: Acolhimento) =>
-        getPermissoesBadges(atendimento.permissoes as ("THC" | "CBD")[]),
+      key: "status" as keyof Acolhimento,
+      header: "Status",
+      render: (atendimento: Record<string, unknown>) =>
+        getStatusBadge((atendimento as Acolhimento).status),
     },
   ];
 
@@ -215,60 +276,158 @@ export default function AcolhimentoPage() {
     try {
       // Aqui seria a chamada para a API real
       setAtendimentos(atendimentos.filter((a) => a.id !== id));
+      setTotalItems((prev) => prev - 1);
     } catch (error) {
       setError("Erro ao excluir agendamento");
       console.error("Erro:", error);
     }
   };
 
+  // Função para mudar de página
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+    // Aqui seria feita a chamada para a API com os parâmetros de paginação
+    console.log(`Navegando para página ${page}`);
+  };
+
   const actions = [
     {
       label: "Editar",
       icon: <FaEdit className="w-4 h-4" />,
-      onClick: handleEdit,
+      onClick: (atendimento: Record<string, unknown>) =>
+        handleEdit(atendimento as Acolhimento),
       variant: "primary" as const,
     },
     {
       label: "Excluir",
       icon: <FaTrash className="w-4 h-4" />,
-      onClick: (atendimento: Acolhimento) => handleDelete(atendimento.id),
+      onClick: (atendimento: Record<string, unknown>) =>
+        handleDelete((atendimento as Acolhimento).id),
       variant: "danger" as const,
     },
   ];
 
   return (
     <MainLayout>
-      <div className="space-y-6">
-        {/* Header */}
-        <div className="flex flex-col gap-4">
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900">Acolhimento</h1>
-            <p className="text-gray-600 text-sm font-medium mt-1">
-              Gerencie o fluxo de atendimento e triagem de pacientes
-            </p>
-          </div>
+      <div className="space-y-6 bg-transparent min-h-screen p-2 md:p-6">
+        {/* Header Section */}
+        <div className="bg-white p-6 rounded-xl shadow-sm border flex flex-col gap-1">
+          <h1 className="text-2xl font-bold text-gray-900 mb-1">
+            Gerenciar Acolhimento
+          </h1>
+          <p className="text-gray-600 text-sm">
+            Visualize e gerencie o fluxo de atendimento e triagem de pacientes
+          </p>
+        </div>
 
-          {/* Search and Add Button */}
-          <div className="flex flex-col sm:flex-row gap-4">
-            <div className="relative flex-1">
-              <Input
-                type="text"
-                placeholder="Buscar por paciente, médico ou ID..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10"
-              />
-              <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+        {/* Stats Section */}
+        {!loading && (
+          <div className="bg-white p-6 rounded-xl shadow-sm border">
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
+              <h3 className="text-lg font-semibold text-gray-900 mb-2 md:mb-0">
+                Resumo do Acolhimento
+              </h3>
+              <ButtonComponent
+                onClick={() => router.push("/admin/acolhimento/novo")}
+                variant="success"
+                size="md"
+                icon={<FaPlus fontSize="small" />}
+              >
+                Novo Acolhimento
+              </ButtonComponent>
             </div>
-            <Button
-              onClick={() => router.push("/admin/acolhimento/novo")}
-              icon={<FaPlus />}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="bg-[#f7fafc] p-6 rounded-xl border border-[#e2e8f0] text-center flex flex-col items-center">
+                <div className="w-3 h-3 bg-green-600 rounded-full mb-2"></div>
+                <div className="text-2xl font-bold text-gray-900 mb-1">
+                  {atendimentos.filter((a) => a.status === "ACTIVE").length}
+                </div>
+                <div className="text-xs text-gray-600 uppercase tracking-wider">
+                  Ativos
+                </div>
+              </div>
+              <div className="bg-[#f7fafc] p-6 rounded-xl border border-[#e2e8f0] text-center flex flex-col items-center">
+                <div className="w-3 h-3 bg-red-600 rounded-full mb-2"></div>
+                <div className="text-2xl font-bold text-gray-900 mb-1">
+                  {atendimentos.filter((a) => a.status === "INACTIVE").length}
+                </div>
+                <div className="text-xs text-gray-600 uppercase tracking-wider">
+                  Inativos
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Filters Section */}
+        <div className="bg-white p-6 rounded-xl shadow-sm border">
+          <div className="mb-4">
+            <h3 className="text-lg font-semibold text-gray-900">
+              Filtros de Pesquisa
+            </h3>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-5">
+            <div className="form-group">
+              <FormInput
+                label="CPF"
+                value={filterCpf}
+                onChange={(e) => setFilterCpf(e.target.value)}
+                placeholder="000.000.000-00"
+              />
+            </div>
+            <div className="form-group">
+              <FormInput
+                label="Telefone"
+                value={filterPhone}
+                onChange={(e) => setFilterPhone(e.target.value)}
+                placeholder="(00) 00000-0000"
+              />
+            </div>
+            <div className="form-group">
+              <FormInput
+                label="Email"
+                value={filterEmail}
+                onChange={(e) => setFilterEmail(e.target.value)}
+                placeholder="exemplo@email.com"
+              />
+            </div>
+            <div className="form-group">
+              <FormInput
+                label="Nome"
+                value={filterName}
+                onChange={(e) => setFilterName(e.target.value)}
+                placeholder="Nome do paciente"
+              />
+            </div>
+            <div className="form-group">
+              <FormSelect
+                label="Status"
+                value={filterStatus}
+                onChange={(e) => setFilterStatus(e.target.value)}
+                options={[
+                  { value: "", label: "Todos os status" },
+                  { value: "ACTIVE", label: "Ativo" },
+                  { value: "INACTIVE", label: "Inativo" },
+                ]}
+              />
+            </div>
+          </div>
+          <div className="flex justify-end gap-3">
+            <ButtonComponent
+              onClick={handleSearch}
               variant="primary"
               size="md"
-              className="whitespace-nowrap"
+              icon={<FaSearch fontSize="small" />}
             >
-              Novo Acolhimento
-            </Button>
+              Pesquisar
+            </ButtonComponent>
+            <ButtonComponent
+              onClick={handleClearFilters}
+              variant="secondary"
+              size="md"
+            >
+              Limpar Filtros
+            </ButtonComponent>
           </div>
         </div>
 
@@ -279,154 +438,32 @@ export default function AcolhimentoPage() {
           </div>
         )}
 
-        {/* Stats Cards */}
-        {!loading && (
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <div className="bg-white p-4 rounded-lg shadow-sm border">
-              <div className="flex items-center">
-                <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
-                  <FaClock className="w-4 h-4 text-blue-600" />
-                </div>
-                <div className="ml-3">
-                  <p className="text-sm font-medium text-gray-600">
-                    Aguardando
-                  </p>
-                  <p className="text-xl font-bold text-gray-900">
-                    {
-                      atendimentos.filter((a) => a.status === "aguardando")
-                        .length
-                    }
-                  </p>
-                </div>
-              </div>
-            </div>
-            <div className="bg-white p-4 rounded-lg shadow-sm border">
-              <div className="flex items-center">
-                <div className="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center">
-                  <FaStethoscope className="w-4 h-4 text-purple-600" />
-                </div>
-                <div className="ml-3">
-                  <p className="text-sm font-medium text-gray-600">Triagem</p>
-                  <p className="text-xl font-bold text-gray-900">
-                    {atendimentos.filter((a) => a.status === "triagem").length}
-                  </p>
-                </div>
-              </div>
-            </div>
-            <div className="bg-white p-4 rounded-lg shadow-sm border">
-              <div className="flex items-center">
-                <div className="w-8 h-8 bg-yellow-100 rounded-lg flex items-center justify-center">
-                  <FaUserCheck className="w-4 h-4 text-yellow-600" />
-                </div>
-                <div className="ml-3">
-                  <p className="text-sm font-medium text-gray-600">
-                    Em Atendimento
-                  </p>
-                  <p className="text-xl font-bold text-gray-900">
-                    {
-                      atendimentos.filter((a) => a.status === "em_atendimento")
-                        .length
-                    }
-                  </p>
-                </div>
-              </div>
-            </div>
-            <div className="bg-white p-4 rounded-lg shadow-sm border">
-              <div className="flex items-center">
-                <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
-                  <FaCheckCircle className="w-4 h-4 text-green-600" />
-                </div>
-                <div className="ml-3">
-                  <p className="text-sm font-medium text-gray-600">Atendidos</p>
-                  <p className="text-xl font-bold text-gray-900">
-                    {atendimentos.filter((a) => a.status === "atendido").length}
-                  </p>
-                </div>
-              </div>
-            </div>
+        {/* Table Section */}
+        <div className="bg-white rounded-xl shadow-sm border overflow-hidden">
+          <div className="px-6 py-5 border-b border-gray-200">
+            <h3 className="text-lg font-semibold text-gray-900">
+              Atendimentos Encontrados
+            </h3>
           </div>
-        )}
+          <Table
+            data={atendimentosPaginados}
+            columns={columns}
+            actions={actions}
+            loading={loading}
+            emptyMessage="Nenhum atendimento encontrado para hoje"
+          />
 
-        {/* Table */}
-        <Table
-          data={filteredAtendimentos}
-          columns={columns}
-          actions={actions}
-          loading={loading}
-          emptyMessage="Nenhum atendimento encontrado para hoje"
-          mobileCardRender={(atendimento: Acolhimento) => (
-            <div className="bg-white rounded-lg p-4 shadow-sm border space-y-3">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-3">
-                  <div className="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center">
-                    <FaUserCheck className="w-5 h-5 text-white" />
-                  </div>
-                  <div>
-                    <h3 className="text-gray-900 text-sm font-medium">
-                      {String(atendimento.paciente_nome)}
-                    </h3>
-                  </div>
-                </div>
-                <div className="flex flex-col gap-1">
-                  {getPermissoesBadges(
-                    atendimento.permissoes as ("THC" | "CBD")[]
-                  )}
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-2 text-sm">
-                <div>
-                  <span className="text-gray-500 text-xs font-medium">
-                    Médico:
-                  </span>
-                  <p className="text-gray-900 text-sm font-medium">
-                    {String(atendimento.medico_nome)}
-                  </p>
-                </div>
-                <div>
-                  <span className="text-gray-500 text-xs font-medium">
-                    Consulta:
-                  </span>
-                  <p className="text-gray-900 text-sm font-medium">
-                    {String(atendimento.tipo_consulta)}
-                  </p>
-                </div>
-                <div>
-                  <span className="text-gray-500 text-xs font-medium">
-                    Agendado:
-                  </span>
-                  <p className="text-gray-900 text-sm font-medium">
-                    {String(atendimento.hora_agendada)}
-                  </p>
-                </div>
-              </div>
-
-              {atendimento.observacoes && (
-                <div>
-                  <span className="text-gray-500 text-xs font-medium">
-                    Observações:
-                  </span>
-                  <p className="text-gray-900 text-sm font-medium">
-                    {String(atendimento.observacoes)}
-                  </p>
-                </div>
-              )}
-
-              <div className="flex justify-end space-x-2 pt-2 border-t">
-                {actions.map((action, index) => (
-                  <Button
-                    key={index}
-                    onClick={() => action.onClick(atendimento)}
-                    variant={action.variant}
-                    size="sm"
-                    icon={action.icon}
-                    title={action.label}
-                  />
-                ))}
-              </div>
-            </div>
+          {/* Componente de Paginação */}
+          {!loading && totalItems > 0 && (
+            <Pagination
+              currentPage={currentPage}
+              totalPages={Math.ceil(totalItems / 10)}
+              totalItems={totalItems}
+              itemsPerPage={10}
+              onPageChange={handlePageChange}
+            />
           )}
-        />
+        </div>
       </div>
     </MainLayout>
   );

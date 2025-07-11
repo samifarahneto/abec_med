@@ -6,6 +6,7 @@ import MainLayout from "@/components/MainLayout";
 import FormInput from "@/components/ui/FormInput";
 import FormSelect from "@/components/ui/FormSelect";
 import { Table } from "@/components/ui/Table";
+import { Pagination } from "@/components/ui/Pagination";
 import ButtonComponent from "@/components/ui/Button";
 import { useAuthSession } from "@/hooks/useAuthSession";
 import AddIcon from "@mui/icons-material/Add";
@@ -118,6 +119,38 @@ function formatPhone(phone: string) {
   return phone;
 }
 
+// Função para criar badges de status seguindo o padrão das outras páginas
+const getStatusBadge = (status: Paciente["status"]) => {
+  const statusConfig = {
+    ativo: {
+      color: "bg-green-500",
+      text: "Ativo",
+      bgClass: "bg-green-50 text-green-700 border-green-200",
+    },
+    inativo: {
+      color: "bg-red-500",
+      text: "Inativo",
+      bgClass: "bg-red-50 text-red-700 border-red-200",
+    },
+    pendente: {
+      color: "bg-yellow-500",
+      text: "Pendente",
+      bgClass: "bg-yellow-50 text-yellow-700 border-yellow-200",
+    },
+  };
+
+  const config = statusConfig[status];
+
+  return (
+    <span
+      className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium border ${config.bgClass}`}
+    >
+      <span className={`w-2 h-2 ${config.color} rounded-full mr-1`}></span>
+      {config.text}
+    </span>
+  );
+};
+
 export default function PacientesPage() {
   const router = useRouter();
   const { user, isAuthenticated } = useAuthSession();
@@ -133,14 +166,22 @@ export default function PacientesPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  // Estados de paginação
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalItems, setTotalItems] = useState(0);
+
   const fetchPacientes = useCallback(
-    async (filters?: {
-      cpf?: string;
-      name?: string;
-      phone?: string;
-      email?: string;
-      status?: string;
-    }) => {
+    async (
+      filters?: {
+        cpf?: string;
+        name?: string;
+        phone?: string;
+        email?: string;
+        status?: string;
+      },
+      page: number = 1,
+      perPage: number = 10
+    ) => {
       try {
         setLoading(true);
         setError(null);
@@ -173,6 +214,10 @@ export default function PacientesPage() {
           if (apiStatus) params.append("status", apiStatus);
         }
 
+        // Adicionar parâmetros de paginação
+        params.append("page", page.toString());
+        params.append("per_page", perPage.toString());
+
         const url = `/api/proxy/patients${
           params.toString() ? `?${params.toString()}` : ""
         }`;
@@ -189,22 +234,39 @@ export default function PacientesPage() {
           const data = await response.json();
           console.log(`📊 Dados recebidos:`, data);
 
-          // Verificar se a resposta é um array de pacientes
-          if (Array.isArray(data) && data.length > 0) {
-            console.log(`✅ ${data.length} pacientes encontrados`);
+          // Verificar se a resposta é um array de pacientes ou objeto com dados paginados
+          let pacientesData: Paciente[] = [];
+          let totalCount = 0;
 
-            // Mapear dados para o formato esperado
-            const pacientesMapeados = data.map(mapApiDataToPaciente);
-            setPacientes(pacientesMapeados);
-
-            console.log(
-              `✅ Pacientes carregados com sucesso:`,
-              pacientesMapeados
-            );
+          if (Array.isArray(data)) {
+            // Resposta direta como array
+            pacientesData = data;
+            totalCount = data.length;
+          } else if (data && typeof data === "object" && "data" in data) {
+            // Resposta paginada com estrutura { data: [], total: number, page: number, etc }
+            pacientesData = Array.isArray(data.data) ? data.data : [];
+            totalCount = data.total || data.total_count || pacientesData.length;
           } else {
-            console.log("❌ Resposta não contém dados de pacientes:", data);
+            console.log("❌ Formato de resposta não reconhecido:", data);
             setPacientes([]);
+            setTotalItems(0);
+            return;
           }
+
+          console.log(`✅ ${pacientesData.length} pacientes encontrados`);
+
+          // Mapear dados para o formato esperado
+          const pacientesMapeados = pacientesData.map((item) =>
+            mapApiDataToPaciente(item as unknown as ApiPacienteData)
+          );
+          setPacientes(pacientesMapeados);
+          setTotalItems(totalCount);
+
+          console.log(
+            `✅ Pacientes carregados com sucesso:`,
+            pacientesMapeados
+          );
+          console.log(`📊 Total de itens: ${totalCount}`);
         } else {
           console.log(`❌ Erro na resposta: ${response.status}`);
           const errorText = await response.text();
@@ -227,9 +289,9 @@ export default function PacientesPage() {
 
   useEffect(() => {
     if (isAuthenticated) {
-      fetchPacientes();
+      fetchPacientes({}, currentPage, 10);
     }
-  }, [isAuthenticated, fetchPacientes]);
+  }, [isAuthenticated, fetchPacientes, currentPage]);
 
   const handleDelete = async (id: string) => {
     if (!confirm("Tem certeza que deseja excluir este paciente?")) return;
@@ -276,6 +338,7 @@ export default function PacientesPage() {
 
   // Função para executar pesquisa com filtros
   const handleSearch = () => {
+    setCurrentPage(1); // Resetar para primeira página
     const filters: {
       cpf?: string;
       name?: string;
@@ -292,7 +355,21 @@ export default function PacientesPage() {
     if (filterStatus) filters.status = filterStatus;
 
     console.log("🔍 Filtros aplicados:", filters);
-    fetchPacientes(filters);
+
+    fetchPacientes(filters, 1, 10);
+  };
+
+  // Função para mudar de página
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+    const filters = {
+      cpf: filterCpf.trim() || undefined,
+      name: filterName.trim() || undefined,
+      phone: filterPhone.trim() || undefined,
+      email: filterEmail.trim() || undefined,
+      status: filterStatus || undefined,
+    };
+    fetchPacientes(filters, page, 10);
   };
 
   // Função para limpar filtros
@@ -302,8 +379,14 @@ export default function PacientesPage() {
     setFilterPhone("");
     setFilterEmail("");
     setFilterStatus("");
-    fetchPacientes(); // Buscar todos os pacientes
+    setCurrentPage(1); // Resetar para primeira página
+    fetchPacientes({}, 1, 10); // Buscar todos os pacientes
   };
+
+  // Fatiar pacientes para exibir apenas 10 por página
+  const startIndex = (currentPage - 1) * 10;
+  const endIndex = startIndex + 10;
+  const pacientesPaginados = pacientes.slice(startIndex, endIndex);
 
   // Verificar se o usuário está autenticado
   if (!isAuthenticated) {
@@ -329,7 +412,7 @@ export default function PacientesPage() {
 
   return (
     <MainLayout>
-      <div className="space-y-6 bg-[#f5f7fa] min-h-screen p-2 md:p-6">
+      <div className="space-y-6 bg-transparent min-h-screen p-2 md:p-6">
         {/* Header Section */}
         <div className="bg-white p-6 rounded-xl shadow-sm border flex flex-col gap-1">
           <h1 className="text-2xl font-bold text-gray-900 mb-1">
@@ -390,7 +473,7 @@ export default function PacientesPage() {
                   {pacientes.filter((p) => p.status === "pendente").length}
                 </div>
                 <div className="text-xs text-gray-600 uppercase tracking-wider">
-                  Suspensos
+                  Pendentes
                 </div>
               </div>
             </div>
@@ -496,7 +579,7 @@ export default function PacientesPage() {
             </h3>
           </div>
           <Table
-            data={pacientes}
+            data={pacientesPaginados}
             columns={[
               {
                 key: "name",
@@ -542,23 +625,7 @@ export default function PacientesPage() {
               {
                 key: "status",
                 header: "Status",
-                render: (paciente) => (
-                  <span
-                    className={`px-4 py-1 rounded-2xl text-xs font-bold uppercase tracking-wide ${
-                      paciente.status === "ativo"
-                        ? "bg-green-100 text-green-700"
-                        : paciente.status === "inativo"
-                        ? "bg-yellow-100 text-yellow-700"
-                        : "bg-red-100 text-red-700"
-                    }`}
-                  >
-                    {paciente.status === "ativo"
-                      ? "ATIVO"
-                      : paciente.status === "inativo"
-                      ? "INATIVO"
-                      : "SUSPENSO"}
-                  </span>
-                ),
+                render: (paciente) => getStatusBadge(paciente.status),
               },
             ]}
             actions={[
@@ -584,6 +651,17 @@ export default function PacientesPage() {
             emptyMessage="Nenhum paciente encontrado"
             loading={loading}
           />
+
+          {/* Componente de Paginação */}
+          {!loading && totalItems > 0 && (
+            <Pagination
+              currentPage={currentPage}
+              totalPages={Math.ceil(totalItems / 10)}
+              totalItems={totalItems}
+              itemsPerPage={10}
+              onPageChange={handlePageChange}
+            />
+          )}
         </div>
       </div>
     </MainLayout>

@@ -122,7 +122,7 @@ export default function CadastrarPacientePage() {
 
   return (
     <MainLayout>
-      <div className="space-y-6">
+      <div className="space-y-6 bg-transparent">
         {/* Header */}
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-4">

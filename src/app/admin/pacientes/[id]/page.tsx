@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useRouter, useParams } from "next/navigation";
+import { useRouter } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import {
   FaArrowLeft,
   FaSave,
@@ -48,8 +49,8 @@ interface Address {
 
 export default function EditPacientePage() {
   const router = useRouter();
-  const params = useParams();
-  const pacienteId = params.id as string;
+  const searchParams = useSearchParams();
+  const pacienteId = searchParams.get("id") || "1"; // Fallback para ID 1 se não houver parâmetro
 
   const [paciente, setPaciente] = useState<Paciente>({
     id: "",
@@ -213,7 +214,7 @@ export default function EditPacientePage() {
 
   return (
     <MainLayout>
-      <div className="space-y-6">
+      <div className="space-y-6 bg-transparent">
         {/* Header */}
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-4">

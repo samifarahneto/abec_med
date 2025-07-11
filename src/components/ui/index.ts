@@ -8,3 +8,4 @@ export { default as FormAutocomplete } from "./FormAutocomplete";
 export { default as Button } from "./Button";
 export { default as FormLayout } from "./form-layout";
 export { default as Table } from "./Table";
+export { default as Pagination } from "./Pagination";

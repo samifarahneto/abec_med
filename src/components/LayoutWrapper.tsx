@@ -10,6 +10,7 @@ import {
 import { usePathname } from "next/navigation";
 import { useSession } from "next-auth/react";
 import Header from "@/components/Header";
+import PrivateHeader from "@/components/PrivateHeader";
 
 interface LayoutContextType {
   isSidebarExpanded: boolean;
@@ -32,8 +33,14 @@ interface LayoutWrapperProps {
 
 export default function LayoutWrapper({ children }: LayoutWrapperProps) {
   const pathname = usePathname();
-  const { data: session, status } = useSession();
+  const { data: session } = useSession();
   const [isSidebarExpanded, setIsSidebarExpanded] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
+
+  // Controle de hidratação
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   // Função para verificar se é rota pública
   const isPublicRoute = () => {
@@ -43,38 +50,48 @@ export default function LayoutWrapper({ children }: LayoutWrapperProps) {
 
   // Definir estado inicial da sidebar baseado no tamanho da tela
   useEffect(() => {
+    if (!isMounted) return;
+
     const handleResize = () => {
       // Em mobile (< 640px), sidebar sempre fechada
-      // Em desktop (>= 640px), pode manter aberta
+      // Em desktop (>= 640px), sidebar expandida por padrão
       if (window.innerWidth < 640) {
         setIsSidebarExpanded(false);
+      } else {
+        setIsSidebarExpanded(true);
       }
     };
 
-    // Verificar tamanho inicial
+    // Definir estado inicial
     handleResize();
 
     // Adicionar listener para mudanças de tamanho
     window.addEventListener("resize", handleResize);
 
-    // Cleanup
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, [isMounted]);
 
-  // Determinar se deve aplicar margem da sidebar
-  const shouldApplySidebarMargin =
-    !isPublicRoute() && status === "authenticated" && session?.user;
+  // Para rotas públicas, renderizar com contexto fake mas com header
+  if (isPublicRoute()) {
+    return (
+      <LayoutContext.Provider
+        value={{ isSidebarExpanded: false, setIsSidebarExpanded: () => {} }}
+      >
+        <Header />
+        <main className="pt-16 min-h-screen bg-gray-50">{children}</main>
+      </LayoutContext.Provider>
+    );
+  }
 
+  // Para rotas autenticadas, renderizar com contexto real e PrivateHeader
   return (
     <LayoutContext.Provider value={{ isSidebarExpanded, setIsSidebarExpanded }}>
-      <Header />
+      {session && <PrivateHeader session={session} />}
       <main
-        className={`transition-all duration-300 pt-16 min-h-screen bg-gray-50 ${
-          shouldApplySidebarMargin
-            ? isSidebarExpanded
-              ? "sm:ml-64 lg:ml-72"
-              : "sm:ml-12 lg:ml-16"
-            : ""
+        className={`pt-16 min-h-screen bg-gray-50 transition-all duration-300 ${
+          isSidebarExpanded ? "ml-64 lg:ml-72" : "ml-12 lg:ml-16"
         }`}
       >
         {children}
