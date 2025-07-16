@@ -261,11 +261,11 @@ const FormAutocomplete = React.forwardRef<
                     )}
                   </li>
                 ))
-              ) : (
+              ) : inputValue.trim().length > 0 ? (
                 <li className="pl-3 pr-9 py-2 text-sm text-gray-500">
                   Nenhum resultado encontrado
                 </li>
-              )}
+              ) : null}
             </ul>
           )}
         </div>
