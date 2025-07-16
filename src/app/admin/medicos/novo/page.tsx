@@ -519,6 +519,8 @@ export default function CadastrarMedicoPage() {
                   onChange={(e) => handleMedicoChange("email", e.target.value)}
                   placeholder="email@exemplo.com"
                   required
+                  autoComplete="email"
+                  name="email"
                 />
                 <FormInput
                   label="Telefone"
@@ -526,6 +528,8 @@ export default function CadastrarMedicoPage() {
                   value={medico.phone}
                   onChange={(e) => handleMedicoChange("phone", e.target.value)}
                   placeholder="(00) 00000-0000"
+                  autoComplete="tel"
+                  name="phone"
                 />
               </div>
               {/* Observações */}
@@ -563,7 +567,8 @@ export default function CadastrarMedicoPage() {
                       handleAddressChange("zip_code", e.target.value)
                     }
                     placeholder="00000-000"
-                    autoComplete="off"
+                    autoComplete="postal-code"
+                    name="zip_code"
                   />
                 </div>
                 <div className="md:w-[70%]">
@@ -576,6 +581,7 @@ export default function CadastrarMedicoPage() {
                     }
                     placeholder="Nome da rua ou avenida"
                     autoComplete="street-address"
+                    name="street"
                   />
                 </div>
                 <div className="md:w-[10%]">
@@ -588,6 +594,7 @@ export default function CadastrarMedicoPage() {
                     }
                     placeholder="Número"
                     autoComplete="off"
+                    name="number"
                   />
                 </div>
               </div>
@@ -603,6 +610,7 @@ export default function CadastrarMedicoPage() {
                   }
                   placeholder="Apto, sala, etc."
                   autoComplete="off"
+                  name="complement"
                 />
                 <FormInput
                   label="Bairro"
@@ -613,6 +621,7 @@ export default function CadastrarMedicoPage() {
                   }
                   placeholder="Nome do bairro"
                   autoComplete="off"
+                  name="neighborhood"
                 />
                 <FormAutocomplete
                   label="Estado"
@@ -667,6 +676,8 @@ export default function CadastrarMedicoPage() {
                 onChange={(e) => setUserPassword(e.target.value)}
                 placeholder="Digite a senha"
                 required
+                autoComplete="new-password"
+                name="password"
               />
               <FormInput
                 label="Confirmação de Senha"
@@ -675,6 +686,8 @@ export default function CadastrarMedicoPage() {
                 onChange={(e) => setUserPasswordConfirm(e.target.value)}
                 placeholder="Confirme a senha"
                 required
+                autoComplete="new-password"
+                name="password-confirm"
               />
             </div>
           </div>

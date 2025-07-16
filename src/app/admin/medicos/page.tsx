@@ -19,24 +19,26 @@ import DeleteIcon from "@mui/icons-material/Delete";
 interface ApiMedicoData {
   id: number | string;
   name: string;
+  cpf: string; // ✅ Adicionando campo CPF
   documentDoctorType: string;
   documentDoctorNumber: string;
   documentDoctorUf: string;
   phone: string;
   email: string;
-  status: "ACTIVE" | "INACTIVE" | "PENDING";
+  status: "ACTIVE" | "INACTIVE";
   created_at: string;
 }
 
 interface Medico extends Record<string, unknown> {
   id: string;
   name: string;
+  cpf: string; // ✅ Adicionando campo CPF
   documentDoctorType: string;
   documentDoctorNumber: string;
   documentDoctorUf: string;
   phone: string;
   email: string;
-  status: "ativo" | "inativo" | "pendente";
+  status: "ativo" | "inativo";
   created_at: string;
 }
 
@@ -47,6 +49,7 @@ const mapApiDataToMedico = (apiData: ApiMedicoData): Medico => {
   const mapped = {
     id: apiData.id?.toString() || "",
     name: apiData.name || "",
+    cpf: apiData.cpf || "", // ✅ Mapeando CPF
     documentDoctorType: apiData.documentDoctorType || "",
     documentDoctorNumber: apiData.documentDoctorNumber || "",
     documentDoctorUf: apiData.documentDoctorUf || "",
@@ -78,6 +81,22 @@ function formatPhone(phone: string) {
   return phone;
 }
 
+// Função para formatar CPF
+function formatCPF(cpf: string) {
+  if (!cpf) return "";
+  // Remove tudo que não for dígito
+  const digits = cpf.replace(/\D/g, "");
+  if (digits.length === 11) {
+    // Formato: XXX.XXX.XXX-XX
+    return `${digits.slice(0, 3)}.${digits.slice(3, 6)}.${digits.slice(
+      6,
+      9
+    )}-${digits.slice(9)}`;
+  }
+  // Retorna o valor original se não bater com o padrão
+  return cpf;
+}
+
 // Função para criar badges de status seguindo o padrão da página de administradores
 const getStatusBadge = (status: Medico["status"]) => {
   const statusConfig = {
@@ -91,11 +110,6 @@ const getStatusBadge = (status: Medico["status"]) => {
       text: "Inativo",
       bgClass: "bg-red-50 text-red-700 border-red-200",
     },
-    pendente: {
-      color: "bg-yellow-500",
-      text: "Pendente",
-      bgClass: "bg-yellow-50 text-yellow-700 border-yellow-200",
-    },
   };
 
   const config = statusConfig[status];
@@ -108,6 +122,16 @@ const getStatusBadge = (status: Medico["status"]) => {
       {config.text}
     </span>
   );
+};
+
+// Função para normalizar CPF (remover pontos, hífens e espaços)
+const normalizeCPF = (cpf: string): string => {
+  return cpf.replace(/[.\-\s]/g, "");
+};
+
+// Função para normalizar telefone (remover caracteres não numéricos)
+const normalizePhone = (phone: string): string => {
+  return phone.replace(/\D/g, "");
 };
 
 export default function MedicosPage() {
@@ -184,8 +208,6 @@ export default function MedicosPage() {
               ? "ACTIVE"
               : filters.status === "inativo"
               ? "INACTIVE"
-              : filters.status === "pendente"
-              ? "PENDING"
               : "";
           if (apiStatus) params.append("status", apiStatus);
         }
@@ -250,6 +272,40 @@ export default function MedicosPage() {
               `🔍 Médicos antes do filtro: ${medicosMapeados.length}`
             );
             console.log(`🔍 Médicos após filtro: ${medicosFiltrados.length}`);
+            medicosMapeados = medicosFiltrados;
+          }
+
+          // Aplicar filtro local para CPF (busca exata)
+          if (filters?.cpf) {
+            const medicosFiltrados = medicosMapeados.filter((medico) => {
+              const medicoCPF = normalizeCPF(medico.cpf);
+              const buscaCPF = normalizeCPF(filters.cpf!);
+              return medicoCPF.includes(buscaCPF);
+            });
+            console.log(`🔍 Filtro local CPF aplicado: ${filters.cpf}`);
+            console.log(
+              `🔍 Médicos antes do filtro CPF: ${medicosMapeados.length}`
+            );
+            console.log(
+              `🔍 Médicos após filtro CPF: ${medicosFiltrados.length}`
+            );
+            medicosMapeados = medicosFiltrados;
+          }
+
+          // Aplicar filtro local para telefone (busca exata)
+          if (filters?.phone) {
+            const medicosFiltrados = medicosMapeados.filter((medico) => {
+              const medicoPhone = normalizePhone(medico.phone);
+              const buscaPhone = normalizePhone(filters.phone!);
+              return medicoPhone.includes(buscaPhone);
+            });
+            console.log(`🔍 Filtro local telefone aplicado: ${filters.phone}`);
+            console.log(
+              `🔍 Médicos antes do filtro telefone: ${medicosMapeados.length}`
+            );
+            console.log(
+              `🔍 Médicos após filtro telefone: ${medicosFiltrados.length}`
+            );
             medicosMapeados = medicosFiltrados;
           }
 
@@ -346,7 +402,10 @@ export default function MedicosPage() {
     } = {};
 
     // Adicionar apenas filtros que não estão vazios
-    if (filterCpf.trim()) filters.cpf = filterCpf.trim();
+    if (filterCpf.trim()) {
+      const normalizedCPF = normalizeCPF(filterCpf.trim());
+      filters.cpf = normalizedCPF;
+    }
     if (filterName.trim()) filters.name = filterName.trim();
     if (filterPhone.trim()) filters.phone = filterPhone.trim();
     if (filterDocumentDoctorType.trim()) {
@@ -481,15 +540,6 @@ export default function MedicosPage() {
                   Inativos
                 </div>
               </div>
-              <div className="bg-[#f7fafc] p-6 rounded-xl border border-[#e2e8f0] text-center flex flex-col items-center">
-                <div className="w-3 h-3 bg-orange-600 rounded-full mb-2"></div>
-                <div className="text-2xl font-bold text-gray-900 mb-1">
-                  {medicos.filter((m) => m.status === "pendente").length}
-                </div>
-                <div className="text-xs text-gray-600 uppercase tracking-wider">
-                  Pendentes
-                </div>
-              </div>
             </div>
           </div>
         )}
@@ -570,7 +620,6 @@ export default function MedicosPage() {
                   { value: "", label: "Todos os status" },
                   { value: "ativo", label: "Ativo" },
                   { value: "inativo", label: "Inativo" },
-                  { value: "pendente", label: "Pendente" },
                 ]}
               />
             </div>
@@ -632,6 +681,15 @@ export default function MedicosPage() {
                     </div>
                     <div className="text-xs text-gray-500">{medico.email}</div>
                   </div>
+                ),
+              },
+              {
+                key: "cpf",
+                header: "CPF", // ✅ Nova coluna CPF
+                render: (medico) => (
+                  <span className="text-sm text-gray-700">
+                    {formatCPF(medico.cpf)}
+                  </span>
                 ),
               },
               {
