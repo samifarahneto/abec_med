@@ -321,49 +321,53 @@ export default function CadastrarMedicoPage() {
         throw new Error("Cidade é obrigatória");
       }
 
-      // Mock de fluxo de cadastro: User -> Address -> Doctor
-      // Preparar payload no formato correto
+      // Preparar payload no formato correto da API
       const payload = {
-        address: {
-          street: address.street,
-          number: parseInt(address.number) || 0,
-          complement: address.complement || null,
-          neighborhood: address.neighborhood,
-          cityId: selectedCity?.id || null,
-          stateId: selectedState?.id || null,
-          zipCode: address.zip_code,
-        },
-        doctor: {
-          personal_information: {
-            name: medico.name,
-            cpf: parseInt(medico.cpf.replace(/\D/g, "")) || 0, // Remove caracteres não numéricos
-            email: medico.email,
-            documentDoctorType: medico.documentDoctorType,
-            documentDoctorNumber: medico.documentDoctorNumber,
-            documentDoctorUf: medico.documentDoctorUf,
-            phone: medico.phone || null,
-            observations: medico.observations || null,
-            status: medico.status,
-          },
-        },
-        user: {
-          email: medico.email,
-          password: userPassword,
-        },
+        email: medico.email,
+        password: userPassword,
+        street: address.street,
+        number: address.number,
+        complement: address.complement || "",
+        neighborhood: address.neighborhood,
+        cityId: selectedCity?.id || 0,
+        stateId: selectedState?.id || 0,
+        zipCode: address.zip_code,
+        name: medico.name,
+        cpf: medico.cpf,
+        documentDoctorType: medico.documentDoctorType,
+        documentDoctorNumber: medico.documentDoctorNumber,
+        documentDoctorUf: medico.documentDoctorUf,
+        phone: medico.phone || "",
+        observations: medico.observations || "",
+        companyId: 1, // Valor fixo conforme exemplo
+        status: medico.status,
       };
 
       console.log("Payload para cadastro:", payload);
-      // await fetch('/api/doctors', {
-      //   method: 'POST',
-      //   headers: { 'Content-Type': 'application/json' },
-      //   body: JSON.stringify(payload)
-      // });
 
-      // Simular delay
-      await new Promise((resolve) => setTimeout(resolve, 1500));
+      // Fazer a requisição POST para a API
+      const response = await fetch("/api/doctors", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(
+          errorData.message || `Erro ${response.status}: ${response.statusText}`
+        );
+      }
+
+      const result = await response.json();
+      console.log("Médico cadastrado com sucesso:", result);
 
       router.push("/admin/medicos");
     } catch (error: unknown) {
+      console.error("Erro ao cadastrar médico:", error);
       setError(
         error instanceof Error ? error.message : "Erro ao cadastrar médico"
       );
