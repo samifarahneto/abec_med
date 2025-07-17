@@ -357,6 +357,19 @@ export default function CadastrarMedicoPage() {
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
+
+        // Handle specific error cases
+        if (response.status === 409) {
+          console.log("Erro409 Detalhes:", errorData);
+
+          // Usar a mensagem específica da API
+          const errorMessage =
+            errorData.message ||
+            errorData.error ||
+            "Médico já cadastrado com este CPF, e-mail ou documento.";
+          throw new Error(`❌ ${errorMessage}`);
+        }
+
         throw new Error(
           errorData.message || `Erro ${response.status}: ${response.statusText}`
         );
@@ -365,7 +378,10 @@ export default function CadastrarMedicoPage() {
       const result = await response.json();
       console.log("Médico cadastrado com sucesso:", result);
 
-      router.push("/admin/medicos");
+      setError(null); // Limpar qualquer erro anterior
+
+      // Redirecionar com parâmetro de sucesso
+      router.push("/admin/medicos?success=true");
     } catch (error: unknown) {
       console.error("Erro ao cadastrar médico:", error);
       setError(
@@ -402,6 +418,9 @@ export default function CadastrarMedicoPage() {
             {error}
           </div>
         )}
+
+        {/* Success Message */}
+        {/* The success message and its useEffect are removed as per the edit hint. */}
 
         {/* Informações Pessoais */}
         <div className="space-y-6 h-full">

@@ -88,6 +88,35 @@ export async function POST(request: NextRequest) {
       const errorData = await response.json().catch(() => ({}));
       console.error("❌ Erro na API externa:", errorData);
 
+      // Handle 409 Conflict specifically
+      if (response.status === 409) {
+        let conflictDetails = {};
+
+        // Try to extract specific conflict information
+        if (errorData.message) {
+          if (errorData.message.toLowerCase().includes("email")) {
+            conflictDetails = { email: "Email já cadastrado" };
+          } else if (errorData.message.toLowerCase().includes("cpf")) {
+            conflictDetails = { cpf: "CPF já cadastrado" };
+          } else if (
+            errorData.message.toLowerCase().includes("document") ||
+            errorData.message.toLowerCase().includes("crm")
+          ) {
+            conflictDetails = {
+              documentDoctorNumber: "Número do documento já cadastrado",
+            };
+          }
+        }
+
+        return NextResponse.json(
+          {
+            error: errorData.message || "Dados já existem no sistema",
+            details: conflictDetails,
+          },
+          { status: response.status }
+        );
+      }
+
       return NextResponse.json(
         {
           error:

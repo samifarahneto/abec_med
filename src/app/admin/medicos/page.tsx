@@ -138,6 +138,7 @@ export default function MedicosPage() {
   const router = useRouter();
   const { user, isAuthenticated } = useAuthSession();
   const [medicos, setMedicos] = useState<Medico[]>([]);
+  const [success, setSuccess] = useState<string | null>(null);
 
   // Estados dos filtros
   const [filterCpf, setFilterCpf] = useState<string>("");
@@ -355,6 +356,36 @@ export default function MedicosPage() {
     }
   }, [isAuthenticated, fetchMedicos, currentPage]);
 
+  // Verificar parâmetro de sucesso na URL
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const successParam = urlParams.get("success");
+
+    if (successParam === "true") {
+      setSuccess("✅ Médico cadastrado com sucesso!");
+
+      // Limpar o parâmetro da URL sem recarregar a página
+      const newUrl = window.location.pathname;
+      window.history.replaceState({}, "", newUrl);
+
+      // Auto-hide após 10 segundos
+      const timer = setTimeout(() => {
+        setSuccess(null);
+      }, 10000);
+      return () => clearTimeout(timer);
+    }
+  }, []);
+
+  // Auto-hide para mensagens de sucesso
+  useEffect(() => {
+    if (success) {
+      const timer = setTimeout(() => {
+        setSuccess(null);
+      }, 10000);
+      return () => clearTimeout(timer);
+    }
+  }, [success]);
+
   const handleDelete = async (id: string) => {
     if (!confirm("Tem certeza que deseja excluir este médico?")) return;
 
@@ -486,6 +517,28 @@ export default function MedicosPage() {
   return (
     <MainLayout>
       <div className="space-y-6 bg-transparent min-h-screen p-2 md:p-6">
+        {/* Success Message at top of content */}
+        {success && (
+          <div className="fixed top-20 left-1/2 transform -translate-x-12 bg-white border border-green-200 text-green-700 px-6 rounded-lg shadow-lg flex items-center max-w-md py-4">
+            <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center mr-3">
+              <svg
+                className="w-4 h-4 text-white"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M5 13l4 4L19 7"
+                />
+              </svg>
+            </div>
+            <span className="font-medium">Médico cadastrado com sucesso!</span>
+          </div>
+        )}
+
         {/* Header Section */}
         <div className="bg-white p-6 rounded-xl shadow-sm border flex flex-col gap-1">
           <h1 className="text-2xl font-bold text-gray-900 mb-1">
