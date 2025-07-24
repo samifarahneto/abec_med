@@ -10,21 +10,26 @@ import { Table } from "@/components/ui/Table";
 import { Pagination } from "@/components/ui/Pagination";
 import ButtonComponent from "@/components/ui/Button";
 
-interface Acolhimento extends Record<string, unknown> {
+interface Acolhimento {
   id: string;
-  paciente_id: string;
-  paciente_nome: string;
-  paciente_cpf: string;
-  telefone: string;
-  medico_nome: string;
-  tipo_consulta: string;
-  hora_chegada: string;
-  hora_agendada: string;
-  prioridade: "baixa" | "media" | "alta" | "urgente";
+  name: string;
+  cpf: string;
+  dateOfBirth: string;
+  gender: string;
+  phone: string;
+  email: string;
+  observations: string;
+  companyId: number;
   status: "ACTIVE" | "INACTIVE";
-  permissoes: ("THC" | "CBD")[];
-  observacoes: string;
-  data_atendimento: string;
+  street: string;
+  number: string;
+  complement?: string;
+  neighborhood: string;
+  cityId: number;
+  stateId: number;
+  zipCode: string;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 // Função para criar badges de status seguindo o padrão das outras páginas
@@ -95,81 +100,54 @@ export default function AcolhimentoPage() {
   const fetchAtendimentos = async () => {
     try {
       setLoading(true);
-      // Simulando dados de acolhimento
-      const mockAtendimentos: Acolhimento[] = [
-        {
-          id: "1",
-          paciente_id: "PAC001",
-          paciente_nome: "Maria Silva Santos",
-          paciente_cpf: "123.456.789-00",
-          telefone: "(11) 99999-0001",
-          medico_nome: "Dr. João Carvalho",
-          tipo_consulta: "Consulta de Rotina",
-          hora_chegada: "08:15",
-          hora_agendada: "08:30",
-          prioridade: "media",
-          status: "ACTIVE",
-          permissoes: ["THC", "CBD"],
-          observacoes: "Primeira consulta, paciente nervosa",
-          data_atendimento: "2024-01-15",
-        },
-        {
-          id: "2",
-          paciente_id: "PAC002",
-          paciente_nome: "João Pedro Oliveira",
-          paciente_cpf: "987.654.321-00",
-          telefone: "(11) 99999-0002",
-          medico_nome: "Dra. Ana Santos",
-          tipo_consulta: "Retorno",
-          hora_chegada: "09:00",
-          hora_agendada: "09:00",
-          prioridade: "baixa",
-          status: "ACTIVE",
-          permissoes: ["CBD"],
-          observacoes: "Paciente pontual, retorno de hipertensão",
-          data_atendimento: "2024-01-15",
-        },
-        {
-          id: "3",
-          paciente_id: "PAC003",
-          paciente_nome: "Ana Carolina Ferreira",
-          paciente_cpf: "456.789.123-00",
-          telefone: "(11) 99999-0003",
-          medico_nome: "Dr. Carlos Silva",
-          tipo_consulta: "Consulta Especializada",
-          hora_chegada: "10:45",
-          hora_agendada: "11:00",
-          prioridade: "alta",
-          status: "ACTIVE",
-          permissoes: ["THC"],
-          observacoes: "Dor no peito, verificar sinais vitais",
-          data_atendimento: "2024-01-15",
-        },
-        {
-          id: "4",
-          paciente_id: "PAC004",
-          paciente_nome: "Roberto Lima Souza",
-          paciente_cpf: "789.123.456-00",
-          telefone: "(11) 99999-0004",
-          medico_nome: "Dra. Marina Costa",
-          tipo_consulta: "Emergência",
-          hora_chegada: "07:30",
-          hora_agendada: "08:00",
-          prioridade: "urgente",
-          status: "INACTIVE",
-          permissoes: ["THC", "CBD"],
-          observacoes: "Atendimento de urgência concluído",
-          data_atendimento: "2024-01-15",
-        },
-      ];
+      setError(null);
 
-      // Simular delay de API
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      setAtendimentos(mockAtendimentos);
-      setTotalItems(mockAtendimentos.length);
+      console.log("🔍 Buscando dados de acolhimento da API...");
+
+      const response = await fetch("/api/reception", {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(
+          errorData.message || `Erro ${response.status}: ${response.statusText}`
+        );
+      }
+
+      const result = await response.json();
+      console.log("✅ Dados recebidos da API:", result);
+
+      // Verificar se a resposta tem a estrutura esperada
+      let acolhimentos: Acolhimento[] = [];
+
+      if (result.success && result.data) {
+        acolhimentos = result.data;
+      } else if (Array.isArray(result)) {
+        acolhimentos = result;
+      } else {
+        console.warn("⚠️ Estrutura de resposta inesperada:", result);
+        acolhimentos = [];
+      }
+
+      setAtendimentos(acolhimentos);
+      setTotalItems(acolhimentos.length);
+
+      console.log(`✅ ${acolhimentos.length} acolhimentos carregados`);
     } catch (error) {
-      setError("Erro ao carregar dados de acolhimento");
-      console.error("Erro:", error);
+      console.error("❌ Erro ao carregar dados:", error);
+      setError(
+        error instanceof Error
+          ? error.message
+          : "Erro ao carregar dados de acolhimento"
+      );
+
+      // Em caso de erro, usar dados vazios
+      setAtendimentos([]);
+      setTotalItems(0);
     } finally {
       setLoading(false);
     }
@@ -182,13 +160,12 @@ export default function AcolhimentoPage() {
     const filtered = atendimentos.filter(
       (atendimento) =>
         (filterName === "" ||
-          String(atendimento.paciente_nome)
+          String(atendimento.name)
             .toLowerCase()
             .includes(filterName.toLowerCase())) &&
-        (filterCpf === "" ||
-          String(atendimento.paciente_cpf).includes(filterCpf)) &&
+        (filterCpf === "" || String(atendimento.cpf).includes(filterCpf)) &&
         (filterPhone === "" ||
-          String(atendimento.telefone).includes(filterPhone)) &&
+          String(atendimento.phone).includes(filterPhone)) &&
         (filterEmail === "" ||
           String(atendimento.email || "")
             .toLowerCase()
@@ -221,39 +198,40 @@ export default function AcolhimentoPage() {
     setTotalItems(atendimentos.length);
   };
 
-  // Fatiar atendimentos filtrados para exibir apenas 10 por página
-  const startIndex = (currentPage - 1) * 10;
-  const endIndex = startIndex + 10;
-  const atendimentosPaginados = filteredAtendimentos.slice(
-    startIndex,
-    endIndex
-  );
-
   const columns = [
     {
-      key: "paciente_nome" as keyof Acolhimento,
+      key: "name" as keyof Acolhimento,
       header: "Nome",
       render: (atendimento: Record<string, unknown>) => (
         <span className="text-gray-900 text-sm font-medium">
-          {(atendimento as Acolhimento).paciente_nome}
+          {(atendimento as unknown as Acolhimento).name}
         </span>
       ),
     },
     {
-      key: "paciente_cpf" as keyof Acolhimento,
+      key: "cpf" as keyof Acolhimento,
       header: "CPF",
       render: (atendimento: Record<string, unknown>) => (
         <span className="text-gray-900 text-sm font-medium">
-          {formatCPF((atendimento as Acolhimento).paciente_cpf)}
+          {formatCPF((atendimento as unknown as Acolhimento).cpf)}
         </span>
       ),
     },
     {
-      key: "telefone" as keyof Acolhimento,
+      key: "phone" as keyof Acolhimento,
       header: "Telefone",
       render: (atendimento: Record<string, unknown>) => (
         <span className="text-gray-900 text-sm font-medium">
-          {(atendimento as Acolhimento).telefone || "-"}
+          {(atendimento as unknown as Acolhimento).phone || "-"}
+        </span>
+      ),
+    },
+    {
+      key: "email" as keyof Acolhimento,
+      header: "Email",
+      render: (atendimento: Record<string, unknown>) => (
+        <span className="text-gray-900 text-sm font-medium">
+          {(atendimento as unknown as Acolhimento).email || "-"}
         </span>
       ),
     },
@@ -261,26 +239,13 @@ export default function AcolhimentoPage() {
       key: "status" as keyof Acolhimento,
       header: "Status",
       render: (atendimento: Record<string, unknown>) =>
-        getStatusBadge((atendimento as Acolhimento).status),
+        getStatusBadge((atendimento as unknown as Acolhimento).status),
     },
   ];
 
-  const handleEdit = (atendimento: Acolhimento) => {
-    // Aqui seria redirecionado para página de edição do agendamento
-    console.log("Editar agendamento:", atendimento);
-  };
-
-  const handleDelete = async (id: string) => {
-    if (!confirm("Tem certeza que deseja excluir este agendamento?")) return;
-
-    try {
-      // Aqui seria a chamada para a API real
-      setAtendimentos(atendimentos.filter((a) => a.id !== id));
-      setTotalItems((prev) => prev - 1);
-    } catch (error) {
-      setError("Erro ao excluir agendamento");
-      console.error("Erro:", error);
-    }
+  const handleEdit = (atendimento: Record<string, unknown>) => {
+    // Aqui seria redirecionado para página de edição do acolhimento
+    console.log("Editar acolhimento:", atendimento as unknown as Acolhimento);
   };
 
   // Função para mudar de página
@@ -295,17 +260,31 @@ export default function AcolhimentoPage() {
       label: "Editar",
       icon: <FaEdit className="w-4 h-4" />,
       onClick: (atendimento: Record<string, unknown>) =>
-        handleEdit(atendimento as Acolhimento),
+        handleEdit(atendimento),
       variant: "primary" as const,
     },
     {
       label: "Excluir",
       icon: <FaTrash className="w-4 h-4" />,
-      onClick: (atendimento: Record<string, unknown>) =>
-        handleDelete((atendimento as Acolhimento).id),
+      onClick: (atendimento: Record<string, unknown>) => {
+        // Funcionalidade de delete será implementada posteriormente
+        console.log(
+          "Delete acolhimento:",
+          atendimento as unknown as Acolhimento
+        );
+        alert("Funcionalidade de exclusão será implementada em breve");
+      },
       variant: "danger" as const,
     },
   ];
+
+  // Fatiar atendimentos filtrados para exibir apenas 10 por página
+  const startIndex = (currentPage - 1) * 10;
+  const endIndex = startIndex + 10;
+  const atendimentosPaginados = filteredAtendimentos.slice(
+    startIndex,
+    endIndex
+  ) as unknown as Record<string, unknown>[];
 
   return (
     <MainLayout>

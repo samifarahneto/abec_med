@@ -31,7 +31,7 @@ interface Acolhimento {
   email: string;
   phone: string;
   observations: string;
-  cargo: string;
+  status: "ACTIVE" | "INACTIVE";
   address_id: string;
   companies_id: string;
 }
@@ -61,7 +61,7 @@ export default function CadastrarAcolhimentoPage() {
     email: "",
     phone: "",
     observations: "",
-    cargo: "Atendente",
+    status: "ACTIVE",
     address_id: "",
     companies_id: "",
   });
@@ -106,6 +106,53 @@ export default function CadastrarAcolhimentoPage() {
 
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // Funções para formatação
+  const formatCPF = (value: string) => {
+    const cpf = value.replace(/\D/g, "");
+    return cpf.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, "$1.$2.$3-$4");
+  };
+
+  const formatPhone = (value: string) => {
+    const phone = value.replace(/\D/g, "");
+    if (phone.length === 11) {
+      return phone.replace(/(\d{2})(\d{5})(\d{4})/, "($1) $2-$3");
+    } else if (phone.length === 10) {
+      return phone.replace(/(\d{2})(\d{4})(\d{4})/, "($1) $2-$3");
+    }
+    return phone;
+  };
+
+  // Função para validar CPF
+  const validateCPF = (cpf: string) => {
+    const cpfLimpo = cpf.replace(/\D/g, "");
+
+    if (cpfLimpo.length !== 11) return false;
+
+    // Verificar se todos os dígitos são iguais
+    if (/^(\d)\1{10}$/.test(cpfLimpo)) return false;
+
+    // Validar primeiro dígito verificador
+    let soma = 0;
+    for (let i = 0; i < 9; i++) {
+      soma += parseInt(cpfLimpo.charAt(i)) * (10 - i);
+    }
+    let resto = 11 - (soma % 11);
+    const digito1 = resto < 2 ? 0 : resto;
+
+    // Validar segundo dígito verificador
+    soma = 0;
+    for (let i = 0; i < 10; i++) {
+      soma += parseInt(cpfLimpo.charAt(i)) * (11 - i);
+    }
+    resto = 11 - (soma % 11);
+    const digito2 = resto < 2 ? 0 : resto;
+
+    return (
+      parseInt(cpfLimpo.charAt(9)) === digito1 &&
+      parseInt(cpfLimpo.charAt(10)) === digito2
+    );
+  };
 
   // Efeito para buscar cidades quando estado é selecionado
   useEffect(() => {
@@ -297,18 +344,62 @@ export default function CadastrarAcolhimentoPage() {
       if (!acolhimento.cpf.trim()) {
         throw new Error("CPF é obrigatório");
       }
+
+      // Validar formato do CPF
+      const cpfLimpo = acolhimento.cpf.replace(/\D/g, "");
+      if (cpfLimpo.length !== 11) {
+        throw new Error("CPF deve ter 11 dígitos");
+      }
+
+      if (!validateCPF(acolhimento.cpf)) {
+        throw new Error("CPF inválido");
+      }
+
       if (!acolhimento.date_of_birth) {
         throw new Error("Data de nascimento é obrigatória");
       }
+
+      // Validar idade mínima (18 anos)
+      const dataNascimento = new Date(acolhimento.date_of_birth);
+      const hoje = new Date();
+      let idade = hoje.getFullYear() - dataNascimento.getFullYear();
+      const mesAtual = hoje.getMonth();
+      const mesNascimento = dataNascimento.getMonth();
+
+      if (
+        mesAtual < mesNascimento ||
+        (mesAtual === mesNascimento &&
+          hoje.getDate() < dataNascimento.getDate())
+      ) {
+        idade--;
+      }
+
+      if (idade < 18) {
+        throw new Error("A pessoa deve ter pelo menos 18 anos");
+      }
+
       if (!acolhimento.email.trim()) {
         throw new Error("Email é obrigatório");
       }
+
+      // Validar formato do email
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(acolhimento.email.trim())) {
+        throw new Error("Formato de email inválido");
+      }
+
       if (!userPassword) {
         throw new Error("Senha é obrigatória");
       }
+
+      if (userPassword.length < 6) {
+        throw new Error("Senha deve ter pelo menos 6 caracteres");
+      }
+
       if (userPassword !== userPasswordConfirm) {
         throw new Error("As senhas não coincidem");
       }
+
       if (!selectedState) {
         throw new Error("Estado é obrigatório");
       }
@@ -316,23 +407,81 @@ export default function CadastrarAcolhimentoPage() {
         throw new Error("Cidade é obrigatória");
       }
 
-      // Mock de salvamento - substituir por chamada real da API
-      console.log("Cadastrando acolhimento:", {
-        acolhimento,
-        address: {
-          ...address,
-          stateId: selectedState.id,
-          cityId: selectedCity.id,
+      if (!acolhimento.gender) {
+        throw new Error("Gênero é obrigatório");
+      }
+
+      // Preparar payload seguindo o modelo fornecido
+      const payload = {
+        name: acolhimento.name.trim(),
+        cpf: cpfLimpo, // CPF já limpo
+        dateOfBirth: acolhimento.date_of_birth,
+        gender: acolhimento.gender.toUpperCase(),
+        phone: acolhimento.phone.trim(),
+        observations: acolhimento.observations.trim(),
+        companyId: 1, // Valor padrão conforme payload
+        status: acolhimento.status, // Status já está no formato correto
+        street: address.street.trim(),
+        number: address.number.trim(),
+        complement: address.complement?.trim() || "",
+        neighborhood: address.neighborhood.trim(),
+        cityId: selectedCity.id,
+        stateId: selectedState.id,
+        zipCode: address.zip_code.replace(/\D/g, ""), // Remove caracteres não numéricos
+        email: acolhimento.email.trim(),
+        password: userPassword,
+      };
+
+      console.log("📤 Enviando payload para API:", payload);
+
+      // Fazer requisição para a API
+      const response = await fetch("/api/reception", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
         },
-        userPassword,
+        body: JSON.stringify(payload),
       });
 
-      // Simular delay
-      await new Promise((resolve) => setTimeout(resolve, 1500));
+      const result = await response.json();
+
+      if (!response.ok) {
+        console.error("❌ Erro na API:", result);
+
+        // Tratar erros específicos
+        if (response.status === 409) {
+          if (result.details?.email) {
+            throw new Error("Email já cadastrado no sistema");
+          } else if (result.details?.cpf) {
+            throw new Error("CPF já cadastrado no sistema");
+          } else {
+            throw new Error(result.error || "Dados já existem no sistema");
+          }
+        } else if (response.status === 400) {
+          throw new Error(result.error || "Dados inválidos");
+        } else if (response.status === 401) {
+          throw new Error("Não autorizado. Verifique suas credenciais.");
+        } else if (response.status === 403) {
+          throw new Error("Acesso negado. Verifique suas permissões.");
+        } else {
+          throw new Error(
+            result.error ||
+              `Erro ${response.status}: ${
+                result.message || "Erro desconhecido"
+              }`
+          );
+        }
+      }
+
+      console.log("✅ Acolhimento cadastrado com sucesso:", result);
+
+      // Mostrar mensagem de sucesso
+      alert("Acolhimento cadastrado com sucesso!");
 
       // Redirect back to acolhimento list
       router.push("/admin/acolhimento");
     } catch (error: unknown) {
+      console.error("❌ Erro ao cadastrar acolhimento:", error);
       setError(
         error instanceof Error ? error.message : "Erro ao cadastrar acolhimento"
       );
@@ -390,7 +539,9 @@ export default function CadastrarAcolhimentoPage() {
                   label="CPF"
                   type="text"
                   value={acolhimento.cpf}
-                  onChange={(e) => handleChange("cpf", e.target.value)}
+                  onChange={(e) =>
+                    handleChange("cpf", formatCPF(e.target.value))
+                  }
                   placeholder="000.000.000-00"
                   required
                 />
@@ -420,7 +571,9 @@ export default function CadastrarAcolhimentoPage() {
                   label="Telefone"
                   type="tel"
                   value={acolhimento.phone}
-                  onChange={(e) => handleChange("phone", e.target.value)}
+                  onChange={(e) =>
+                    handleChange("phone", formatPhone(e.target.value))
+                  }
                   placeholder="(00) 00000-0000"
                   autoComplete="tel"
                   name="phone"
@@ -438,14 +591,18 @@ export default function CadastrarAcolhimentoPage() {
                   ]}
                 />
                 <FormSelect
-                  label="Cargo"
-                  value={acolhimento.cargo}
-                  onChange={(e) => handleChange("cargo", e.target.value)}
+                  label="Status"
+                  value={acolhimento.status}
+                  onChange={(e) =>
+                    handleChange(
+                      "status",
+                      e.target.value as "ACTIVE" | "INACTIVE"
+                    )
+                  }
                   required
                   options={[
-                    { value: "Atendente", label: "Atendente" },
-                    { value: "Administrativo", label: "Administrativo" },
-                    { value: "Logistica", label: "Logística" },
+                    { value: "ACTIVE", label: "Ativo" },
+                    { value: "INACTIVE", label: "Inativo" },
                   ]}
                 />
               </div>
